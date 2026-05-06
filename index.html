@@ -5,173 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayBase | Game Lobby</title>
     <style>
-        body {
-            background-color: #05080a;
-            color: #e6edf3;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        /* Nagłówek Lobby */
-        .lobby-header {
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071');
-            background-size: cover;
-            height: 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 4px solid #00d4ff;
-            text-align: center;
-        }
-
-        .lobby-header h1 {
-            font-size: 4rem;
-            margin: 0;
-            color: #00d4ff;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
-            letter-spacing: 5px;
-        }
-
-        /* Kontener na gry */
-        .lobby-container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            border-bottom: 2px solid #30363d;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            color: #8b949e;
-        }
-
-        /* Karta gry w Lobby */
-        .game-entry {
-            background: #161b22;
-            border-radius: 20px;
-            border: 1px solid #30363d;
-            margin-bottom: 50px;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-
-        .game-entry:hover {
-            border-color: #00d4ff;
-            box-shadow: 0 0 40px rgba(0, 212, 255, 0.1);
-        }
-
-        .game-banner {
-            height: 120px;
-            background: #0d1117;
-            display: flex;
-            align-items: center;
-            padding: 0 40px;
-            border-bottom: 1px solid #30363d;
-        }
-
-        .game-banner h2 {
-            font-size: 2.2rem;
-            color: #ffffff;
-            margin: 0;
-        }
-
-        .game-details {
-            padding: 40px;
-        }
-
-        .long-description {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #acbac7;
-            text-align: justify;
-        }
-
-        .stats-bar {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            color: #00d4ff;
-            font-weight: bold;
-        }
-
-        .btn-launch {
-            background: #00d4ff;
-            color: #000;
-            padding: 18px 50px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            text-decoration: none;
+        body { background-color: #05080a; color: #e6edf3; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        .lobby-header { background: #000; padding: 30px; text-align: center; border-bottom: 4px solid #00d4ff; }
+        .lobby-header h1 { font-size: 3rem; margin: 0; color: #00d4ff; text-shadow: 0 0 20px #00d4ff; }
+        .lobby-container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        
+        /* Styl okna gry */
+        #game-canvas {
+            background: #111;
+            border: 3px solid #00d4ff;
+            display: block;
+            margin: 20px auto;
+            cursor: crosshair;
             border-radius: 10px;
-            display: inline-block;
-            transition: 0.3s;
-            margin-top: 20px;
         }
-
-        .btn-launch:hover {
-            background: #fff;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px;
-            color: #484f58;
-            font-size: 0.8rem;
-        }
+        .game-ui { text-align: center; margin-bottom: 20px; color: #00d4ff; font-weight: bold; }
+        
+        .game-entry { background: #161b22; border-radius: 20px; border: 1px solid #30363d; margin-bottom: 50px; overflow: hidden; }
+        .game-details { padding: 30px; }
+        .controls-hint { background: #0d1117; padding: 10px; border-radius: 5px; color: #8b949e; margin-bottom: 10px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="lobby-header">
         <h1>GAME LOBBY</h1>
-        <p>Wybierz serwer i dołącz do rozgrywki</p>
     </div>
 
     <div class="lobby-container">
-        <div class="section-title">DOSTĘPNE TYTUŁY</div>
-
         <div class="game-entry">
-            <div class="game-banner" style="border-left: 10px solid #00d4ff;">
-                <h2>Shadow Protocol: Zero Hour</h2>
+            <div style="background: #00d4ff; color: #000; padding: 15px; font-weight: bold; font-size: 1.5rem;">
+                STREFA BOJOWA: SHOOTER 2D (WASD + MYSZKA)
             </div>
+            
             <div class="game-details">
-                <div class="stats-bar">
-                    <span>STATUS: ONLINE</span> | <span>GRACZY: 1,429</span> | <span>REGION: EU-WEST</span>
+                <div class="controls-hint">STEROWANIE: <b>W, A, S, D</b> - Chodzenie | <b>MYSZKA</b> - Strzelanie | Cel: Pokonaj czerwone boty!</div>
+                <div class="game-ui" id="ui">KILLE: 0 | ZDROWIE: 100%</div>
+                
+                <canvas id="game-canvas" width="800" height="400"></canvas>
+                
+                <div style="color: #8b949e; line-height: 1.6; margin-top: 20px;">
+                    <h3>Opis Misji: Shadow Protocol Strike</h3>
+                    <p>Zostałeś wysłany do sektora zero, aby wyeliminować zbuntowane jednostki treningowe. Wykorzystaj swoją zwinność i refleks. Pamiętaj: boty pojawiają się falami i stają się coraz agresywniejsze. To jest Twoje szkolenie bojowe w PlayBase Lobby.</p>
                 </div>
-                <div class="long-description">
-                    <p>Wkrocz do mrocznego świata Neo-Veridii, gdzie technologia spotyka się z magią ulicy. W <strong>Shadow Protocol</strong> wcielasz się w hakera potrafiącego przejąć kontrolę nad każdym aspektem miasta. Gra oferuje gigantyczny otwarty świat, w którym każdy Twój ruch jest śledzony przez potężne korporacje. Czy zdołasz wykraść dane, które zmienią losy ludzkości, czy zginiesz jako kolejny bezimienny cień w neonowej dżungli? System walki pozwala na używanie modyfikacji ciała, dronów oraz broni palnej najnowszej generacji. Każda misja może zostać rozwiązana na dziesiątki sposobów – od cichego skradania po totalną demolkę.</p>
-                </div>
-                <a href="#" class="btn-launch">DOŁĄCZ DO LOBBY</a>
             </div>
         </div>
-
-        <div class="game-entry">
-            <div class="game-banner" style="border-left: 10px solid #ff4500;">
-                <h2 style="color: #ff4500;">Inferno: Red Planet</h2>
-            </div>
-            <div class="game-details">
-                <div class="stats-bar" style="color: #ff4500;">
-                    <span>STATUS: RESTART SERWERA</span> | <span>GRACZY: 0</span> | <span>REGION: MARS-01</span>
-                </div>
-                <div class="long-description">
-                    <p>Ludzkość skolonizowała Marsa, ale coś poszło bardzo nie tak. W <strong>Inferno: Red Planet</strong> musisz przetrwać w ekstremalnych warunkach, walcząc nie tylko z brakiem tlenu i burzami piaskowymi, ale także z tajemniczą formą życia, która obudziła się pod powierzchnią planety. To survival horror najwyższej klasy, gdzie każda kropla wody jest na wagę złota, a Twój skafander to jedyna rzecz, która dzieli Cię od pewnej śmierci. Buduj bazy, zbieraj surowce i odkrywaj mroczne sekrety opuszczonych placówek badawczych. Czy uda Ci się wysłać sygnał ratunkowy na Ziemię, zanim zapadnie wieczna noc?</p>
-                </div>
-                <a href="#" class="btn-launch" style="background: #ff4500;">URUCHOM SERWER</a>
-            </div>
-        </div>
-
     </div>
 
-    <footer>
-        PlayBase v1.2 | Created by Kapecki
-    </footer>
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const ui = document.getElementById('ui');
 
+        let player = { x: 400, y: 200, size: 20, speed: 4, health: 100, kills: 0 };
+        let bullets = [];
+        let enemies = [];
+        let keys = {};
+
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+        canvas.addEventListener('mousedown', shoot);
+
+        function shoot(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const angle = Math.atan2(mouseY - player.y, mouseX - player.x);
+            bullets.push({ x: player.x, y: player.y, vx: Math.cos(angle) * 7, vy: Math.sin(angle) * 7 });
+        }
+
+        function spawnEnemy() {
+            if (enemies.length < 5) {
+                enemies.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: 20, speed: 1.5 });
+            }
+        }
+        setInterval(spawnEnemy, 2000);
+
+        function update() {
+            // Ruch gracza
+            if (keys['KeyW'] && player.y > 0) player.y -= player.speed;
+            if (keys['KeyS'] && player.y < canvas.height) player.y += player.speed;
+            if (keys['KeyA'] && player.x > 0) player.x -= player.speed;
+            if (keys['KeyD'] && player.x < canvas.width) player.x += player.speed;
+
+            // Pociski
+            bullets.forEach((b, bi) => {
+                b.x += b.vx; b.y += b.vy;
+                if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) bullets.splice(bi, 1);
+            });
+
+            // Boty
+            enemies.forEach((en, ei) => {
+                const angle = Math.atan2(player.y - en.y, player.x - en.x);
+                en.x += Math.cos(angle) * en.speed;
+                en.y += Math.sin(angle) * en.speed;
+
+                // Kolizja bot-gracz
+                const dist = Math.hypot(player.x - en.x, player.y - en.y);
+                if (dist < 20) {
+                    player.health -= 0.5;
+                    if (player.health <= 0) { alert('GAME OVER! Kille: ' + player.kills); location.reload(); }
+                }
+
+                // Kolizja pocisk-bot
+                bullets.forEach((b, bi) => {
+                    const bDist = Math.hypot(b.x - en.x, b.y - en.y);
+                    if (bDist < 20) {
+                        enemies.splice(ei, 1);
+                        bullets.splice(bi, 1);
+                        player.kills++;
+                    }
+                });
+            });
+
+            ui.innerHTML = `KILLE: ${player.kills} | ZDROWIE: ${Math.ceil(player.health)}%`;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Gracz (Niebieski)
+            ctx.fillStyle = '#00d4ff';
+            ctx.beginPath(); ctx.arc(player.x, player.y, player.size, 0, Math.PI*2); ctx.fill();
+
+            // Pociski
+            ctx.fillStyle = '#fff';
+            bullets.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, 5, 0, Math.PI*2); ctx.fill(); });
+
+            // Boty (Czerwone)
+            ctx.fillStyle = '#ff4500';
+            enemies.forEach(en => { ctx.beginPath(); ctx.arc(en.x, en.y, en.size, 0, Math.PI*2); ctx.fill(); });
+
+            requestAnimationFrame(() => { update(); draw(); });
+        }
+        draw();
+    </script>
 </body>
 </html>
