@@ -2,328 +2,341 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>PlayBase | Tic-Tac-Toe Pro</title>
+    <title>PlayBase | Tic-Tac-Toe & UNO</title>
     <style>
         :root {
             --primary: #00d4ff; --secondary: #ffcc00; --danger: #ff4d4d;
-            --bg: #0b0e14; --card: #161b22; --accent: #8e44ad;
+            --bg: #0b0e14; --card: #161b22; --uno-red: #ff5555; --uno-blue: #5555ff; --uno-green: #55aa55; --uno-yellow: #ffaa00;
         }
 
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; overflow: hidden; }
 
-        /* --- PASEK GÓRNY --- */
-        #top-bar {
-            position: fixed; top: 0; right: 0; padding: 25px; display: flex; align-items: center; gap: 15px; z-index: 1000;
-        }
-        .user-pill { 
-            background: rgba(0, 212, 255, 0.1); border: 2px solid var(--primary); 
-            padding: 10px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
-        }
-        .settings-icon { font-size: 28px; cursor: pointer; transition: 0.4s; display: inline-block; }
+        /* --- UI GÓRNE --- */
+        #top-bar { position: fixed; top: 0; right: 0; padding: 20px; display: flex; align-items: center; gap: 15px; z-index: 1000; }
+        .user-pill { background: rgba(0, 212, 255, 0.1); border: 2px solid var(--primary); padding: 8px 20px; border-radius: 50px; display: flex; align-items: center; gap: 12px; }
+        .settings-icon { cursor: pointer; transition: 0.3s; font-size: 24px; }
         .settings-icon:hover { transform: rotate(90deg); color: var(--secondary); }
 
-        /* --- OKNO USTAWIEŃ (MODAL) --- */
-        #settings-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);
-        }
-        .settings-card { 
-            background: var(--card); padding: 40px; border-radius: 35px; border: 3px solid var(--primary); 
-            width: 380px; text-align: center; box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
-        }
-        .settings-card h2 { margin-top: 0; color: var(--primary); }
-        .settings-card input { 
-            width: 90%; padding: 15px; margin: 20px 0; border-radius: 12px; border: 2px solid #333; 
-            background: #0b0e14; color: white; font-family: inherit; text-align: center; font-size: 18px;
-        }
-        .settings-card input:focus { border-color: var(--primary); outline: none; }
-        
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 0; padding: 0 10px; }
-        
-        /* --- KAFLE GŁÓWNE --- */
+        /* --- MODAL USTAWIEŃ --- */
+        #settings-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .settings-card { background: var(--card); padding: 30px; border-radius: 30px; border: 3px solid var(--primary); width: 320px; text-align: center; }
+        .settings-card input { width: 80%; padding: 10px; margin: 15px 0; border-radius: 10px; border: none; text-align: center; font-family: inherit; }
+
+        /* --- HUB GŁÓWNY --- */
         #home-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .hub-grid { display: flex; gap: 40px; }
-        .hub-btn { 
-            width: 350px; background: var(--card); border: 4px solid #333; border-radius: 45px; 
-            padding: 50px; text-align: center; cursor: pointer; transition: 0.4s;
-        }
-        .hub-btn:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,212,255,0.2); }
-        .hub-btn.locked { border-style: dashed; opacity: 0.4; cursor: default; }
+        .hub-grid { display: flex; gap: 30px; }
+        .hub-btn { width: 300px; background: var(--card); border: 4px solid #333; border-radius: 40px; padding: 40px; text-align: center; cursor: pointer; transition: 0.4s; }
+        .hub-btn:hover { border-color: var(--primary); transform: translateY(-10px); }
 
-        /* --- RANKING I GRY --- */
-        #game-lobby {
-            display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500;
-            flex-direction: column; align-items: center; padding-top: 100px; overflow-y: auto;
-        }
-        .leaderboard {
-            width: 90%; max-width: 550px; background: rgba(255,255,255,0.03); border: 3px solid var(--secondary);
-            border-radius: 30px; padding: 25px; margin-bottom: 40px;
-        }
-        .rank-entry { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #222; font-size: 20px; }
-        .rank-entry.highlight { color: var(--secondary); background: rgba(255,204,0,0.1); border-radius: 12px; border-bottom: none; }
+        /* --- UNO ARENA --- */
+        #uno-arena { display: none; position: fixed; inset: 0; background: radial-gradient(circle, #2c3e50, #000); z-index: 800; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px; }
+        .uno-card { width: 80px; height: 120px; border-radius: 10px; border: 3px solid white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; cursor: pointer; transition: 0.2s; position: relative; user-select: none; }
+        .uno-card:hover { transform: translateY(-20px); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .uno-card.red { background: var(--uno-red); }
+        .uno-card.blue { background: var(--uno-blue); }
+        .uno-card.green { background: var(--uno-green); }
+        .uno-card.yellow { background: var(--uno-yellow); }
+        .uno-card.black { background: #333; }
 
-        /* --- PLANSZA --- */
-        #game-arena { display: none; position: fixed; inset: 0; background: #000; z-index: 600; flex-direction: column; align-items: center; justify-content: center; }
-        .board { display: grid; gap: 12px; background: var(--primary); padding: 12px; border-radius: 20px; }
-        .board.s9 { grid-template-columns: repeat(3, 130px); }
-        .board.s18 { grid-template-columns: repeat(6, 100px); }
-        .cell { background: var(--bg); display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 12px; font-size: 60px; transition: 0.2s; }
-        .board.s9 .cell { width: 130px; height: 130px; }
-        .board.s18 .cell { width: 100px; height: 100px; font-size: 50px; }
-        .cell.x { color: var(--danger); } .cell.o { color: var(--primary); }
+        #opponent-hand { display: flex; gap: -20px; height: 120px; }
+        #player-hand { display: flex; gap: 10px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 20px; max-width: 90vw; overflow-x: auto; }
+        #center-pile { display: flex; gap: 40px; align-items: center; }
+        .deck-pile { width: 80px; height: 120px; background: linear-gradient(45deg, #444, #111); border: 3px solid #666; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        .btn { padding: 15px 40px; border-radius: 15px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 16px; transition: 0.3s; }
-        .btn:hover { filter: brightness(1.2); transform: scale(1.05); }
-
-        .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px; }
-        .lvl-box { width: 75px; height: 75px; border-radius: 18px; border: 3px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; }
-        .lvl-box.off { opacity: 0.15; cursor: not-allowed; }
+        /* --- TIC-TAC-TOE (Lobby i Arena) --- */
+        #ttt-lobby, #ttt-arena { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500; flex-direction: column; align-items: center; padding-top: 60px; }
+        .board { display: grid; gap: 10px; background: var(--primary); padding: 10px; border-radius: 15px; }
+        .board.s9 { grid-template-columns: repeat(3, 120px); }
+        .board.s18 { grid-template-columns: repeat(6, 90px); }
+        .cell { width: 100%; height: 100%; min-height: 90px; background: var(--bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; }
+        
+        .btn { padding: 12px 25px; border-radius: 12px; border: none; cursor: pointer; font-family: inherit; font-weight: bold; transition: 0.3s; }
+        .lvl-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+        .lvl-box { width: 50px; height: 50px; border-radius: 10px; border: 2px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .lvl-box.locked { opacity: 0.2; }
     </style>
 </head>
 <body>
 
-    <audio id="audio-player" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bg-music" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg"></audio>
 
     <div id="top-bar">
         <div class="user-pill">
-            <span id="player-name-tag">Wczytywanie...</span>
-            <span class="settings-icon" onclick="openSettings()">⚙️</span>
+            <span id="nick-tag">Gracz</span>
+            <span class="settings-icon" onclick="toggleSets()">⚙️</span>
         </div>
     </div>
 
     <div id="settings-overlay">
         <div class="settings-card">
-            <h2>USTAWIENIA PROFILU</h2>
-            <p style="color: #888;">Zmień nazwę gracza:</p>
-            <input type="text" id="name-input" maxlength="15">
-            
-            <div class="toggle-row">
-                <span>Muzyka w tle:</span>
-                <button id="music-btn" class="btn" style="background: var(--danger);" onclick="toggleMusic()">WYŁĄCZONA</button>
+            <h2>USTAWIENIA</h2>
+            <input type="text" id="nick-in" maxlength="12">
+            <div style="margin: 15px 0;">
+                Muzyka: <button id="m-btn" class="btn" style="background: var(--danger);" onclick="switchMusic()">OFF</button>
             </div>
-            
-            <button class="btn" style="background: var(--primary); width: 100%; margin-top: 10px;" onclick="closeSettings()">ZAPISZ I WRÓĆ</button>
+            <button class="btn" style="background: var(--primary); width: 100%;" onclick="saveSets()">ZAPISZ</button>
         </div>
     </div>
 
     <div id="home-screen">
-        <h1 style="font-size: 80px; color: var(--primary); text-shadow: 0 0 30px rgba(0,212,255,0.3); margin-bottom: 50px;">PlayBase</h1>
+        <h1 style="font-size: 60px; color: var(--primary);">PlayBase</h1>
         <div class="hub-grid">
-            <div class="hub-btn" onclick="goToLobby()">
-                <div style="font-size: 80px; margin-bottom: 20px;">🏆</div>
+            <div class="hub-btn" onclick="openTTT()">
+                <div style="font-size: 50px;">❌⭕</div>
                 <h2>KÓŁKO I KRZYŻYK</h2>
-                <p>20 poziomów. Plansze 3x3 i 6x3. Ranking Live.</p>
+                <p>Ranking i Poziomy</p>
             </div>
-            <div class="hub-btn locked">
-                <div style="font-size: 80px; margin-bottom: 20px;">❓</div>
-                <h2>WKRÓTCE ????</h2>
-                <p>Nowa gra wkrótce zostanie odblokowana.</p>
+            <div class="hub-btn" onclick="openUno()">
+                <div style="font-size: 50px;">🃏</div>
+                <h2>UNO PLAYBASE</h2>
+                <p>Szybka gra w karty!</p>
             </div>
         </div>
     </div>
 
-    <div id="game-lobby">
-        <div class="leaderboard">
-            <h2 style="text-align: center; color: var(--secondary); margin-top: 0;">RANKING GLOBALNY</h2>
-            <div id="rank-content"></div>
+    <div id="uno-arena">
+        <div id="opponent-hand"></div>
+        
+        <div id="center-pile">
+            <div class="deck-pile" onclick="playerDrawCard()">
+                <div style="font-size: 30px;">🎴</div>
+            </div>
+            <div id="discard-pile"></div>
         </div>
 
-        <h3 style="color: var(--primary)">ETAPY KLASYCZNE (3x3)</h3>
-        <div class="level-grid" id="grid3x3"></div>
+        <div id="uno-status" style="font-size: 24px; color: var(--secondary);">TWOJA KOLEJ</div>
 
-        <h3 style="color: var(--accent)">WIELKA ARENA (6x3)</h3>
-        <div class="level-grid" id="grid6x3"></div>
-
-        <button class="btn" onclick="location.reload()" style="background: #333; color: white; margin-bottom: 50px;">POWRÓT DO MENU</button>
+        <div id="player-hand"></div>
+        
+        <button class="btn" onclick="location.reload()" style="background: var(--danger); color: white;">WYJDŹ</button>
     </div>
 
-    <div id="game-arena">
-        <div id="game-status" style="font-size: 40px; color: var(--secondary); margin-bottom: 30px;">TWOJA KOLEJ</div>
-        <div id="game-board" class="board"></div>
-        <button class="btn" onclick="backToLobby()" style="background: var(--danger); color: white; margin-top: 40px;">PODDAJ SIĘ</button>
+    <div id="ttt-lobby">
+        <div id="ttt-rank" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; width: 300px; margin-bottom: 20px; border: 2px solid var(--secondary);"></div>
+        <h3>POZIOMY (3x3 / 6x3)</h3>
+        <div class="lvl-grid" id="ttt-lvls"></div>
+        <button class="btn" onclick="location.reload()" style="background: #444; color: white;">POWRÓT</button>
+    </div>
+
+    <div id="ttt-arena">
+        <div id="ttt-status" style="font-size: 30px; margin-bottom: 20px;">X ZACZYNA</div>
+        <div id="ttt-board" class="board"></div>
+        <button class="btn" onclick="openTTT()" style="background: var(--danger); color: white; margin-top: 20px;">WYJDŹ</button>
     </div>
 
     <script>
-        // --- SYSTEM ZAPISU I PROFILU ---
-        const randomNames = ["SzybkiWilk", "CyberGracz", "MistrzX", "TurboO", "Gamer2026"];
-        let playerName = localStorage.getItem('pb_name') || randomNames[Math.floor(Math.random()*randomNames.length)] + "_" + Math.floor(Math.random()*99);
-        let playerWins = parseInt(localStorage.getItem('pb_wins')) || 0;
-        let unlockedLvl = parseInt(localStorage.getItem('pb_unlocked')) || 1;
-        let musicActive = false;
+        let nick = localStorage.getItem('pb_n') || "Gracz_" + Math.floor(Math.random()*999);
+        let tttWins = parseInt(localStorage.getItem('pb_tw')) || 0;
+        let tttLvl = parseInt(localStorage.getItem('pb_tl')) || 1;
+        let music = false;
 
         function init() {
-            document.getElementById('player-name-tag').innerText = playerName;
-            document.getElementById('name-input').value = playerName;
+            document.getElementById('nick-tag').innerText = nick;
+            document.getElementById('nick-in').value = nick;
         }
 
-        function openSettings() { document.getElementById('settings-overlay').style.display = 'flex'; }
-
-        function closeSettings() {
-            const newName = document.getElementById('name-input').value.trim();
-            if(newName) {
-                playerName = newName;
-                localStorage.setItem('pb_name', playerName);
-                document.getElementById('player-name-tag').innerText = playerName;
-            }
-            document.getElementById('settings-overlay').style.display = 'none';
-            if(document.getElementById('game-lobby').style.display === 'flex') refreshLeaderboard();
+        function toggleSets() { 
+            const s = document.getElementById('settings-overlay');
+            s.style.display = s.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function toggleMusic() {
-            const player = document.getElementById('audio-player');
-            const btn = document.getElementById('music-btn');
-            if(!musicActive) {
-                player.play();
-                btn.innerText = "WŁĄCZONA";
-                btn.style.background = "#2ecc71";
-                musicActive = true;
-            } else {
-                player.pause();
-                btn.innerText = "WYŁĄCZONA";
-                btn.style.background = "var(--danger)";
-                musicActive = false;
-            }
+        function saveSets() {
+            nick = document.getElementById('nick-in').value || nick;
+            localStorage.setItem('pb_n', nick);
+            document.getElementById('nick-tag').innerText = nick;
+            toggleSets();
+            if(document.getElementById('ttt-lobby').style.display === 'flex') renderTTTRank();
         }
 
-        function refreshLeaderboard() {
-            const content = document.getElementById('rank-content');
-            const data = [
-                {n: playerName, w: playerWins, me: true},
-                {n: "Szymon_PRO", w: 14},
-                {n: "Oliwia_X", w: 9},
-                {n: "Legenda99", w: 5}
-            ].sort((a,b) => b.w - a.w);
-
-            content.innerHTML = '';
-            data.forEach((p, i) => {
-                content.innerHTML += `
-                    <div class="rank-entry ${p.me ? 'highlight' : ''}">
-                        <span>#${i+1} ${p.n}</span>
-                        <span>${p.w} wygranych</span>
-                    </div>`;
-            });
+        function switchMusic() {
+            const m = document.getElementById('bg-music');
+            const b = document.getElementById('m-btn');
+            music = !music;
+            if(music) { m.play(); b.innerText="ON"; b.style.background="#2ecc71"; }
+            else { m.pause(); b.innerText="OFF"; b.style.background="var(--danger)"; }
         }
 
-        function goToLobby() {
+        /* --- KÓŁKO I KRZYŻYK --- */
+        function openTTT() {
             document.getElementById('home-screen').style.display = 'none';
-            document.getElementById('game-lobby').style.display = 'flex';
-            refreshLeaderboard();
-            drawLevels();
+            document.getElementById('ttt-arena').style.display = 'none';
+            document.getElementById('ttt-lobby').style.display = 'flex';
+            renderTTTRank();
+            renderTTTLvls();
         }
 
-        function drawLevels() {
-            const draw = (id, s, e, col) => {
-                const el = document.getElementById(id); el.innerHTML = '';
-                for(let i=s; i<=e; i++) {
-                    const box = document.createElement('div');
-                    box.className = `lvl-box ${i > unlockedLvl ? 'off' : ''}`;
-                    box.style.background = col; box.innerText = i;
-                    if(i <= unlockedLvl) box.onclick = () => startMatch(i);
-                    el.appendChild(box);
-                }
-            };
-            draw('grid3x3', 1, 10, '#2ecc71');
-            draw('grid6x3', 11, 20, '#a55eea');
+        function renderTTTRank() {
+            const r = document.getElementById('ttt-rank');
+            r.innerHTML = `<h4 style="margin:0">RANKING</h4>
+            <div style="display:flex; justify-content:space-between; color:var(--secondary)"><span>#1 ${nick}</span><span>${tttWins} W</span></div>`;
         }
 
-        // --- SILNIK GRY ---
-        let boardState = [];
-        let activeMatch = false;
-        let matchLvl = 1;
+        function renderTTTLvls() {
+            const g = document.getElementById('ttt-lvls'); g.innerHTML = '';
+            for(let i=1; i<=20; i++) {
+                const b = document.createElement('div');
+                b.className = `lvl-box ${i > tttLvl ? 'locked' : ''}`;
+                b.style.background = i <= 10 ? "#2ecc71" : "#8e44ad";
+                b.innerText = i;
+                if(i <= tttLvl) b.onclick = () => startTTT(i);
+                g.appendChild(b);
+            }
+        }
 
-        function startMatch(lvl) {
-            matchLvl = lvl;
-            document.getElementById('game-lobby').style.display = 'none';
-            document.getElementById('game-arena').style.display = 'flex';
-            
-            const arena = document.getElementById('game-board');
-            const isSmall = lvl <= 10;
-            const size = isSmall ? 9 : 18;
-            arena.className = `board ${isSmall ? 's9' : 's18'}`;
-            boardState = Array(size).fill("");
-            
-            arena.innerHTML = '';
+        let tttBoard = [];
+        let tttActive = true;
+        let tttMode = 3;
+
+        function startTTT(l) {
+            document.getElementById('ttt-lobby').style.display = 'none';
+            document.getElementById('ttt-arena').style.display = 'flex';
+            tttMode = l <= 10 ? 3 : 6;
+            const size = l <= 10 ? 9 : 18;
+            tttBoard = Array(size).fill("");
+            const b = document.getElementById('ttt-board');
+            b.className = `board ${l <= 10 ? 's9' : 's18'}`;
+            b.innerHTML = '';
             for(let i=0; i<size; i++) {
                 const c = document.createElement('div');
                 c.className = 'cell';
-                c.onclick = () => {
-                    if(boardState[i] === "" && activeMatch) {
-                        boardState[i] = "X"; renderBoard();
-                        if(!checkGameOver()) {
-                            activeMatch = false;
-                            document.getElementById('game-status').innerText = "AI MYŚLI...";
-                            setTimeout(aiPlay, 600);
-                        }
-                    }
-                };
-                arena.appendChild(c);
+                c.onclick = () => { if(tttBoard[i]==="" && tttActive) { tttBoard[i]="X"; refreshTTT(); checkTTT(); if(tttActive) setTimeout(aiTTT, 500); } };
+                b.appendChild(c);
             }
-            activeMatch = true;
-            document.getElementById('game-status').innerText = "TWOJA KOLEJ (X)";
+            tttActive = true;
+            document.getElementById('ttt-status').innerText = "TWOJA KOLEJ (X)";
         }
 
-        function aiPlay() {
-            let options = boardState.map((v,i) => v===""?i:null).filter(v=>v!==null);
-            if(options.length) boardState[options[Math.floor(Math.random()*options.length)]] = "O";
-            renderBoard();
-            if(!checkGameOver()) {
-                activeMatch = true;
-                document.getElementById('game-status').innerText = "TWOJA KOLEJ (X)";
-            }
+        function aiTTT() {
+            let f = tttBoard.map((v,i)=>v===""?i:null).filter(v=>v!==null);
+            if(f.length) tttBoard[f[Math.floor(Math.random()*f.length)]] = "O";
+            refreshTTT(); checkTTT();
         }
 
-        function checkGameOver() {
+        function refreshTTT() {
+            const cells = document.querySelectorAll('.cell');
+            tttBoard.forEach((v,i) => { cells[i].innerText = v; cells[i].style.color = v==="X"?"var(--danger)":"var(--primary)"; });
+        }
+
+        function checkTTT() {
             const win = (p) => {
-                const goal = matchLvl <= 10 ? 3 : 4;
-                const c = matchLvl <= 10 ? 3 : 6;
-                for(let i=0; i<boardState.length; i++) {
-                    if(scanLine(i, 1, p, goal, c)) return true;
-                    if(scanLine(i, c, p, goal, c)) return true;
+                const target = tttMode === 3 ? 3 : 4;
+                const cols = tttMode === 3 ? 3 : 6;
+                for(let i=0; i<tttBoard.length; i++) {
+                    if(scan(i, 1, p, target, cols)) return true;
+                    if(scan(i, cols, p, target, cols)) return true;
                 }
                 return false;
             };
-
-            if(win("X")) {
-                activeMatch = false;
-                playerWins++; unlockedLvl = Math.max(unlockedLvl, matchLvl + 1);
-                localStorage.setItem('pb_wins', playerWins);
-                localStorage.setItem('pb_unlocked', unlockedLvl);
-                document.getElementById('game-status').innerText = "WYGRAŁEŚ! 🎉";
-                return true;
-            }
-            if(win("O")) {
-                activeMatch = false;
-                document.getElementById('game-status').innerText = "PRZEGRAŁEŚ! 🤖";
-                return true;
-            }
-            if(!boardState.includes("")) {
-                activeMatch = false;
-                document.getElementById('game-status').innerText = "REMIS! 🤝";
-                return true;
-            }
-            return false;
+            if(win("X")) { 
+                tttActive = false; tttWins++; tttLvl = Math.max(tttLvl, tttLvl+1); 
+                localStorage.setItem('pb_tw', tttWins); localStorage.setItem('pb_tl', tttLvl);
+                document.getElementById('ttt-status').innerText = "WYGRAŁEŚ!";
+            } else if(win("O")) { tttActive = false; document.getElementById('ttt-status').innerText = "PRZEGRAŁEŚ!"; }
         }
 
-        function scanLine(s, step, p, goal, cols) {
-            let count = 0;
-            for(let i=0; i<goal; i++) {
-                let idx = s + i*step;
-                if(idx < boardState.length && boardState[idx] === p) count++;
+        function scan(s, st, p, t, cols) {
+            let c = 0;
+            for(let i=0; i<t; i++) {
+                let idx = s + i*st;
+                if(idx < tttBoard.length && tttBoard[idx] === p) c++;
             }
-            return count === goal;
+            return c === t;
         }
 
-        function renderBoard() {
-            const cells = document.querySelectorAll('.cell');
-            boardState.forEach((v,i) => { cells[i].innerText = v; cells[i].className = `cell ${v.toLowerCase()}`; });
+        /* --- UNO LOGIC --- */
+        let unoDeck = [];
+        let playerHand = [];
+        let cpuHand = [];
+        let topCard = null;
+        let unoTurn = "player";
+
+        function openUno() {
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('uno-arena').style.display = 'flex';
+            startUno();
         }
 
-        function backToLobby() {
-            document.getElementById('game-arena').style.display = 'none';
-            goToLobby();
+        function startUno() {
+            const colors = ["red", "blue", "green", "yellow"];
+            unoDeck = [];
+            colors.forEach(c => {
+                for(let i=0; i<=9; i++) unoDeck.push({color: c, val: i});
+                unoDeck.push({color: c, val: "+2"});
+            });
+            for(let i=0; i<4; i++) unoDeck.push({color: "black", val: "WILD"});
+            
+            unoDeck.sort(() => Math.random() - 0.5);
+            playerHand = unoDeck.splice(0, 7);
+            cpuHand = unoDeck.splice(0, 7);
+            topCard = unoDeck.splice(0, 1)[0];
+            while(topCard.color === "black") { unoDeck.push(topCard); topCard = unoDeck.splice(0,1)[0]; }
+            
+            renderUno();
+        }
+
+        function renderUno() {
+            const p = document.getElementById('player-hand'); p.innerHTML = '';
+            playerHand.forEach((c, i) => {
+                const d = document.createElement('div');
+                d.className = `uno-card ${c.color}`;
+                d.innerText = c.val;
+                d.onclick = () => playCard(i);
+                p.appendChild(d);
+            });
+
+            const opp = document.getElementById('opponent-hand'); opp.innerHTML = '';
+            cpuHand.forEach(() => {
+                const d = document.createElement('div');
+                d.className = `uno-card black`;
+                d.style.background = "linear-gradient(45deg, #222, #000)";
+                opp.appendChild(d);
+            });
+
+            const pile = document.getElementById('discard-pile'); pile.innerHTML = '';
+            const tc = document.createElement('div');
+            tc.className = `uno-card ${topCard.color}`;
+            tc.innerText = topCard.val;
+            pile.appendChild(tc);
+        }
+
+        function playCard(idx) {
+            if(unoTurn !== "player") return;
+            const c = playerHand[idx];
+            if(c.color === topCard.color || c.val === topCard.val || c.color === "black") {
+                topCard = c;
+                playerHand.splice(idx, 1);
+                if(playerHand.length === 0) { alert("WYGRAŁEŚ W UNO!"); location.reload(); return; }
+                
+                if(c.val === "+2") { for(let i=0; i<2; i++) cpuHand.push(unoDeck.pop()); }
+                
+                unoTurn = "cpu";
+                document.getElementById('uno-status').innerText = "AI MYŚLI...";
+                renderUno();
+                setTimeout(cpuPlay, 1000);
+            }
+        }
+
+        function playerDrawCard() {
+            if(unoTurn !== "player") return;
+            playerHand.push(unoDeck.pop());
+            unoTurn = "cpu";
+            renderUno();
+            setTimeout(cpuPlay, 1000);
+        }
+
+        function cpuPlay() {
+            let possible = cpuHand.findIndex(c => c.color === topCard.color || c.val === topCard.val || c.color === "black");
+            if(possible !== -1) {
+                let c = cpuHand.splice(possible, 1)[0];
+                topCard = c;
+                if(c.val === "+2") { for(let i=0; i<2; i++) playerHand.push(unoDeck.pop()); }
+                if(cpuHand.length === 0) { alert("AI WYGRAŁO W UNO!"); location.reload(); return; }
+            } else {
+                cpuHand.push(unoDeck.pop());
+            }
+            unoTurn = "player";
+            document.getElementById('uno-status').innerText = "TWOJA KOLEJ";
+            renderUno();
         }
 
         init();
