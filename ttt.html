@@ -2,29 +2,48 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>PlayBase | TicTacToe</title>
+    <title>PlayBase | TicTacToe Pro</title>
     <style>
-        body { background: #0b0e14; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .board { display: grid; gap: 10px; background: #00d4ff; padding: 10px; border-radius: 15px; }
-        .board.s3 { grid-template-columns: repeat(3, 100px); }
-        .board.s6 { grid-template-columns: repeat(6, 60px); }
-        .cell { width: 100%; height: 100px; background: #0b0e14; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; }
-        .board.s6 .cell { height: 60px; font-size: 20px; }
-        .btn { padding: 15px 30px; margin-top: 20px; cursor: pointer; border-radius: 10px; border: none; font-weight: bold; }
+        :root { --primary: #00d4ff; --bg: #0b0e14; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        
+        .board { display: grid; gap: 12px; background: var(--primary); padding: 12px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,212,255,0.3); }
+        .board.s3 { grid-template-columns: repeat(3, 120px); }
+        .cell { width: 120px; height: 120px; background: #0b0e14; display: flex; align-items: center; justify-content: center; font-size: 60px; cursor: pointer; border-radius: 10px; transition: 0.2s; font-weight: bold; }
+        .cell:hover { background: #161b22; }
+
+        /* Ekran końca gry */
+        #end-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+        #end-msg { font-size: 50px; color: var(--primary); margin-bottom: 30px; text-shadow: 0 0 20px var(--primary); }
+        
+        .btn { padding: 15px 40px; cursor: pointer; border-radius: 15px; border: none; font-weight: bold; transition: 0.3s; font-family: inherit; }
     </style>
 </head>
 <body>
-    <h1 id="status">TWÓJ RUCH (X)</h1>
+    <audio id="bg-music" loop autoplay><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"></audio>
+
+    <h1 id="status" style="margin-bottom: 30px; letter-spacing: 2px;">TWÓJ RUCH <span style="color:red">(X)</span></h1>
+    
     <div id="board" class="board s3"></div>
-    <button class="btn" style="background:#ff4d4d; color:white" onclick="location.href='index.html'">POWRÓT DO LOBBY</button>
+
+    <div id="end-screen">
+        <div id="end-msg">WYGRANA!</div>
+        <button class="btn" style="background:var(--primary)" onclick="location.reload()">ZAGRAJ PONOWNIE</button>
+        <button class="btn" style="background:none; color:white; margin-top:20px; border: 1px solid #444" onclick="location.href='index.html'">POWRÓT DO LOBBY</button>
+    </div>
+
+    <button class="btn" style="background:#ff4d4d; color:white; margin-top: 40px;" onclick="location.href='index.html'">PODDAJ SIĘ</button>
 
     <script>
         let board = Array(9).fill("");
         let active = true;
-        const bEl = document.getElementById('board');
+        const music = document.getElementById('bg-music');
+        
+        // Fix dla muzyki (przeglądarki blokują auto-play)
+        window.onclick = () => { music.play(); };
 
         function init() {
-            bEl.innerHTML = '';
+            const bEl = document.getElementById('board');
             board.forEach((_, i) => {
                 const c = document.createElement('div');
                 c.className = 'cell';
@@ -41,7 +60,7 @@
 
         function update() {
             const cells = document.querySelectorAll('.cell');
-            board.forEach((v, i) => { cells[i].innerText = v; cells[i].style.color = v === "X" ? "red" : "#00d4ff"; });
+            board.forEach((v, i) => { cells[i].innerText = v; cells[i].style.color = v === "X" ? "#ff4d4d" : "#00d4ff"; });
         }
 
         function check() {
@@ -49,10 +68,16 @@
                 const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
                 return lines.some(l => l.every(idx => board[idx] === s));
             };
-            if(win("X")) { alert("WYGRAŁEŚ!"); location.reload(); return true; }
-            if(win("O")) { alert("AI WYGRAŁO!"); location.reload(); return true; }
-            if(!board.includes("")) { alert("REMIS!"); location.reload(); return true; }
+            if(win("X")) { showEnd("ZWYCIĘSTWO!"); return true; }
+            if(win("O")) { showEnd("PRZEGRAŁEŚ!"); return true; }
+            if(!board.includes("")) { showEnd("REMIS!"); return true; }
             return false;
+        }
+
+        function showEnd(msg) {
+            document.getElementById('end-screen').style.display = 'flex';
+            document.getElementById('end-msg').innerText = msg;
+            active = false;
         }
         init();
     </script>
