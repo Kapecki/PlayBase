@@ -2,173 +2,385 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayBase | PvP Arena</title>
+    <title>PlayBase Stars | Mobile Brawl Clone</title>
     <style>
-        body { background-color: #05080a; color: #e6edf3; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
+        :root {
+            --bs-blue: #00d4ff;
+            --bs-yellow: #ffcc00;
+            --bs-red: #ff4500;
+            --bs-green: #2ecc71;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; font-family: 'Arial Black', sans-serif;
+            overflow: hidden; user-select: none;
+        }
+
+        /* --- LOBBY UI --- */
+        #lobby {
+            position: absolute; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .logo {
+            font-size: 80px; color: white; text-shadow: 4px 4px 0px #000, -4px -4px 0px #000, 4px -4px 0px #000, -4px 4px 0px #000, 0px 10px 20px rgba(0,0,0,0.5);
+            margin-bottom: 50px; transform: rotate(-5deg);
+        }
+
+        .play-btn {
+            padding: 25px 80px; font-size: 40px; background: var(--bs-yellow);
+            border: 5px solid #fff; border-radius: 20px; cursor: pointer;
+            box-shadow: 0 10px 0 #b38f00; transition: 0.1s; color: #444;
+        }
+
+        .play-btn:active { transform: translateY(5px); box-shadow: 0 5px 0 #b38f00; }
+
+        /* --- GAME UI --- */
+        #game-ui {
+            position: absolute; top: 20px; left: 20px; z-index: 10;
+            display: none; pointer-events: none;
+        }
+
+        .stats-box {
+            background: rgba(0,0,0,0.6); padding: 15px; border-radius: 15px;
+            border: 2px solid var(--bs-blue); color: white;
+        }
+
+        #joy-container {
+            position: absolute; bottom: 50px; left: 50px; width: 150px; height: 150px;
+            background: rgba(255,255,255,0.1); border-radius: 50%; display: none;
+        }
+
+        /* --- CANVAS --- */
+        canvas { display: none; background: #2c3e50; }
         
-        /* Ekran Lobby */
-        #lobby-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070');
-            background-size: cover;
+        #death-screen {
+            position: absolute; top:0; left:0; width: 100%; height: 100%;
+            background: rgba(255,0,0,0.4); display: none;
+            flex-direction: column; align-items: center; justify-content: center; z-index: 200;
         }
-
-        .lobby-card {
-            background: rgba(22, 27, 34, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            border: 2px solid #00d4ff;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
-        }
-
-        h1 { font-size: 3.5rem; color: #00d4ff; margin-bottom: 10px; }
-        .description { color: #8b949e; margin-bottom: 30px; max-width: 400px; }
-
-        .btn-pvp {
-            background: #00d4ff;
-            color: #000;
-            padding: 20px 60px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-pvp:hover { transform: scale(1.1); background: #fff; box-shadow: 0 0 30px #00d4ff; }
-
-        /* Ekran Gry */
-        #game-screen { display: none; text-align: center; background: #000; height: 100vh; }
-        canvas { background: #111; border-bottom: 4px solid #00d4ff; cursor: crosshair; }
-        .game-stats { padding: 10px; font-size: 1.2rem; color: #00d4ff; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="lobby-screen">
-        <div class="lobby-card">
-            <h1>PLAYBASE LOBBY</h1>
-            <p class="description">Witaj w bazie. Jesteś gotowy na starcie PvP z botami? Wykorzystaj WASD i myszkę, aby przetrwać jak najdłużej.</p>
-            <button class="btn-pvp" onclick="startGame()">ZAGRAJ PVP</button>
+    <div id="lobby">
+        <div class="logo">PLAYBASE<br>STARS</div>
+        <button class="play-btn" onclick="initGame()">ZAGRAJ</button>
+        <p style="color: white; margin-top: 20px;">STEROWANIE: WASD + MYSZKA</p>
+    </div>
+
+    <div id="game-ui">
+        <div class="stats-box">
+            <div id="player-name">GRACZ 1</div>
+            <div style="font-size: 24px; color: var(--bs-yellow);">PUNKTY: <span id="kill-count">0</span></div>
         </div>
     </div>
 
-    <div id="game-screen">
-        <div class="game-stats" id="stat-bar">KILLE: 0 | ZDROWIE: 100%</div>
-        <canvas id="gameCanvas"></canvas>
+    <div id="death-screen">
+        <h1 style="font-size: 100px; color: white; text-shadow: 5px 5px #000;">POKONANY!</h1>
+        <button class="play-btn" onclick="location.reload()">POWRÓT DO LOBBY</button>
     </div>
 
+    <canvas id="gameCanvas"></canvas>
+
     <script>
-        const lobby = document.getElementById('lobby-screen');
-        const gameScreen = document.getElementById('game-screen');
+        /**
+         * PLAYBASE STARS ENGINE v1.0
+         * Pełny silnik gry typu Brawl-like
+         */
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const lobby = document.getElementById('lobby');
+        const gameUI = document.getElementById('game-ui');
+        const deathScreen = document.getElementById('death-screen');
+        const killLabel = document.getElementById('kill-count');
 
-        let player, bullets, enemies, keys, gameActive;
+        // --- KONFIGURACJA ---
+        let gameActive = false;
+        let kills = 0;
+        const world = { width: 2000, height: 2000 };
+        const view = { x: 0, y: 0 };
+        
+        let player = {
+            x: 1000, y: 1000, radius: 30, speed: 6,
+            hp: 4000, maxHp: 4000, color: '#00d4ff',
+            name: "TY", lastHit: 0, ammo: 3, maxAmmo: 3, reloadTimer: 0
+        };
 
-        function startGame() {
-            // Przełączanie ekranów
-            lobby.style.display = 'none';
-            gameScreen.style.display = 'block';
-            
-            // Ustawienia płótna
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight - 50;
+        let keys = {};
+        let bullets = [];
+        let enemies = [];
+        let bushes = [];
+        let walls = [];
 
-            // Inicjalizacja gry
-            player = { x: canvas.width/2, y: canvas.height/2, size: 20, health: 100, kills: 0 };
-            bullets = [];
-            enemies = [];
-            keys = {};
-            gameActive = true;
-
-            gameLoop();
-        }
-
-        function returnToLobby() {
-            gameActive = false;
-            alert("ZOSTAŁEŚ ZABITY! Powrót do lobby. Wynik: " + player.kills + " killi.");
-            gameScreen.style.display = 'none';
-            lobby.style.display = 'flex';
-        }
-
-        window.addEventListener('keydown', e => keys[e.code] = true);
-        window.addEventListener('keyup', e => keys[e.code] = false);
-        window.addEventListener('mousedown', e => {
-            if(!gameActive) return;
-            const angle = Math.atan2(e.clientY - 50 - player.y, e.clientX - player.x);
-            bullets.push({ x: player.x, y: player.y, vx: Math.cos(angle) * 8, vy: Math.sin(angle) * 8 });
-        });
-
-        function gameLoop() {
-            if(!gameActive) return;
-
-            // Ruch
-            if(keys['KeyW'] && player.y > 20) player.y -= 5;
-            if(keys['KeyS'] && player.y < canvas.height - 20) player.y += 5;
-            if(keys['KeyA'] && player.x > 20) player.x -= 5;
-            if(keys['KeyD'] && player.x < canvas.width - 20) player.x += 5;
-
-            // Spawnowanie botów
-            if(Math.random() < 0.02) {
-                enemies.push({ 
-                    x: Math.random() > 0.5 ? 0 : canvas.width, 
-                    y: Math.random() * canvas.height, 
-                    size: 20 
+        // --- GENEROWANIE MAPY ---
+        function generateMap() {
+            // Dodaj krzaki
+            for(let i=0; i<30; i++) {
+                bushes.push({
+                    x: Math.random() * world.width,
+                    y: Math.random() * world.height,
+                    w: 150 + Math.random()*200,
+                    h: 100 + Math.random()*150
                 });
             }
-
-            // Logika pocisków i wrogów
-            bullets.forEach((b, bi) => {
-                b.x += b.vx; b.y += b.vy;
-                if(b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) bullets.splice(bi, 1);
-            });
-
-            enemies.forEach((en, ei) => {
-                const angle = Math.atan2(player.y - en.y, player.x - en.x);
-                en.x += Math.cos(angle) * 2;
-                en.y += Math.sin(angle) * 2;
-
-                // Kolizja z graczem
-                if(Math.hypot(player.x - en.x, player.y - en.y) < 30) {
-                    player.health -= 1;
-                    if(player.health <= 0) returnToLobby();
-                }
-
-                // Trafienie bota
-                bullets.forEach((b, bi) => {
-                    if(Math.hypot(b.x - en.x, b.y - en.y) < 25) {
-                        enemies.splice(ei, 1);
-                        bullets.splice(bi, 1);
-                        player.kills++;
-                    }
+            // Dodaj ściany
+            for(let i=0; i<20; i++) {
+                walls.push({
+                    x: Math.random() * world.width,
+                    y: Math.random() * world.height,
+                    w: 100, h: 100
                 });
-            });
+            }
+        }
 
-            // Rysowanie
-            ctx.fillStyle = '#111';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#00d4ff'; // Gracz
-            ctx.beginPath(); ctx.arc(player.x, player.y, player.size, 0, Math.PI*2); ctx.fill();
-
-            ctx.fillStyle = '#ff4500'; // Boty
-            enemies.forEach(en => { ctx.beginPath(); ctx.arc(en.x, en.y, en.size, 0, Math.PI*2); ctx.fill(); });
-
-            ctx.fillStyle = '#fff'; // Strzały
-            bullets.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI*2); ctx.fill(); });
-
-            document.getElementById('stat-bar').innerHTML = `KILLE: ${player.kills} | ZDROWIE: ${Math.ceil(player.health)}%`;
-
+        function initGame() {
+            lobby.style.display = 'none';
+            canvas.style.display = 'block';
+            gameUI.style.display = 'block';
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            generateMap();
+            gameActive = true;
+            spawnEnemy(5);
             requestAnimationFrame(gameLoop);
         }
+
+        // --- LOGIKA GRY ---
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+        window.addEventListener('mousedown', shoot);
+
+        function shoot(e) {
+            if(!gameActive || player.ammo < 1) return;
+
+            const targetX = e.clientX + view.x;
+            const targetY = e.clientY + view.y;
+            const angle = Math.atan2(targetY - player.y, targetX - player.x);
+
+            // Strzał typu "Shelly/Colt" - 3 pociski w serii
+            for(let i=0; i<3; i++) {
+                setTimeout(() => {
+                    bullets.push({
+                        x: player.x, y: player.y,
+                        vx: Math.cos(angle) * 15, vy: Math.sin(angle) * 15,
+                        owner: 'player', damage: 400, range: 500, startX: player.x, startY: player.y
+                    });
+                }, i * 100);
+            }
+            player.ammo--;
+            player.reloadTimer = 60;
+        }
+
+        function spawnEnemy(count) {
+            for(let i=0; i<count; i++) {
+                enemies.push({
+                    x: Math.random() * world.width,
+                    y: Math.random() * world.height,
+                    hp: 3000, maxHp: 3000, radius: 30,
+                    speed: 3 + Math.random()*2, color: '#ff4500',
+                    state: 'idle', shootTimer: 0
+                });
+            }
+        }
+
+        function update() {
+            if(!gameActive) return;
+
+            // Ruch gracza
+            let dx = 0, dy = 0;
+            if(keys['KeyW']) dy -= player.speed;
+            if(keys['KeyS']) dy += player.speed;
+            if(keys['KeyA']) dx -= player.speed;
+            if(keys['KeyD']) dx += player.speed;
+
+            // Kolizja ze ścianami
+            player.x += dx;
+            walls.forEach(w => {
+                if(player.x+player.radius > w.x && player.x-player.radius < w.x+w.w && player.y+player.radius > w.y && player.y-player.radius < w.y+w.h) player.x -= dx;
+            });
+            player.y += dy;
+            walls.forEach(w => {
+                if(player.x+player.radius > w.x && player.x-player.radius < w.x+w.w && player.y+player.radius > w.y && player.y-player.radius < w.y+w.h) player.y -= dy;
+            });
+
+            // Przeładowanie
+            if(player.ammo < player.maxAmmo) {
+                player.reloadTimer--;
+                if(player.reloadTimer <= 0) {
+                    player.ammo++;
+                    player.reloadTimer = 90;
+                }
+            }
+
+            // Kamera
+            view.x = player.x - canvas.width / 2;
+            view.y = player.y - canvas.height / 2;
+
+            // Pociski
+            bullets.forEach((b, i) => {
+                b.x += b.vx; b.y += b.vy;
+                const dist = Math.hypot(b.x - b.startX, b.y - b.startY);
+                
+                if(dist > b.range) bullets.splice(i, 1);
+
+                // Trafienie wroga
+                if(b.owner === 'player') {
+                    enemies.forEach((en, ei) => {
+                        if(Math.hypot(b.x - en.x, b.y - en.y) < en.radius) {
+                            en.hp -= b.damage;
+                            bullets.splice(i, 1);
+                            if(en.hp <= 0) { 
+                                enemies.splice(ei, 1); 
+                                kills++; 
+                                killLabel.innerText = kills;
+                                spawnEnemy(1);
+                            }
+                        }
+                    });
+                } else {
+                    // Trafienie gracza
+                    if(Math.hypot(b.x - player.x, b.y - player.y) < player.radius) {
+                        player.hp -= b.damage;
+                        bullets.splice(i, 1);
+                        if(player.hp <= 0) gameOver();
+                    }
+                }
+            });
+
+            // AI Przeciwników
+            enemies.forEach(en => {
+                const distToPlayer = Math.hypot(player.x - en.x, player.y - en.y);
+                
+                if(distToPlayer < 600) {
+                    // Pościg
+                    const angle = Math.atan2(player.y - en.y, player.x - en.x);
+                    en.x += Math.cos(angle) * en.speed;
+                    en.y += Math.sin(angle) * en.speed;
+
+                    // Atak bota
+                    en.shootTimer++;
+                    if(en.shootTimer > 100) {
+                        bullets.push({
+                            x: en.x, y: en.y,
+                            vx: Math.cos(angle) * 10, vy: Math.sin(angle) * 10,
+                            owner: 'enemy', damage: 300, range: 400, startX: en.x, startY: en.y
+                        });
+                        en.shootTimer = 0;
+                    }
+                }
+            });
+
+            // Regeneracja HP (jeśli nie bity przez 3 sekundy)
+            if(Date.now() - player.lastHit > 3000 && player.hp < player.maxHp) {
+                player.hp += 5;
+            }
+        }
+
+        function drawPlayer(p, isBot = false) {
+            const screenX = p.x - view.x;
+            const screenY = p.y - view.y;
+
+            // Sprawdź czy w krzakach
+            let inBush = false;
+            bushes.forEach(b => {
+                if(p.x > b.x && p.x < b.x+b.w && p.y > b.y && p.y < b.y+b.h) inBush = true;
+            });
+
+            ctx.globalAlpha = inBush ? 0.4 : 1.0;
+
+            // Cień
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.beginPath(); ctx.ellipse(screenX, screenY+25, 25, 10, 0, 0, Math.PI*2); ctx.fill();
+
+            // Postać
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(screenX, screenY, p.radius, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.stroke();
+
+            // Pasek HP
+            const barW = 80;
+            ctx.fillStyle = '#333';
+            ctx.fillRect(screenX - barW/2, screenY - 60, barW, 10);
+            ctx.fillStyle = isBot ? '#ff4500' : '#2ecc71';
+            ctx.fillRect(screenX - barW/2, screenY - 60, barW * (p.hp/p.maxHp), 10);
+
+            // Amunicja (tylko gracz)
+            if(!isBot) {
+                for(let i=0; i<player.maxAmmo; i++) {
+                    ctx.fillStyle = i < player.ammo ? varColor('--bs-yellow') : '#555';
+                    ctx.fillRect(screenX - 40 + (i*30), screenY - 75, 20, 5);
+                }
+            }
+
+            ctx.globalAlpha = 1.0;
+        }
+
+        function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name); }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Tło (Siatka)
+            ctx.strokeStyle = '#34495e'; ctx.lineWidth = 1;
+            for(let x = -view.x % 100; x < canvas.width; x += 100) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for(let y = -view.y % 100; y < canvas.height; y += 100) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Krzaki
+            ctx.fillStyle = '#1b5e20';
+            bushes.forEach(b => ctx.fillRect(b.x - view.x, b.y - view.y, b.w, b.h));
+
+            // Ściany
+            ctx.fillStyle = '#5d4037';
+            walls.forEach(w => {
+                ctx.fillRect(w.x - view.x, w.y - view.y, w.w, w.h);
+                ctx.strokeStyle = '#3e2723'; ctx.lineWidth = 5;
+                ctx.strokeRect(w.x - view.x, w.y - view.y, w.w, w.h);
+            });
+
+            // Pociski
+            bullets.forEach(b => {
+                ctx.fillStyle = b.owner === 'player' ? '#fff' : '#ff0';
+                ctx.beginPath(); ctx.arc(b.x - view.x, b.y - view.y, 8, 0, Math.PI*2); ctx.fill();
+            });
+
+            // Postacie
+            enemies.forEach(en => drawPlayer(en, true));
+            drawPlayer(player);
+
+            if(gameActive) {
+                update();
+                requestAnimationFrame(draw);
+            }
+        }
+
+        function gameOver() {
+            gameActive = false;
+            deathScreen.style.display = 'flex';
+        }
+
+        function gameLoop() {
+            draw();
+        }
+
     </script>
 </body>
 </html>
