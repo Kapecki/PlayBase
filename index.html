@@ -5,58 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayBase | Lobby</title>
     <style>
-        :root { --primary: #00d4ff; --bg: #0b0e14; --card: #1d232a; }
+        :root { --primary: #00d4ff; --bg: #0b0e14; --card: #1d232a; --accent: #ffcc00; }
         body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
-        #top-bar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; }
-        .pill { background: var(--card); border: 2px solid var(--primary); padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; gap: 10px; }
+        /* Tło z efektem głębi */
+        body::before { content: ''; position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, #16213e 0%, #0b0e14 100%); z-index: -1; }
+
+        #top-bar { position: fixed; top: 20px; right: 20px; z-index: 10; }
+        .pill { background: rgba(29, 35, 42, 0.9); border: 2px solid var(--primary); padding: 10px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 0 20px rgba(0,212,255,0.2); backdrop-filter: blur(5px); }
         
-        .grid { display: flex; gap: 30px; margin-top: 50px; }
-        .card { width: 280px; background: var(--card); border: 3px solid #333; border-radius: 40px; padding: 40px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,212,255,0.3); }
+        .grid { display: flex; gap: 40px; margin-top: 30px; }
+        .card { 
+            width: 300px; background: var(--card); border: 2px solid #333; border-radius: 30px; padding: 40px; 
+            text-align: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .card:hover { border-color: var(--primary); transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,212,255,0.4); }
+        .card h2 { color: var(--primary); margin: 15px 0; }
         
-        #settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; }
-        .modal-box { background: var(--card); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); text-align: center; width: 320px; }
-        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; border: none; text-align: center; font-size: 16px; }
-        .btn { padding: 10px 25px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        #settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-box { background: var(--card); padding: 40px; border-radius: 30px; border: 2px solid var(--primary); text-align: center; width: 350px; }
+        input { width: 100%; padding: 15px; margin: 20px 0; border-radius: 12px; border: 1px solid #444; background: #0b0e14; color: white; text-align: center; font-size: 18px; }
+        .btn { padding: 12px 25px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; background: var(--primary); color: #000; }
+        .btn:hover { transform: scale(1.05); filter: brightness(1.1); }
     </style>
 </head>
 <body>
 
     <div id="top-bar">
         <div class="pill">
-            <span id="display-nick">Gracz</span>
-            <span style="cursor:pointer" onclick="toggleSettings()">⚙️</span>
+            <span id="display-nick" style="font-weight: bold; letter-spacing: 1px;">GRACZ</span>
+            <span style="cursor:pointer; font-size: 20px;" onclick="toggleSettings()">⚙️</span>
         </div>
     </div>
 
     <div id="settings-modal">
         <div class="modal-box">
-            <h2 style="color:var(--primary)">USTAWIENIA</h2>
-            <input type="text" id="input-nick" placeholder="Twój Nick">
-            <button class="btn" style="background:var(--primary)" onclick="saveNick()">ZAPISZ</button>
-            <button class="btn" style="background:#333; color:white; margin-top:10px;" onclick="toggleSettings()">ZAMKNIJ</button>
+            <h2 style="color:var(--primary); margin-top:0;">USTAWIENIA</h2>
+            <p style="color: #888;">Zmień swój pseudonim:</p>
+            <input type="text" id="input-nick" maxlength="12">
+            <button class="btn" onclick="saveNick()">ZAPISZ ZMIANY</button>
+            <p style="font-size: 12px; color: #555; margin-top: 20px;">v2.0 Professional Build</p>
         </div>
     </div>
 
-    <h1 style="font-size: 70px; color: var(--primary); text-shadow: 0 0 20px rgba(0,212,255,0.5);">PlayBase</h1>
+    <h1 style="font-size: 80px; color: var(--primary); margin-bottom: 10px; text-shadow: 0 0 30px rgba(0,212,255,0.6);">PlayBase</h1>
+    <p style="color: var(--accent); letter-spacing: 5px; margin-bottom: 40px; font-weight: bold;">PREMIUM GAMING HUB</p>
     
     <div class="grid">
         <div class="card" onclick="location.href='ttt.html'">
-            <div style="font-size: 50px;">❌</div>
-            <h2>KÓŁKO I KRZYŻYK</h2>
-            <p>20 poziomów trudności</p>
+            <span style="font-size: 60px;">❌</span>
+            <h2>TIC-TAC-TOE</h2>
+            <p style="color: #888;">Klasyczna strategia w nowym wydaniu.</p>
         </div>
         <div class="card" onclick="location.href='dash.html'">
-            <div style="font-size: 50px;">⚡</div>
+            <span style="font-size: 60px;">⚡</span>
             <h2>CYBER DASH</h2>
-            <p>Zabójczy bieg neonowy</p>
+            <p style="color: #888;">Poczuj prędkość neonowego świata.</p>
         </div>
     </div>
 
     <script>
         const nick = localStorage.getItem('p_nick') || "Gracz_" + Math.floor(Math.random()*99);
-        document.getElementById('display-nick').innerText = nick;
+        document.getElementById('display-nick').innerText = nick.toUpperCase();
 
         function toggleSettings() {
             const m = document.getElementById('settings-modal');
@@ -65,7 +75,7 @@
         }
 
         function saveNick() {
-            const newNick = document.getElementById('input-nick').value;
+            const newNick = document.getElementById('input-nick').value.trim();
             if(newNick) {
                 localStorage.setItem('p_nick', newNick);
                 location.reload();
