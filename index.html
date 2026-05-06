@@ -3,165 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayBase | Działa na 100%</title>
+    <title>PlayBase | Lobby</title>
     <style>
-        :root {
-            --primary: #00d4ff; --secondary: #ffcc00; --bg: #0b0e14; --card: #1d232a; --neon: #00ff99;
-        }
-        * { box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: sans-serif; background: var(--bg); color: white; overflow: hidden; }
-
-        /* PASEK GÓRNY */
-        #top-bar { position: fixed; top: 0; right: 0; padding: 15px; z-index: 1000; display: flex; align-items: center; gap: 10px; }
-        .pill { background: #161b22; border: 2px solid var(--primary); padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 10px; }
-        .cog { cursor: pointer; font-size: 20px; }
-
-        /* HUB */
-        #home { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .grid { display: flex; gap: 20px; }
-        .card { width: 250px; background: var(--card); border: 2px solid #333; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
-
-        /* MODAL */
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-box { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; width: 300px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-
-        /* GRY */
-        .screen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500; flex-direction: column; align-items: center; justify-content: center; }
-        .board { display: grid; gap: 8px; background: var(--primary); padding: 8px; border-radius: 10px; }
-        .board.s9 { grid-template-columns: repeat(3, 100px); }
-        .board.s18 { grid-template-columns: repeat(6, 60px); }
-        .cell { width: 100%; height: 100px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; }
-        .board.s18 .cell { height: 60px; font-size: 20px; }
-
-        .lvl-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
-        .lvl { width: 45px; height: 45px; border: 1px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 5px; }
-        .locked { opacity: 0.2; }
-
-        canvas { border: 2px solid var(--neon); background: #000; max-width: 90vw; }
-        .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; margin: 5px; font-weight: bold; }
+        :root { --primary: #00d4ff; --bg: #0b0e14; --card: #1d232a; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        
+        #top-bar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; }
+        .pill { background: var(--card); border: 2px solid var(--primary); padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; gap: 10px; }
+        
+        .grid { display: flex; gap: 30px; margin-top: 50px; }
+        .card { width: 280px; background: var(--card); border: 3px solid #333; border-radius: 40px; padding: 40px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,212,255,0.3); }
+        
+        #settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; }
+        .modal-box { background: var(--card); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); text-align: center; width: 320px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; border: none; text-align: center; font-size: 16px; }
+        .btn { padding: 10px 25px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
     </style>
 </head>
 <body>
 
-<audio id="m-audio" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
-
-<div id="top-bar">
-    <div class="pill">
-        <span id="n-display">Gracz</span>
-        <span class="cog" onclick="openS()">⚙️</span>
+    <div id="top-bar">
+        <div class="pill">
+            <span id="display-nick">Gracz</span>
+            <span style="cursor:pointer" onclick="toggleSettings()">⚙️</span>
+        </div>
     </div>
-</div>
 
-<div id="modal">
-    <div class="modal-box">
-        <h3>USTAWIENIA</h3>
-        <input type="text" id="n-input">
-        <button class="btn" style="background:var(--primary)" onclick="saveS()">ZAPISZ</button>
-        <button class="btn" id="m-toggle" onclick="toggleM()">MUZYKA: OFF</button>
+    <div id="settings-modal">
+        <div class="modal-box">
+            <h2 style="color:var(--primary)">USTAWIENIA</h2>
+            <input type="text" id="input-nick" placeholder="Twój Nick">
+            <button class="btn" style="background:var(--primary)" onclick="saveNick()">ZAPISZ</button>
+            <button class="btn" style="background:#333; color:white; margin-top:10px;" onclick="toggleSettings()">ZAMKNIJ</button>
+        </div>
     </div>
-</div>
 
-<div id="home">
-    <h1 style="color:var(--primary); font-size: 50px;">PlayBase</h1>
+    <h1 style="font-size: 70px; color: var(--primary); text-shadow: 0 0 20px rgba(0,212,255,0.5);">PlayBase</h1>
+    
     <div class="grid">
-        <div class="card" onclick="showT()"><h2>❌ TTT</h2><p>Poziomy & Ranking</p></div>
-        <div class="card" onclick="showD()"><h2>⚡ DASH</h2><p>Cyber Bieg</p></div>
+        <div class="card" onclick="location.href='ttt.html'">
+            <div style="font-size: 50px;">❌</div>
+            <h2>KÓŁKO I KRZYŻYK</h2>
+            <p>20 poziomów trudności</p>
+        </div>
+        <div class="card" onclick="location.href='dash.html'">
+            <div style="font-size: 50px;">⚡</div>
+            <h2>CYBER DASH</h2>
+            <p>Zabójczy bieg neonowy</p>
+        </div>
     </div>
-</div>
 
-<div id="t-lobby" class="screen" style="padding-top: 50px; overflow-y: auto;">
-    <h3>RANKING</h3>
-    <div id="rank" style="width: 250px; background: #161b22; padding: 10px; border-radius: 10px; border: 1px solid var(--secondary); margin-bottom: 20px;"></div>
-    <h3>ETAPY</h3>
-    <div class="lvl-grid" id="l-grid"></div>
-    <button class="btn" onclick="location.reload()" style="margin-top: 30px;">POWRÓT</button>
-</div>
+    <script>
+        const nick = localStorage.getItem('p_nick') || "Gracz_" + Math.floor(Math.random()*99);
+        document.getElementById('display-nick').innerText = nick;
 
-<div id="t-game" class="screen">
-    <h2 id="t-status">TWOJA KOLEJ</h2>
-    <div id="t-board" class="board"></div>
-    <button class="btn" onclick="showT()" style="margin-top: 20px; background: red; color: white;">WYJDŹ</button>
-</div>
-
-<div id="d-game" class="screen">
-    <h2 id="d-score">0m</h2>
-    <canvas id="d-canv" width="300" height="500"></canvas>
-    <button id="d-start" class="btn" style="background:var(--neon)" onclick="startD()">START</button>
-    <button class="btn" onclick="location.reload()">WYJDŹ</button>
-</div>
-
-<script>
-    let p = {
-        n: localStorage.getItem('p_n') || "Gracz",
-        w: parseInt(localStorage.getItem('p_w')) || 0,
-        u: parseInt(localStorage.getItem('p_u')) || 1,
-        m: false
-    };
-
-    function openS() { document.getElementById('modal').style.display='flex'; document.getElementById('n-input').value=p.n; }
-    function saveS() { p.n = document.getElementById('n-input').value || p.n; localStorage.setItem('p_n', p.n); document.getElementById('n-display').innerText=p.n; document.getElementById('modal').style.display='none'; if(document.getElementById('t-lobby').style.display==='flex') renderR(); }
-    function toggleM() { const a=document.getElementById('m-audio'); p.m=!p.m; a[p.m?'play':'pause']().catch(()=>{}); document.getElementById('m-toggle').innerText=p.m?'MUZYKA: ON':'MUZYKA: OFF'; }
-
-    // TTT
-    function showT() { document.getElementById('home').style.display='none'; document.getElementById('t-game').style.display='none'; document.getElementById('t-lobby').style.display='flex'; renderR(); renderL(); }
-    function renderR() { document.getElementById('rank').innerHTML = `1. ${p.n} - ${p.w} W<br>2. Bot_Seba - 5 W`; }
-    function renderL() { 
-        const g = document.getElementById('l-grid'); g.innerHTML='';
-        for(let i=1; i<=20; i++){
-            const b=document.createElement('div'); b.className=`lvl ${i>p.u?'locked':''}`; b.style.background=i<=10?'#2ecc71':'#8e44ad'; b.innerText=i;
-            if(i<=p.u) b.onclick=()=>startT(i); g.appendChild(b);
+        function toggleSettings() {
+            const m = document.getElementById('settings-modal');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+            document.getElementById('input-nick').value = nick;
         }
-    }
 
-    let bData=[], active=false, sz=9;
-    function startT(l){
-        document.getElementById('t-lobby').style.display='none'; document.getElementById('t-game').style.display='flex';
-        sz = l<=10?9:18; bData=Array(sz).fill(""); active=true;
-        const b=document.getElementById('t-board'); b.className=`board ${l<=10?'s9':'s18'}`; b.innerHTML='';
-        for(let i=0; i<sz; i++){
-            const c=document.createElement('div'); c.className='cell'; c.onclick=()=>{ if(bData[i]==="" && active){ bData[i]="X"; updB(); if(!checkW()){ active=false; setTimeout(ai,500);}} };
-            b.appendChild(c);
+        function saveNick() {
+            const newNick = document.getElementById('input-nick').value;
+            if(newNick) {
+                localStorage.setItem('p_nick', newNick);
+                location.reload();
+            }
         }
-        document.getElementById('t-status').innerText="TWOJA KOLEJ";
-    }
-    function ai(){ let f=bData.map((v,i)=>v===""?i:null).filter(v=>v!==null); if(f.length) bData[f[Math.floor(Math.random()*f.length)]]="O"; updB(); checkW(); active=true; }
-    function updB(){ const c=document.querySelectorAll('.cell'); bData.forEach((v,i)=>{ c[i].innerText=v; c[i].style.color=v==="X"?"red":"#00d4ff";}); }
-    function checkW(){
-        const win = (s) => {
-            const winL = sz===9?3:4; const c=sz===9?3:6;
-            for(let i=0; i<sz; i++){
-                let h=0, v=0;
-                for(let j=0; j<winL; j++) { if(bData[i+j]===s && (i+j)<sz) h++; if(bData[i+j*c]===s && (i+j*c)<sz) v++; }
-                if(h===winL || v===winL) return true;
-            } return false;
-        };
-        if(win("X")){ p.w++; p.u++; localStorage.setItem('p_w', p.w); localStorage.setItem('p_u', p.u); alert("WYGRANA!"); showT(); return true; }
-        if(win("O")){ alert("PRZEGRANA"); showT(); return true; }
-        return false;
-    }
-
-    // DASH
-    const cv=document.getElementById('d-canv'), ct=cv.getContext('2d');
-    let d={ a:false, x:130, s:0, obs:[], spd:5 };
-    function showD(){ document.getElementById('home').style.display='none'; document.getElementById('d-game').style.display='flex'; }
-    function startD(){ d={ a:true, x:130, s:0, obs:[], spd:5 }; document.getElementById('d-start').style.display='none'; loopD(); }
-    window.onkeydown=(e)=>{ if(e.key==="ArrowLeft"||e.key==="a") d.x=Math.max(10, d.x-60); if(e.key==="ArrowRight"||e.key==="d") d.x=Math.min(250, d.x+60); };
-    function loopD(){
-        if(!d.a) return; ct.clearRect(0,0,300,500);
-        ct.fillStyle="white"; ct.beginPath(); ct.arc(d.x+20, 450, 15, 0, 7); ct.fill();
-        if(Math.random()<0.03) d.obs.push({x:[20, 80, 140, 200, 260][Math.floor(Math.random()*5)], y:-30});
-        d.obs.forEach((o,i)=>{
-            o.y+=d.spd; ct.fillStyle="#00ff99"; ct.fillRect(o.x, o.y, 40, 20);
-            if(o.y>430 && o.y<470 && Math.abs(o.x-d.x)<30){ d.a=false; alert("KONIEC! "+Math.floor(d.s)+"m"); document.getElementById('d-start').style.display='block'; }
-            if(o.y>500) d.obs.splice(i,1);
-        });
-        d.s+=0.1; d.spd+=0.001; document.getElementById('d-score').innerText=Math.floor(d.s)+"m";
-        requestAnimationFrame(loopD);
-    }
-
-    document.getElementById('n-display').innerText=p.n;
-</script>
+    </script>
 </body>
 </html>
