@@ -2,170 +2,218 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>PlayBase | Tic-Tac-Toe Network Edition</title>
+    <title>PlayBase | Ultimate Hub</title>
     <style>
         :root {
             --primary: #00d4ff; --secondary: #ffcc00; --danger: #ff4d4d;
-            --bg: #0b0e14; --card: #161b22; --accent: #a55eea;
+            --bg: #0b0e14; --card: #161b22; --accent: #8e44ad;
         }
 
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; overflow: hidden; }
 
-        /* --- HUB GŁÓWNY --- */
-        #home-screen { height: 100vh; padding: 60px; text-align: center; background: radial-gradient(circle, #1e293b, #0b0e14); }
-        .main-header h1 { font-size: clamp(40px, 10vw, 70px); color: var(--primary); text-shadow: 0 0 30px rgba(0,212,255,0.5); }
-        
-        .hub-grid { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-top: 50px; }
+        /* --- PASEK GÓRNY --- */
+        #top-bar {
+            position: fixed; top: 0; right: 0; padding: 20px; display: flex; align-items: center; gap: 15px; z-index: 1000;
+        }
+        .user-info { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--primary); display: flex; align-items: center; gap: 10px; }
+        .settings-btn { font-size: 24px; cursor: pointer; transition: 0.3s; }
+        .settings-btn:hover { transform: rotate(90deg); color: var(--primary); }
+
+        /* --- OKNO USTAWIEŃ --- */
+        #settings-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+            align-items: center; justify-content: center;
+        }
+        .modal-content { background: var(--card); padding: 40px; border-radius: 30px; border: 3px solid var(--primary); width: 350px; text-align: center; }
+        .modal-content input { width: 100%; padding: 10px; margin: 20px 0; border-radius: 10px; border: none; font-family: inherit; font-size: 18px; }
+        .toggle-box { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
+
+        /* --- STRONA GŁÓWNA --- */
+        #home-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .hub-grid { display: flex; gap: 30px; margin-top: 50px; }
         .hub-card { 
-            width: 380px; background: var(--card); border: 5px solid #30363d; border-radius: 45px; 
-            padding: 45px; transition: 0.4s; cursor: pointer; position: relative;
+            width: 300px; background: var(--card); border: 4px solid #333; border-radius: 35px; 
+            padding: 40px; transition: 0.4s; cursor: pointer; 
         }
-        .hub-card:hover { transform: scale(1.05); border-color: var(--primary); }
-        .hub-card.mystery { border-style: dashed; opacity: 0.6; }
+        .hub-card:hover { border-color: var(--primary); transform: translateY(-10px); }
+        .hub-card.mystery { border-style: dashed; opacity: 0.5; }
 
-        /* --- MENU Z TABELĄ (WIDOK PO KLIKNIĘCIU) --- */
+        /* --- MENU GRY & TABELA --- */
         #game-menu {
-            display: none; position: fixed; inset: 0; background: #0b0e14;
-            z-index: 100; flex-direction: column; align-items: center; padding: 40px; overflow-y: auto;
+            display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500;
+            flex-direction: column; align-items: center; padding-top: 80px; overflow-y: auto;
         }
-
-        .leaderboard-box {
-            width: 100%; max-width: 650px; background: #1c222d; border: 4px solid var(--secondary);
-            border-radius: 35px; padding: 30px; margin-bottom: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        .leaderboard {
+            width: 90%; max-width: 500px; background: rgba(255,255,255,0.05); border: 2px solid var(--secondary);
+            border-radius: 20px; padding: 20px; margin-bottom: 30px;
         }
-        .leaderboard-box h2 { color: var(--secondary); margin-top: 0; text-transform: uppercase; letter-spacing: 2px; }
-        
-        .rank-list { width: 100%; }
-        .rank-row { 
-            display: flex; justify-content: space-between; padding: 15px 25px; 
-            margin: 10px 0; border-radius: 15px; background: rgba(255,255,255,0.05);
-            font-size: 20px; transition: 0.3s;
-        }
-        .rank-row.me { background: linear-gradient(90deg, rgba(255,204,0,0.3), rgba(0,212,255,0.3)); border: 2px solid var(--secondary); transform: scale(1.02); }
-        .rank-num { font-weight: bold; width: 40px; }
-        .rank-name { flex: 1; text-align: left; padding-left: 20px; }
+        .rank-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
+        .rank-row.active { color: var(--secondary); background: rgba(255,204,0,0.1); border-radius: 8px; }
 
         /* --- ARENA --- */
-        #game-arena { display: none; position: fixed; inset: 0; background: #000; z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
-        .board { display: grid; gap: 12px; background: var(--primary); padding: 12px; border-radius: 20px; }
-        .board.s9 { grid-template-columns: repeat(3, 130px); }
-        .board.s18 { grid-template-columns: repeat(6, 100px); }
-
-        .cell { background: var(--bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        .board.s9 .cell { width: 130px; height: 130px; font-size: 80px; }
-        .board.s18 .cell { width: 100px; height: 100px; font-size: 55px; }
+        #game-arena { display: none; position: fixed; inset: 0; background: #000; z-index: 600; flex-direction: column; align-items: center; justify-content: center; }
+        .board { display: grid; gap: 10px; background: var(--primary); padding: 10px; border-radius: 15px; }
+        .board.s9 { grid-template-columns: repeat(3, 120px); }
+        .board.s18 { grid-template-columns: repeat(6, 90px); }
+        .cell { width: 100%; height: 100%; min-height: 90px; background: var(--bg); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 50px; border-radius: 10px; }
         .cell.x { color: var(--danger); } .cell.o { color: var(--primary); }
 
-        .status-txt { font-size: 35px; margin-bottom: 25px; color: var(--secondary); text-align: center; }
-        .btn-action { margin-top: 25px; padding: 15px 45px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 18px; }
-        
-        .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin: 20px 0; }
-        .lvl-btn { width: 70px; height: 70px; border-radius: 15px; border: 3px solid white; cursor: pointer; font-size: 24px; display: flex; align-items: center; justify-content: center; }
-        .lvl-btn.locked { opacity: 0.2; cursor: not-allowed; }
+        .btn { padding: 12px 30px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; }
+        .lvl-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+        .lvl-btn { width: 60px; height: 60px; border-radius: 10px; border: 2px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .lvl-btn.locked { opacity: 0.2; }
     </style>
 </head>
 <body>
 
-    <div id="home-screen">
-        <div class="main-header">
-            <h1>PlayBase</h1>
-            <p>Zdominuj globalne rankingi.</p>
+    <audio id="bg-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="top-bar">
+        <div class="user-info">
+            <span id="display-nick">Gracz_123</span>
+            <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
         </div>
+    </div>
+
+    <div id="settings-modal">
+        <div class="modal-content">
+            <h2>USTAWIENIA</h2>
+            <p>Zmień swój nick:</p>
+            <input type="text" id="nick-input" placeholder="Wpisz nick...">
+            
+            <div class="toggle-box">
+                <span>Muzyka:</span>
+                <button id="music-toggle" class="btn" style="background: var(--danger);" onclick="toggleMusic()">WYŁĄCZONA</button>
+            </div>
+            
+            <button class="btn" style="background: var(--primary); width: 100%;" onclick="saveSettings()">ZAPISZ I ZAMKNIJ</button>
+        </div>
+    </div>
+
+    <div id="home-screen">
+        <h1 style="font-size: 70px; color: var(--primary); margin: 0;">PlayBase</h1>
         <div class="hub-grid">
-            <div class="hub-card" onclick="enterGame()">
-                <div style="font-size: 90px;">👑</div>
+            <div class="hub-card" onclick="openGameMenu()">
+                <div style="font-size: 60px;">❌⭕</div>
                 <h2>KÓŁKO I KRZYŻYK</h2>
-                <p>Wejdź do tabeli i walcz o 1. miejsce!</p>
+                <p>Graj, zdobywaj wygrane i bądź #1 w tabeli!</p>
             </div>
             <div class="hub-card mystery">
-                <div style="font-size: 90px;">❓</div>
+                <div style="font-size: 60px;">❓</div>
                 <h2>WKRÓTCE ????</h2>
-                <p>Nowa gra już w produkcji.</p>
             </div>
         </div>
     </div>
 
     <div id="game-menu">
-        <div class="leaderboard-box">
-            <h2>🏆 Tabela Globalna (LIVE)</h2>
-            <div id="leaderboard-content" class="rank-list">
-                </div>
+        <div class="leaderboard">
+            <h3 style="text-align: center; color: var(--secondary);">RANKING GLOBALNY</h3>
+            <div id="rank-list"></div>
         </div>
 
         <div style="text-align: center;">
-            <h3 style="color: var(--primary)">ARENA 3x3 (LVL 1-10)</h3>
-            <div class="level-grid" id="grid-s"></div>
-            <h3 style="color: var(--accent)">ARENA 6x3 (LVL 11-20)</h3>
-            <div class="level-grid" id="grid-l"></div>
+            <h3>POZIOMY (3x3)</h3>
+            <div class="lvl-grid" id="grid9"></div>
+            <h3>POZIOMY (6x3)</h3>
+            <div class="lvl-grid" id="grid18"></div>
         </div>
 
-        <button class="btn-action" onclick="location.reload()" style="background: #333; color: white;">POWRÓT</button>
+        <button class="btn" onclick="location.reload()" style="background: #333; margin-top: 20px; color: white;">POWRÓT</button>
     </div>
 
     <div id="game-arena">
-        <div class="status-txt" id="status">TWOJA KOLEJ (X)</div>
+        <div id="status" style="font-size: 30px; color: var(--secondary); margin-bottom: 20px;">TWOJA KOLEJ</div>
         <div id="board" class="board"></div>
-        <button class="btn-action" onclick="exitToMenu()" style="background: var(--danger); color: white;">ZREZYGNUJ</button>
+        <button class="btn" onclick="exitArena()" style="background: var(--danger); color: white; margin-top: 30px;">ZREZYGNUJ</button>
     </div>
 
     <script>
-        /** * SILNIK PLAYBASE LIVE v8.0 **/
-        
-        // Dane gracza
-        let myWins = parseInt(localStorage.getItem('pb8_wins')) || 0;
-        let myLvl = parseInt(localStorage.getItem('pb8_lvl')) || 1;
-        
-        // Symulacja innych graczy (Backend Simulation)
-        let players = [
-            { name: "TY (MISTRZ)", wins: myWins, isMe: true },
-            { name: "X-Pro-Gamer", wins: 15 },
-            { name: "Szymon_2012", wins: 8 },
-            { name: "Bot_Tester", wins: 3 }
-        ];
+        // SYSTEM DANYCH
+        const nicks = ["SzybkiGamer", "MistrzKółka", "Ninja_X", "ProPlayer", "TurboKrzyżyk"];
+        let userNick = localStorage.getItem('pb_nick') || nicks[Math.floor(Math.random()*nicks.length)] + "_" + Math.floor(Math.random()*99);
+        let wins = parseInt(localStorage.getItem('pb_wins')) || 0;
+        let unlocked = parseInt(localStorage.getItem('pb_lvl')) || 1;
+        let musicOn = false;
+
+        document.getElementById('display-nick').innerText = userNick;
+        document.getElementById('nick-input').value = userNick;
+
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function saveSettings() {
+            const newNick = document.getElementById('nick-input').value;
+            if(newNick) {
+                userNick = newNick;
+                localStorage.setItem('pb_nick', userNick);
+                document.getElementById('display-nick').innerText = userNick;
+            }
+            toggleSettings();
+            updateLeaderboard();
+        }
+
+        function toggleMusic() {
+            const music = document.getElementById('bg-music');
+            const btn = document.getElementById('music-toggle');
+            if(!musicOn) {
+                music.play();
+                btn.innerText = "WŁĄCZONA";
+                btn.style.background = "#2ecc71";
+                musicOn = true;
+            } else {
+                music.pause();
+                btn.innerText = "WYŁĄCZONA";
+                btn.style.background = var(--danger);
+                musicOn = false;
+            }
+        }
 
         function updateLeaderboard() {
-            players[0].wins = myWins; // Aktualizuj moje punkty
-            // Sortowanie po wygranych
-            players.sort((a, b) => b.wins - a.wins);
-            
-            const container = document.getElementById('leaderboard-content');
-            container.innerHTML = '';
-            
-            players.forEach((p, index) => {
-                const row = document.createElement('div');
-                row.className = `rank-row ${p.isMe ? 'me' : ''}`;
-                row.innerHTML = `
-                    <span class="rank-num">#${index + 1}</span>
-                    <span class="rank-name">${p.name}</span>
-                    <span class="rank-wins">${p.wins} WYGRANYCH</span>
-                `;
-                container.appendChild(row);
+            const list = document.getElementById('rank-list');
+            const players = [
+                {n: userNick, w: wins, me: true},
+                {n: "Marek_PL", w: 12},
+                {n: "Kasia99", w: 7},
+                {n: "Zordon", w: 3}
+            ].sort((a,b) => b.w - a.w);
+
+            list.innerHTML = '';
+            players.forEach((p, i) => {
+                list.innerHTML += `
+                    <div class="rank-row ${p.me ? 'active' : ''}">
+                        <span>#${i+1} ${p.n}</span>
+                        <span>${p.w} wygranych</span>
+                    </div>`;
             });
         }
 
-        function enterGame() {
+        function openGameMenu() {
             document.getElementById('home-screen').style.display = 'none';
             document.getElementById('game-menu').style.display = 'flex';
             updateLeaderboard();
-            renderLvls();
+            renderLevels();
         }
 
-        function renderLvls() {
+        function renderLevels() {
             const draw = (id, s, e, col) => {
-                const div = document.getElementById(id); div.innerHTML = '';
+                const g = document.getElementById(id); g.innerHTML = '';
                 for(let i=s; i<=e; i++) {
                     const b = document.createElement('div');
-                    b.className = `lvl-btn ${i > myLvl ? 'locked' : ''}`;
+                    b.className = `lvl-btn ${i > unlocked ? 'locked' : ''}`;
                     b.style.background = col; b.innerText = i;
-                    if(i <= myLvl) b.onclick = () => startMatch(i);
-                    div.appendChild(b);
+                    if(i <= unlocked) b.onclick = () => startMatch(i);
+                    g.appendChild(b);
                 }
             };
-            draw('grid-s', 1, 10, '#2ecc71');
-            draw('grid-l', 11, 20, '#a55eea');
+            draw('grid9', 1, 10, '#2ecc71');
+            draw('grid18', 11, 20, '#8e44ad');
         }
 
-        /* --- LOGIKA GRY --- */
+        // LOGIKA GRY
         let board = [];
         let curLvl = 1;
         let active = true;
@@ -174,114 +222,66 @@
             curLvl = l;
             document.getElementById('game-menu').style.display = 'none';
             document.getElementById('game-arena').style.display = 'flex';
-            
-            const bEl = document.getElementById('board');
+            const b = document.getElementById('board');
             const size = l <= 10 ? 9 : 18;
-            bEl.className = l <= 10 ? 'board s9' : 'board s18';
+            b.className = `board ${l <= 10 ? 's9' : 's18'}`;
             board = Array(size).fill("");
-            
-            bEl.innerHTML = '';
+            b.innerHTML = '';
             for(let i=0; i<size; i++) {
                 const c = document.createElement('div');
                 c.className = 'cell';
-                c.onclick = () => move(i);
-                bEl.appendChild(c);
+                c.onclick = () => { if(board[i]==="" && active) { board[i]="X"; checkGame(); if(active) setTimeout(ai, 500); } };
+                b.appendChild(c);
             }
-            active = true;
-            document.getElementById('status').innerText = "TWOJA KOLEJ (X)";
-        }
-
-        function move(i) {
-            if(board[i] === "" && active) {
-                board[i] = "X";
-                refresh();
-                if(!check()) {
-                    active = false;
-                    document.getElementById('status').innerText = "AI MYŚLI...";
-                    setTimeout(ai, 500);
-                }
-            }
+            active = true; refresh();
         }
 
         function ai() {
             let free = board.map((v,i) => v===""?i:null).filter(v=>v!==null);
-            if(free.length > 0) {
-                let choice = free[Math.floor(Math.random()*free.length)];
-                board[choice] = "O";
-            }
-            refresh();
-            if(!check()) {
-                active = true;
-                document.getElementById('status').innerText = "TWOJA KOLEJ (X)";
-            }
+            if(free.length && active) board[free[Math.floor(Math.random()*free.length)]] = "O";
+            checkGame(); refresh();
         }
 
-        function check() {
-            const isS = curLvl <= 10;
-            const target = isS ? 3 : 4;
-            const cols = isS ? 3 : 6;
-
+        function checkGame() {
             const win = (p) => {
+                const target = curLvl <= 10 ? 3 : 4;
+                const cols = curLvl <= 10 ? 3 : 6;
                 for(let i=0; i<board.length; i++) {
                     if(line(i, 1, p, target, cols)) return true;
                     if(line(i, cols, p, target, cols)) return true;
-                    if(line(i, cols+1, p, target, cols)) return true;
-                    if(line(i, cols-1, p, target, cols)) return true;
                 }
                 return false;
             };
 
-            if(win("X")) return end("X");
-            if(win("O")) return end("O");
-            if(!board.includes("")) return end("tie");
-            return false;
+            if(win("X")) {
+                active = false; wins++; unlocked = Math.max(unlocked, curLvl + 1);
+                localStorage.setItem('pb_wins', wins); localStorage.setItem('pb_lvl', unlocked);
+                document.getElementById('status').innerText = "WYGRAŁEŚ!";
+            } else if(win("O")) {
+                active = false; document.getElementById('status').innerText = "PRZEGRAŁEŚ!";
+            } else if(!board.includes("")) {
+                active = false; document.getElementById('status').innerText = "REMIS!";
+            }
         }
 
         function line(s, step, p, t, cols) {
-            let c = 0;
+            let count = 0;
             for(let i=0; i<t; i++) {
                 let idx = s + i*step;
-                if(idx >= 0 && idx < board.length && board[idx] === p) {
-                    if(step === 1 && Math.floor(idx/cols) !== Math.floor(s/cols)) break;
-                    c++;
-                } else break;
+                if(idx < board.length && board[idx] === p) count++;
             }
-            return c === t;
-        }
-
-        function end(res) {
-            active = false;
-            if(res === "X") {
-                document.getElementById('status').innerText = "ZWYCIĘSTWO! 🎉";
-                myWins++; localStorage.setItem('pb8_wins', myWins);
-                if(curLvl === myLvl && myLvl < 20) { myLvl++; localStorage.setItem('pb8_lvl', myLvl); }
-            } else if(res === "O") document.getElementById('status').innerText = "PRZEGRANA 🤖";
-            else document.getElementById('status').innerText = "REMIS 🤝";
-            return true;
+            return count === t;
         }
 
         function refresh() {
             const cells = document.querySelectorAll('.cell');
-            board.forEach((v, i) => {
-                cells[i].innerText = v;
-                cells[i].className = `cell ${v.toLowerCase()}`;
-            });
+            board.forEach((v,i) => { cells[i].innerText = v; cells[i].className = `cell ${v.toLowerCase()}`; });
         }
 
-        function exitToMenu() {
+        function exitArena() {
             document.getElementById('game-arena').style.display = 'none';
-            document.getElementById('game-menu').style.display = 'flex';
-            updateLeaderboard();
-            renderLvls();
+            openGameMenu();
         }
-
-        // DODATEK: Symulacja "życia" tabeli co 10 sekund (ktoś inny może zdobyć punkt)
-        setInterval(() => {
-            if(Math.random() > 0.7) {
-                players[1].wins += 1; // Inny gracz zdobywa punkt
-                if(document.getElementById('game-menu').style.display === 'flex') updateLeaderboard();
-            }
-        }, 10000);
     </script>
 </body>
 </html>
