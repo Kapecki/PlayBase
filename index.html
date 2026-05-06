@@ -2,87 +2,105 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>PlayBase | Tic-Tac-Toe & CyberDash</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayBase Ultimate | HUB</title>
     <style>
         :root {
             --primary: #00d4ff; --secondary: #ffcc00; --danger: #ff4d4d;
-            --bg: #0b0e14; --card: #161b22; --neon: #00ff99;
+            --bg: #0b0e14; --card: #1d232a; --neon: #00ff99;
         }
 
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; overflow: hidden; }
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Segoe UI', 'Arial Black', sans-serif; background: var(--bg); color: white; overflow: hidden; }
 
         /* --- UI GÓRNE --- */
-        #top-bar { position: fixed; top: 0; right: 0; padding: 20px; display: flex; align-items: center; gap: 15px; z-index: 1000; }
-        .user-pill { background: rgba(0, 212, 255, 0.1); border: 2px solid var(--primary); padding: 8px 20px; border-radius: 50px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(5px); }
-        .settings-icon { cursor: pointer; transition: 0.3s; font-size: 24px; }
-        .settings-icon:hover { transform: rotate(90deg); color: var(--secondary); }
+        #top-bar { position: fixed; top: 0; right: 0; padding: 15px 25px; display: flex; align-items: center; gap: 15px; z-index: 1000; }
+        .user-pill { 
+            background: rgba(29, 35, 42, 0.8); border: 2px solid var(--primary); 
+            padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; gap: 15px;
+            backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        .settings-btn { font-size: 24px; cursor: pointer; transition: 0.4s; }
+        .settings-btn:hover { transform: rotate(90deg); color: var(--secondary); }
 
-        /* --- SETTINGS --- */
-        #settings-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; }
-        .settings-card { background: var(--card); padding: 30px; border-radius: 30px; border: 3px solid var(--primary); width: 320px; text-align: center; }
-        .settings-card input { width: 80%; padding: 12px; margin: 15px 0; border-radius: 10px; border: none; text-align: center; font-family: inherit; font-size: 16px; }
+        /* --- SETTINGS MODAL --- */
+        #settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .settings-card { background: var(--card); padding: 40px; border-radius: 30px; border: 2px solid var(--primary); width: 350px; text-align: center; }
+        .settings-card h2 { margin-top: 0; color: var(--primary); }
+        .settings-card input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 10px; border: 1px solid #444; background: #0b0e14; color: white; text-align: center; font-size: 18px; }
 
-        /* --- HUB --- */
-        #home-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, #1e293b 0%, #0b0e14 100%); }
-        .hub-grid { display: flex; gap: 40px; margin-top: 50px; }
-        .hub-btn { width: 320px; background: var(--card); border: 4px solid #333; border-radius: 45px; padding: 45px; text-align: center; cursor: pointer; transition: 0.4s; }
-        .hub-btn:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 0 30px rgba(0,212,255,0.3); }
+        /* --- HOME SCREEN --- */
+        #home-screen { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #16213e 0%, #0b0e14 100%); }
+        .hub-grid { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; padding: 20px; }
+        .hub-card { 
+            width: 320px; background: var(--card); border: 3px solid #333; border-radius: 40px; padding: 40px; 
+            text-align: center; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .hub-card:hover { border-color: var(--primary); transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,212,255,0.3); }
+        .hub-card i { font-size: 60px; display: block; margin-bottom: 20px; }
 
-        /* --- CYBER DASH ARENA --- */
-        #dash-arena { display: none; position: fixed; inset: 0; background: #000; z-index: 800; flex-direction: column; align-items: center; justify-content: center; }
-        #dash-canvas { border: 4px solid var(--neon); border-radius: 20px; background: #050505; box-shadow: 0 0 50px rgba(0, 255, 153, 0.2); }
-        .dash-ui { position: absolute; top: 40px; font-size: 30px; color: var(--neon); text-shadow: 0 0 10px var(--neon); pointer-events: none; }
-        .dash-controls { margin-top: 20px; color: #555; font-size: 14px; }
+        /* --- TIC-TAC-TOE LOBBY --- */
+        #ttt-lobby { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500; flex-direction: column; align-items: center; padding-top: 80px; overflow-y: auto; }
+        .rank-table { 
+            width: 90%; max-width: 500px; background: rgba(255,255,255,0.05); border: 2px solid var(--secondary); 
+            border-radius: 20px; padding: 20px; margin-bottom: 30px; 
+        }
+        .rank-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
+        .rank-row.me { color: var(--secondary); font-weight: bold; }
 
-        /* --- TTT LOBBY --- */
-        #ttt-lobby { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500; flex-direction: column; align-items: center; padding-top: 80px; }
-        .leaderboard { width: 400px; background: rgba(255,255,255,0.05); border: 2px solid var(--secondary); border-radius: 20px; padding: 20px; margin-bottom: 30px; }
-        .lvl-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-        .lvl-box { width: 60px; height: 60px; border-radius: 12px; border: 2px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .lvl-box.locked { opacity: 0.2; cursor: not-allowed; }
+        .lvl-container { text-align: center; margin-bottom: 50px; }
+        .lvl-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 15px; }
+        .lvl-btn { width: 60px; height: 60px; border-radius: 12px; border: 2px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .lvl-btn.locked { opacity: 0.2; cursor: not-allowed; }
 
-        /* --- TTT ARENA --- */
-        #ttt-arena { display: none; position: fixed; inset: 0; background: #000; z-index: 600; flex-direction: column; align-items: center; justify-content: center; }
-        .board { display: grid; gap: 10px; background: var(--primary); padding: 10px; border-radius: 15px; }
-        .board.s9 { grid-template-columns: repeat(3, 130px); }
-        .board.s18 { grid-template-columns: repeat(6, 100px); }
-        .cell { width: 100%; height: 100%; min-height: 100px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 60px; cursor: pointer; border-radius: 10px; }
+        /* --- GAME ARENAS --- */
+        #ttt-arena, #dash-arena { display: none; position: fixed; inset: 0; background: #000; z-index: 600; flex-direction: column; align-items: center; justify-content: center; }
         
-        .btn { padding: 12px 30px; border-radius: 15px; border: none; cursor: pointer; font-family: inherit; font-weight: bold; transition: 0.3s; }
+        /* TicTacToe Board */
+        .board { display: grid; gap: 10px; background: var(--primary); padding: 10px; border-radius: 15px; box-shadow: 0 0 50px rgba(0,212,255,0.2); }
+        .board.s9 { grid-template-columns: repeat(3, 110px); }
+        .board.s18 { grid-template-columns: repeat(6, 90px); }
+        .cell { width: 100%; height: 100%; min-height: 90px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; border-radius: 8px; }
+
+        /* Cyber Dash */
+        #dash-canvas { border: 4px solid var(--neon); border-radius: 20px; background: #050505; max-height: 80vh; max-width: 95vw; }
+
+        .btn-ui { padding: 15px 40px; border-radius: 15px; border: none; cursor: pointer; font-family: inherit; font-weight: bold; font-size: 16px; margin: 10px; transition: 0.2s; }
+        .btn-ui:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
-    <audio id="main-music" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg"></audio>
+    <audio id="bg-music" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3" type="audio/mpeg"></audio>
 
     <div id="top-bar">
         <div class="user-pill">
-            <span id="player-nick">Wczytywanie...</span>
-            <span class="settings-icon" onclick="openSettings()">⚙️</span>
+            <span id="ui-nick">Wczytywanie...</span>
+            <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
         </div>
     </div>
 
-    <div id="settings-overlay">
+    <div id="settings-modal">
         <div class="settings-card">
-            <h2>USTAWIENIA</h2>
-            <input type="text" id="name-input" maxlength="12">
+            <h2>PROFIL GRACZA</h2>
+            <input type="text" id="input-nick" placeholder="Wpisz swój nick...">
             <div style="margin-bottom: 20px;">
-                Dźwięk: <button id="music-toggle" class="btn" style="background: var(--danger);" onclick="toggleMusic()">OFF</button>
+                Dźwięki: <button id="music-btn" class="btn-ui" style="background: var(--danger); width: 100px;" onclick="toggleAudio()">OFF</button>
             </div>
-            <button class="btn" style="background: var(--primary); width: 100%;" onclick="saveSettings()">ZAPISZ</button>
+            <button class="btn-ui" style="background: var(--primary); width: 100%; color: #000;" onclick="saveProfile()">ZAPISZ</button>
         </div>
     </div>
 
     <div id="home-screen">
-        <h1 style="font-size: 80px; color: var(--primary); margin: 0; text-shadow: 0 0 20px rgba(0,212,255,0.5);">PlayBase</h1>
+        <h1 style="font-size: clamp(40px, 10vw, 80px); color: var(--primary); margin: 0; text-shadow: 0 0 30px rgba(0,212,255,0.4);">PlayBase</h1>
         <div class="hub-grid">
-            <div class="hub-btn" onclick="showTTT()">
-                <div style="font-size: 60px;">❌⭕</div>
+            <div class="hub-card" onclick="openTTT()">
+                <i>❌</i>
                 <h2>KÓŁKO I KRZYŻYK</h2>
-                <p>20 Poziomów & Ranking</p>
+                <p>Ranking & Poziomy</p>
             </div>
-            <div class="hub-btn" onclick="startDash()">
-                <div style="font-size: 60px;">⚡</div>
+            <div class="hub-card" onclick="openDash()">
+                <i>⚡</i>
                 <h2>CYBER DASH</h2>
                 <p>Omijaj przeszkody!</p>
             </div>
@@ -90,205 +108,243 @@
     </div>
 
     <div id="ttt-lobby">
-        <div class="leaderboard" id="ttt-rank"></div>
-        <h3 style="color: var(--primary)">WYBIERZ ETAP</h3>
-        <div class="lvl-grid" id="ttt-lvls"></div>
-        <button class="btn" onclick="location.reload()" style="background: #333; color: white; margin-top: 40px;">POWRÓT</button>
+        <div class="rank-table">
+            <h3 style="margin-top:0; color: var(--secondary)">MISTRZOWIE ARENY</h3>
+            <div id="rank-content"></div>
+        </div>
+        <div class="lvl-container">
+            <h3 style="color: var(--primary)">KLASYK 3x3</h3>
+            <div class="lvl-grid" id="grid-3x3"></div>
+            <h3 style="color: var(--accent); margin-top: 30px;">WIELKA ARENA 6x3</h3>
+            <div class="lvl-grid" id="grid-6x3"></div>
+        </div>
+        <button class="btn-ui" onclick="location.reload()" style="background: #333; color: #fff;">POWRÓT</button>
     </div>
 
     <div id="ttt-arena">
-        <div id="ttt-status" style="font-size: 35px; color: var(--secondary); margin-bottom: 25px;">X ZACZYNA</div>
+        <div id="ttt-status" style="font-size: 30px; color: var(--secondary); margin-bottom: 20px;">TWOJA KOLEJ</div>
         <div id="ttt-board" class="board"></div>
-        <button class="btn" onclick="showTTT()" style="background: var(--danger); color: white; margin-top: 30px;">WYJDŹ</button>
+        <button class="btn-ui" onclick="openTTT()" style="background: var(--danger); color: white; margin-top: 30px;">WYJDŹ</button>
     </div>
 
     <div id="dash-arena">
-        <div class="dash-ui">DYSTANS: <span id="dash-score">0</span>m</div>
+        <div id="dash-score-ui" style="font-size: 30px; color: var(--neon); margin-bottom: 10px;">0m</div>
         <canvas id="dash-canvas" width="400" height="600"></canvas>
-        <div class="dash-controls">Użyj [←] [→] lub [A] [D] by omijać bloki</div>
-        <button id="dash-btn" class="btn" style="background: var(--neon); color: black; margin-top: 20px;" onclick="resetDash()">START</button>
-        <button class="btn" onclick="location.reload()" style="background: #333; color: white; margin-top: 10px;">POWRÓT</button>
+        <div style="margin-top: 15px; color: #666;">A / D lub Strzałki by sterować</div>
+        <button id="dash-start-btn" class="btn-ui" style="background: var(--neon); color: #000;" onclick="startDashGame()">START</button>
+        <button class="btn-ui" onclick="location.reload()" style="background: #333; color: #fff;">POWRÓT</button>
     </div>
 
     <script>
-        let nick = localStorage.getItem('pb_n') || "Gracz_" + Math.floor(Math.random()*99);
-        let tttWins = parseInt(localStorage.getItem('pb_tw')) || 0;
-        let tttLvl = parseInt(localStorage.getItem('pb_tl')) || 1;
-        let audioOn = false;
+        // --- LOGIKA PROFILU ---
+        let player = {
+            nick: localStorage.getItem('pb_nick') || "Gracz_" + Math.floor(Math.random()*99),
+            wins: parseInt(localStorage.getItem('pb_wins')) || 0,
+            unlocked: parseInt(localStorage.getItem('pb_unlocked')) || 1,
+            audio: false
+        };
 
-        function init() {
-            document.getElementById('player-nick').innerText = nick;
-            document.getElementById('name-input').value = nick;
+        function updateUI() {
+            document.getElementById('ui-nick').innerText = player.nick;
+            document.getElementById('input-nick').value = player.nick;
         }
 
-        function openSettings() { document.getElementById('settings-overlay').style.display = 'flex'; }
-        function saveSettings() {
-            nick = document.getElementById('name-input').value || nick;
-            localStorage.setItem('pb_n', nick);
-            document.getElementById('player-nick').innerText = nick;
-            document.getElementById('settings-overlay').style.display = 'none';
-            if(document.getElementById('ttt-lobby').style.display === 'flex') renderTTTRank();
+        function toggleSettings() {
+            const m = document.getElementById('settings-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function toggleMusic() {
-            const m = document.getElementById('main-music');
-            const b = document.getElementById('music-toggle');
-            audioOn = !audioOn;
-            if(audioOn) { m.play(); b.innerText="ON"; b.style.background="#2ecc71"; }
-            else { m.pause(); b.innerText="OFF"; b.style.background="var(--danger)"; }
+        function saveProfile() {
+            const n = document.getElementById('input-nick').value.trim();
+            if(n) {
+                player.nick = n;
+                localStorage.setItem('pb_nick', n);
+                updateUI();
+                if(document.getElementById('ttt-lobby').style.display === 'flex') renderRank();
+            }
+            toggleSettings();
         }
 
-        /* --- KÓŁKO I KRZYŻYK --- */
-        function showTTT() {
+        function toggleAudio() {
+            const music = document.getElementById('bg-music');
+            const btn = document.getElementById('music-btn');
+            player.audio = !player.audio;
+            if(player.audio) { music.play(); btn.innerText = "ON"; btn.style.background = "#2ecc71"; }
+            else { music.pause(); btn.innerText = "OFF"; btn.style.background = "var(--danger)"; }
+        }
+
+        // --- KÓŁKO I KRZYŻYK ---
+        function openTTT() {
             document.getElementById('home-screen').style.display = 'none';
             document.getElementById('ttt-arena').style.display = 'none';
             document.getElementById('ttt-lobby').style.display = 'flex';
-            renderTTTRank();
-            renderTTTLvls();
+            renderRank();
+            renderLevels();
         }
 
-        function renderTTTRank() {
-            const r = document.getElementById('ttt-rank');
-            r.innerHTML = `<h3 style="margin:0; color:var(--secondary)">RANKING</h3>
-            <div style="display:flex; justify-content:space-between; margin-top:10px;"><span>🥇 ${nick}</span><span>${tttWins} Wygranych</span></div>`;
+        function renderRank() {
+            const content = document.getElementById('rank-content');
+            const fakePlayers = [
+                {n: player.nick, w: player.wins, me: true},
+                {n: "Turbo_Seba", w: 15},
+                {n: "Emi_Gamer", w: 8},
+                {n: "Bot_3000", w: 2}
+            ].sort((a,b) => b.w - a.w);
+
+            content.innerHTML = '';
+            fakePlayers.forEach((p, i) => {
+                content.innerHTML += `<div class="rank-row ${p.me ? 'me' : ''}"><span>#${i+1} ${p.n}</span><span>${p.w} Wygranych</span></div>`;
+            });
         }
 
-        function renderTTTLvls() {
-            const g = document.getElementById('ttt-lvls'); g.innerHTML = '';
-            for(let i=1; i<=20; i++) {
-                const b = document.createElement('div');
-                b.className = `lvl-box ${i > tttLvl ? 'locked' : ''}`;
-                b.style.background = i <= 10 ? "#2ecc71" : "#a55eea";
-                b.innerText = i;
-                if(i <= tttLvl) b.onclick = () => startTTTArena(i);
-                g.appendChild(b);
-            }
+        function renderLevels() {
+            const draw = (id, s, e, col) => {
+                const el = document.getElementById(id); el.innerHTML = '';
+                for(let i=s; i<=e; i++) {
+                    const b = document.createElement('div');
+                    b.className = `lvl-btn ${i > player.unlocked ? 'locked' : ''}`;
+                    b.style.background = col; b.innerText = i;
+                    if(i <= player.unlocked) b.onclick = () => startTTTGame(i);
+                    el.appendChild(b);
+                }
+            };
+            draw('grid-3x3', 1, 10, '#2ecc71');
+            draw('grid-6x3', 11, 20, '#8e44ad');
         }
 
-        let board = [];
-        let canPlay = true;
-
-        function startTTTArena(l) {
+        let tttData = { board: [], active: false, size: 9 };
+        function startTTTGame(lvl) {
             document.getElementById('ttt-lobby').style.display = 'none';
             document.getElementById('ttt-arena').style.display = 'flex';
-            const size = l <= 10 ? 9 : 18;
-            board = Array(size).fill("");
-            const bEl = document.getElementById('ttt-board');
-            bEl.className = `board ${l <= 10 ? 's9' : 's18'}`;
-            bEl.innerHTML = '';
-            for(let i=0; i<size; i++) {
+            const isSmall = lvl <= 10;
+            tttData.size = isSmall ? 9 : 18;
+            tttData.board = Array(tttData.size).fill("");
+            const boardEl = document.getElementById('ttt-board');
+            boardEl.className = `board ${isSmall ? 's9' : 's18'}`;
+            boardEl.innerHTML = '';
+            
+            for(let i=0; i<tttData.size; i++) {
                 const c = document.createElement('div');
                 c.className = 'cell';
-                c.onclick = () => { if(board[i]==="" && canPlay) { board[i]="X"; updateTTT(); if(!checkTTT()) { canPlay=false; setTimeout(aiTTT, 500); } } };
-                bEl.appendChild(c);
+                c.onclick = () => {
+                    if(tttData.board[i] === "" && tttData.active) {
+                        tttData.board[i] = "X"; updateBoard();
+                        if(!checkWinner()) {
+                            tttData.active = false;
+                            document.getElementById('ttt-status').innerText = "AI MYŚLI...";
+                            setTimeout(aiMove, 600);
+                        }
+                    }
+                };
+                boardEl.appendChild(c);
             }
-            canPlay = true;
+            tttData.active = true;
             document.getElementById('ttt-status').innerText = "TWÓJ RUCH (X)";
         }
 
-        function aiTTT() {
-            let f = board.map((v,i)=>v===""?i:null).filter(v=>v!==null);
-            if(f.length) board[f[Math.floor(Math.random()*f.length)]] = "O";
-            updateTTT(); checkTTT(); canPlay = true;
+        function aiMove() {
+            let free = tttData.board.map((v,i) => v===""?i:null).filter(v=>v!==null);
+            if(free.length) tttData.board[free[Math.floor(Math.random()*free.length)]] = "O";
+            updateBoard();
+            if(!checkWinner()) {
+                tttData.active = true;
+                document.getElementById('ttt-status').innerText = "TWÓJ RUCH (X)";
+            }
         }
 
-        function updateTTT() {
+        function updateBoard() {
             const cells = document.querySelectorAll('.cell');
-            board.forEach((v,i) => { cells[i].innerText = v; cells[i].style.color = v==="X"?"var(--danger)":"var(--primary)"; });
+            tttData.board.forEach((v, i) => { 
+                cells[i].innerText = v; 
+                cells[i].style.color = v === "X" ? "var(--danger)" : "var(--primary)";
+            });
         }
 
-        function checkTTT() {
+        function checkWinner() {
             const win = (p) => {
-                const winLen = board.length === 9 ? 3 : 4;
-                const cols = board.length === 9 ? 3 : 6;
-                for(let i=0; i<board.length; i++) {
-                    if(scanTTT(i, 1, p, winLen, cols)) return true;
-                    if(scanTTT(i, cols, p, winLen, cols)) return true;
+                const target = tttData.size === 9 ? 3 : 4;
+                const cols = tttData.size === 9 ? 3 : 6;
+                for(let i=0; i<tttData.board.length; i++) {
+                    if(checkLine(i, 1, p, target, cols)) return true;
+                    if(checkLine(i, cols, p, target, cols)) return true;
                 }
                 return false;
             };
-            if(win("X")) { 
-                document.getElementById('ttt-status').innerText = "ZWYCIĘSTWO!"; tttWins++; tttLvl++;
-                localStorage.setItem('pb_tw', tttWins); localStorage.setItem('pb_tl', tttLvl);
-                canPlay = false; return true;
+
+            if(win("X")) {
+                document.getElementById('ttt-status').innerText = "ZWYCIĘSTWO! 🎉";
+                player.wins++; player.unlocked++;
+                localStorage.setItem('pb_wins', player.wins);
+                localStorage.setItem('pb_unlocked', player.unlocked);
+                tttData.active = false; return true;
             }
-            if(win("O")) { document.getElementById('ttt-status').innerText = "PRZEGRANA!"; canPlay = false; return true; }
+            if(win("O")) { document.getElementById('ttt-status').innerText = "PRZEGRANA 🤖"; tttData.active = false; return true; }
+            if(!tttData.board.includes("")) { document.getElementById('ttt-status').innerText = "REMIS 🤝"; tttData.active = false; return true; }
             return false;
         }
 
-        function scanTTT(s, st, p, goal, cols) {
-            let c = 0;
-            for(let i=0; i<goal; i++) {
-                let idx = s + i*st;
-                if(idx < board.length && board[idx] === p) c++;
+        function checkLine(s, step, p, target, cols) {
+            let count = 0;
+            for(let i=0; i<target; i++) {
+                let idx = s + i*step;
+                if(idx < tttData.board.length && tttData.board[idx] === p) count++;
             }
-            return c === goal;
+            return count === target;
         }
 
-        /* --- CYBER DASH GAME --- */
+        // --- CYBER DASH ---
         const canvas = document.getElementById('dash-canvas');
         const ctx = canvas.getContext('2d');
-        let gameActive = false;
-        let score = 0;
-        let playerX = 175;
-        let obstacles = [];
-        let gameSpeed = 5;
+        let dash = { active: false, x: 175, score: 0, obstacles: [], speed: 5 };
 
-        function startDash() {
+        function openDash() {
             document.getElementById('home-screen').style.display = 'none';
             document.getElementById('dash-arena').style.display = 'flex';
         }
 
-        function resetDash() {
-            gameActive = true; score = 0; playerX = 175; obstacles = []; gameSpeed = 5;
-            document.getElementById('dash-btn').style.display = 'none';
-            requestAnimationFrame(gameLoop);
+        function startDashGame() {
+            dash = { active: true, x: 175, score: 0, obstacles: [], speed: 5 };
+            document.getElementById('dash-start-btn').style.display = 'none';
+            animateDash();
         }
 
         window.addEventListener('keydown', (e) => {
-            if(e.key === "ArrowLeft" || e.key === "a") playerX = Math.max(20, playerX - 50);
-            if(e.key === "ArrowRight" || e.key === "d") playerX = Math.min(330, playerX + 50);
+            if(e.key === "ArrowLeft" || e.key === "a") dash.x = Math.max(25, dash.x - 50);
+            if(e.key === "ArrowRight" || e.key === "d") dash.x = Math.min(325, dash.x + 50);
         });
 
-        function gameLoop() {
-            if(!gameActive) return;
+        function animateDash() {
+            if(!dash.active) return;
             ctx.clearRect(0,0,400,600);
 
-            // Rysuj gracza (Neonowa Kula)
-            ctx.beginPath();
-            ctx.arc(playerX + 25, 530, 20, 0, Math.PI*2);
-            ctx.fillStyle = "#fff"; ctx.fill();
-            ctx.shadowBlur = 20; ctx.shadowColor = var(--primary);
-            ctx.strokeStyle = var(--primary); ctx.lineWidth = 4; ctx.stroke();
+            // Gracz
+            ctx.shadowBlur = 15; ctx.shadowColor = var(--primary);
+            ctx.fillStyle = "#fff";
+            ctx.beginPath(); ctx.arc(dash.x + 25, 540, 20, 0, Math.PI*2); ctx.fill();
 
             // Przeszkody
-            if(Math.random() < 0.03) {
-                obstacles.push({ x: [20, 120, 220, 320][Math.floor(Math.random()*4)], y: -50 });
-            }
+            if(Math.random() < 0.04) dash.obstacles.push({ x: [25, 125, 225, 325][Math.floor(Math.random()*4)], y: -50 });
 
-            obstacles.forEach((ob, index) => {
-                ob.y += gameSpeed;
+            dash.obstacles.forEach((ob, i) => {
+                ob.y += dash.speed;
                 ctx.fillStyle = var(--neon);
-                ctx.fillRect(ob.x, ob.y, 60, 30);
-                ctx.shadowBlur = 10; ctx.shadowColor = var(--neon);
+                ctx.fillRect(ob.x, ob.y, 50, 30);
 
-                // Kolizja
-                if(ob.y > 500 && ob.y < 560 && Math.abs(ob.x - playerX) < 40) {
-                    gameActive = false;
-                    document.getElementById('dash-btn').style.display = 'inline-block';
-                    document.getElementById('dash-btn').innerText = "RESTART";
-                    alert("KRAK! TWÓJ WYNIK: " + Math.floor(score));
+                if(ob.y > 510 && ob.y < 570 && Math.abs(ob.x - dash.x) < 40) {
+                    dash.active = false;
+                    alert("KOLIZJA! WYNIK: " + Math.floor(dash.score) + "m");
+                    document.getElementById('dash-start-btn').style.display = 'inline-block';
+                    document.getElementById('dash-start-btn').innerText = "RESTART";
                 }
-                if(ob.y > 600) obstacles.splice(index, 1);
+                if(ob.y > 600) dash.obstacles.splice(i, 1);
             });
 
-            score += 0.1;
-            gameSpeed += 0.001;
-            document.getElementById('dash-score').innerText = Math.floor(score);
-            requestAnimationFrame(gameLoop);
+            dash.score += 0.1; dash.speed += 0.001;
+            document.getElementById('dash-score-ui').innerText = Math.floor(dash.score) + "m";
+            requestAnimationFrame(animateDash);
         }
 
-        init();
+        updateUI();
     </script>
 </body>
 </html>
