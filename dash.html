@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>PlayBase | Cyber Dash</title>
+    <style>
+        body { background: #000; color: #00ff99; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        canvas { border: 3px solid #00ff99; background: #050505; box-shadow: 0 0 20px #00ff9955; }
+        .btn { padding: 10px 25px; margin-top: 15px; cursor: pointer; border-radius: 10px; border: none; font-weight: bold; background: #333; color: white; }
+    </style>
+</head>
+<body>
+    <h1 id="score">DYSTANS: 0m</h1>
+    <canvas id="game" width="350" height="500"></canvas>
+    <button class="btn" style="background:#00ff99; color:black" onclick="start()">START / RESTART</button>
+    <button class="btn" onclick="location.href='index.html'">LOBBY</button>
+
+    <script>
+        const cvs = document.getElementById('game');
+        const ctx = cvs.getContext('2d');
+        let game = { active: false, x: 150, obs: [], score: 0 };
+
+        function start() { game = { active: true, x: 150, obs: [], score: 0 }; loop(); }
+
+        window.onkeydown = (e) => {
+            if(e.key === "ArrowLeft" || e.key === "a") game.x = Math.max(10, game.x - 70);
+            if(e.key === "ArrowRight" || e.key === "d") game.x = Math.min(270, game.x + 70);
+        };
+
+        function loop() {
+            if(!game.active) return;
+            ctx.clearRect(0, 0, 350, 500);
+            
+            ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(game.x + 35, 450, 20, 0, 7); ctx.fill();
+
+            if(Math.random() < 0.04) game.obs.push({ x: [10, 80, 150, 220, 290][Math.floor(Math.random()*5)], y: -50 });
+
+            game.obs.forEach((o, i) => {
+                o.y += 6;
+                ctx.fillStyle = "#00ff99"; ctx.fillRect(o.x, o.y, 50, 25);
+                if(o.y > 420 && o.y < 480 && Math.abs(o.x - game.x) < 40) { game.active = false; alert("KONIEC! Wynik: " + Math.floor(game.score)); }
+                if(o.y > 500) game.obs.splice(i, 1);
+            });
+
+            game.score += 0.1;
+            document.getElementById('score').innerText = "DYSTANS: " + Math.floor(game.score) + "m";
+            requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+</html>
