@@ -2,259 +2,275 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>PlayBase | Tic-Tac-Toe Global Mastery</title>
+    <title>PlayBase | Tic-Tac-Toe Pro Mastery</title>
     <style>
         :root {
             --primary: #00d4ff; --secondary: #ffcc00; --danger: #ff4d4d;
-            --bg: #0b0e14; --card: #161b22; --accent: #8e44ad;
+            --bg: #0b0e14; --card: #161b22; --accent: #a55eea;
         }
 
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
 
-        /* --- STRONA GŁÓWNA --- */
-        #home-screen { padding: 50px; text-align: center; }
-        .header h1 { font-size: 60px; color: var(--primary); text-shadow: 0 0 20px rgba(0,212,255,0.4); margin-bottom: 10px; }
+        /* --- 1. STRONA GŁÓWNA (TWOJE KAFLE) --- */
+        #home-screen { height: 100vh; padding: 60px; text-align: center; }
+        .main-header { border-bottom: 3px solid #333; padding-bottom: 30px; margin-bottom: 50px; }
+        .main-header h1 { font-size: 65px; color: var(--primary); text-shadow: 0 0 25px rgba(0,212,255,0.4); margin: 0; }
         
-        .game-card { 
-            max-width: 400px; margin: 40px auto; background: var(--card); border: 4px solid #333; 
-            border-radius: 40px; padding: 40px; transition: 0.4s; cursor: pointer;
+        .hub-grid { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .hub-card { 
+            width: 380px; background: var(--card); border: 5px solid #30363d; border-radius: 45px; 
+            padding: 45px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative;
         }
-        .game-card:hover { border-color: var(--primary); transform: scale(1.02); }
+        .hub-card:hover { transform: scale(1.05); border-color: var(--primary); box-shadow: 0 15px 40px rgba(0,212,255,0.2); }
+        .hub-card.mystery { border-style: dashed; opacity: 0.7; }
+        .hub-card.mystery:hover { border-color: var(--accent); box-shadow: 0 0 30px var(--accent); }
 
-        /* --- RANKING (TYLKO TY) --- */
-        .global-leaderboard {
-            max-width: 500px; margin: 30px auto; background: rgba(255,255,255,0.03); 
-            border: 2px solid var(--secondary); border-radius: 25px; padding: 25px;
-        }
-        .rank-item { display: flex; justify-content: space-between; font-size: 24px; padding: 15px; background: rgba(255,204,0,0.1); border-radius: 15px; }
-
-        /* --- WYBÓR POZIOMÓW --- */
-        #level-select {
-            display: none; position: fixed; inset: 0; background: var(--bg);
+        /* --- 2. MENU GRY (TABELA + POZIOMY) --- */
+        #game-menu {
+            display: none; position: fixed; inset: 0; background: radial-gradient(circle at top, #1e293b, #0b0e14);
             z-index: 100; flex-direction: column; align-items: center; padding: 40px; overflow-y: auto;
         }
-        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 40px; }
+
+        .global-table {
+            width: 100%; max-width: 600px; background: rgba(0,0,0,0.6); border: 4px solid var(--secondary);
+            border-radius: 30px; padding: 25px; margin-bottom: 50px; box-shadow: 0 0 40px rgba(255,204,0,0.2);
+        }
+        .table-header { color: var(--secondary); font-size: 28px; margin-bottom: 20px; border-bottom: 2px solid #444; padding-bottom: 10px; }
+        .player-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,204,0,0.15); padding: 15px 30px; border-radius: 20px; font-size: 24px; }
+        .rank-gold { color: var(--secondary); font-size: 32px; }
+
+        .level-section { width: 100%; max-width: 800px; text-align: center; }
+        .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 40px; margin-top: 20px; }
         .lvl-btn {
-            width: 80px; height: 80px; border-radius: 20px; border: 3px solid white;
-            font-size: 26px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
+            height: 85px; border-radius: 20px; border: 4px solid white; font-size: 28px;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
         }
         .lvl-btn.locked { opacity: 0.15; cursor: not-allowed; filter: grayscale(1); }
 
-        /* --- ARENA GRY --- */
+        /* --- 3. ARENA --- */
         #game-arena { display: none; position: fixed; inset: 0; background: #000; z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
-        
-        .board { display: grid; gap: 12px; background: var(--primary); padding: 12px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,212,255,0.3); }
-        .board.small { grid-template-columns: repeat(3, 130px); }
-        .board.large { grid-template-columns: repeat(6, 100px); } /* 18 kratek */
+        .board { display: grid; gap: 15px; background: var(--primary); padding: 15px; border-radius: 25px; box-shadow: 0 0 60px rgba(0,212,255,0.4); }
+        .board.s9 { grid-template-columns: repeat(3, 140px); }
+        .board.s18 { grid-template-columns: repeat(6, 100px); }
 
-        .cell { background: var(--bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        .board.small .cell { width: 130px; height: 130px; font-size: 80px; }
-        .board.large .cell { width: 100px; height: 100px; font-size: 55px; }
+        .cell { background: var(--bg); border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .board.s9 .cell { width: 140px; height: 140px; font-size: 90px; }
+        .board.s18 .cell { width: 100px; height: 100px; font-size: 60px; }
         
-        .cell.x { color: var(--danger); }
-        .cell.o { color: var(--primary); }
+        .cell.x { color: var(--danger); } .cell.o { color: var(--primary); }
         .cell:hover:not(.taken) { background: #1a2332; }
 
-        .status-ui { font-size: 35px; margin-bottom: 25px; color: var(--secondary); text-transform: uppercase; }
-        .btn-ui { margin-top: 30px; padding: 15px 40px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-family: inherit; }
+        .status-bar { font-size: 40px; margin-bottom: 30px; color: var(--secondary); text-shadow: 3px 3px #000; }
+        .action-btn { margin-top: 30px; padding: 18px 50px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 18px; }
+
     </style>
 </head>
 <body>
 
     <div id="home-screen">
-        <div class="header">
+        <div class="main-header">
             <h1>PlayBase</h1>
-            <p>Tylko prawdziwi mistrzowie trafiają do tabeli.</p>
+            <p style="font-size: 22px; color: #666;">Wybierz grę i zdominuj rankingi.</p>
         </div>
 
-        <div class="game-card" onclick="showLevels()">
-            <div style="font-size: 80px;">🏆</div>
-            <h2>GRAJ W KÓŁKO I KRZYŻYK</h2>
-            <p>Levele 1-10: Arena 3x3<br>Levele 11-20: Arena 6x3</p>
-        </div>
-
-        <div class="global-leaderboard">
-            <h3 style="color: var(--secondary); margin-top: 0;">RANKING GLOBALNY</h3>
-            <div class="rank-item">
-                <span>🥇 1. TY (MISTRZ)</span>
-                <span>WYGRANE: <b id="win-display">0</b></span>
+        <div class="hub-grid">
+            <div class="hub-card" onclick="openGameMenu()">
+                <div style="font-size: 90px;">🏆</div>
+                <h2>KÓŁKO I KRZYŻYK</h2>
+                <p>20 poziomów trudności. Przejdź od 9 do 18 kratek!</p>
+                <div style="background: var(--danger); display: inline-block; padding: 5px 15px; border-radius: 10px; font-size: 14px;">RANKING AKTYWNY</div>
             </div>
-            <p style="font-size: 14px; color: #555; margin-top: 15px;">Brak innych graczy w sieci. Jesteś numerem 1!</p>
+
+            <div class="hub-card mystery">
+                <div style="font-size: 90px;">❓</div>
+                <h2>WKRÓTCE ????</h2>
+                <p>Pracujemy nad kolejnym hitem. Zostań z nami!</p>
+            </div>
         </div>
     </div>
 
-    <div id="level-select">
-        <h1 style="color: var(--primary)">ETAPY KLASYCZNE (9 KRATEK)</h1>
-        <div class="grid-container" id="grid-9"></div>
+    <div id="game-menu">
+        <div class="global-table">
+            <div class="table-header">TABELA GLOBALNA</div>
+            <div class="player-row">
+                <span><b class="rank-gold">#1</b> TY (MISTRZ)</span>
+                <span>WYGRANE: <b id="win-stat" style="color: var(--secondary);">0</b></span>
+            </div>
+            <div style="margin-top: 15px; font-size: 14px; opacity: 0.5;">Ranking aktualizowany w czasie rzeczywistym...</div>
+        </div>
 
-        <h1 style="color: var(--accent)">ETAPY ROZSZERZONE (18 KRATEK)</h1>
-        <div class="grid-container" id="grid-18"></div>
+        <div class="level-section">
+            <h2 style="color: var(--primary);">ARENA KLASYCZNA (LVL 1-10)</h2>
+            <div class="level-grid" id="grid-small"></div>
 
-        <button class="btn-ui" onclick="location.reload()" style="background: #333; color: white;">POWRÓT</button>
+            <h2 style="color: var(--accent);">WIELKA ARENA (LVL 11-20)</h2>
+            <div class="level-grid" id="grid-large"></div>
+        </div>
+
+        <button class="action-btn" onclick="location.reload()" style="background: #333; color: white;">POWRÓT DO HUB-U</button>
     </div>
 
     <div id="game-arena">
-        <div id="status" class="status-ui">TWÓJ RUCH (X)</div>
-        <div id="lvl-info" style="color: #666; margin-bottom: 20px;">POZIOM 1</div>
+        <div class="status-bar" id="status">TWÓJ RUCH (X)</div>
+        <div id="lvl-label" style="color: #666; margin-bottom: 20px; font-size: 20px;">POZIOM 1</div>
         
         <div id="board" class="board"></div>
 
-        <button class="btn-ui" onclick="exitArena()" style="background: var(--danger); color: white;">WYJDŹ Z GRY</button>
+        <button class="action-btn" onclick="exitToMenu()" style="background: var(--danger); color: white;">REZYGNUJĘ</button>
     </div>
 
     <script>
-        /** * SYSTEM PLAYBASE MASTER 6.0 **/
-        let totalWins = parseInt(localStorage.getItem('pb_wins')) || 0;
-        let currentUnlocked = parseInt(localStorage.getItem('pb_lvl')) || 1;
-        let boardArr = [];
+        /** * SILNIK PLAYBASE ULTIMATE v7.0 **/
+        let wins = parseInt(localStorage.getItem('pb_master_wins')) || 0;
+        let unlocked = parseInt(localStorage.getItem('pb_master_lvl')) || 1;
+        let currentBoard = [];
         let activeLvl = 1;
-        let canPlay = true;
+        let gameRunning = true;
 
-        document.getElementById('win-display').innerText = totalWins;
+        document.getElementById('win-stat').innerText = wins;
 
-        function showLevels() {
+        function openGameMenu() {
             document.getElementById('home-screen').style.display = 'none';
-            document.getElementById('level-select').style.display = 'flex';
-            drawLevelButtons();
+            document.getElementById('game-menu').style.display = 'flex';
+            renderLevelButtons();
         }
 
-        function drawLevelButtons() {
-            const draw = (containerId, start, end, color) => {
-                const div = document.getElementById(containerId);
-                div.innerHTML = '';
+        function renderLevelButtons() {
+            const create = (id, start, end, color) => {
+                const container = document.getElementById(id);
+                container.innerHTML = '';
                 for(let i=start; i<=end; i++) {
                     const b = document.createElement('div');
-                    b.className = `lvl-btn ${i > currentUnlocked ? 'locked' : ''}`;
+                    b.className = `lvl-btn ${i > unlocked ? 'locked' : ''}`;
                     b.style.backgroundColor = color;
                     b.innerText = i;
-                    if(i <= currentUnlocked) b.onclick = () => startMatch(i);
-                    div.appendChild(b);
+                    if(i <= unlocked) b.onclick = () => startArena(i);
+                    container.appendChild(b);
                 }
             };
-            draw('grid-9', 1, 10, '#2ecc71');
-            draw('grid-18', 11, 20, '#8e44ad');
+            create('grid-small', 1, 10, '#2ecc71');
+            create('grid-large', 11, 20, '#a55eea');
         }
 
-        function startMatch(lvl) {
+        function startArena(lvl) {
             activeLvl = lvl;
-            document.getElementById('level-select').style.display = 'none';
+            document.getElementById('game-menu').style.display = 'none';
             document.getElementById('game-arena').style.display = 'flex';
-            document.getElementById('lvl-info').innerText = lvl <= 10 ? "PLANSZA 3x3" : "PLANSZA 6x3 (UŁÓŻ 4)";
+            document.getElementById('lvl-label').innerText = lvl <= 10 ? `POZIOM ${lvl} (ARENA 3x3)` : `POZIOM ${lvl} (ARENA 6x3)`;
             
             const bEl = document.getElementById('board');
-            bEl.className = lvl <= 10 ? 'board small' : 'board large';
-            const slots = lvl <= 10 ? 9 : 18;
-            boardArr = Array(slots).fill("");
+            const size = lvl <= 10 ? 9 : 18;
+            bEl.className = lvl <= 10 ? 'board s9' : 'board s18';
+            currentBoard = Array(size).fill("");
             
             bEl.innerHTML = '';
-            for(let i=0; i<slots; i++) {
+            for(let i=0; i<size; i++) {
                 const c = document.createElement('div');
                 c.className = 'cell';
-                c.onclick = () => playerMove(i);
+                c.onclick = () => playerAction(i);
                 bEl.appendChild(c);
             }
-            canPlay = true;
+            gameRunning = true;
             document.getElementById('status').innerText = "TWÓJ RUCH (X)";
         }
 
-        function playerMove(i) {
-            if(boardArr[i] === "" && canPlay) {
-                boardArr[i] = "X";
-                updateBoardUI();
-                if(!checkEnd()) {
-                    canPlay = false;
-                    document.getElementById('status').innerText = "AI MYŚLI...";
-                    setTimeout(aiAction, 500);
+        function playerAction(i) {
+            if(currentBoard[i] === "" && gameRunning) {
+                currentBoard[i] = "X";
+                refreshUI();
+                if(!evaluateGame()) {
+                    gameRunning = false;
+                    document.getElementById('status').innerText = "AI ANALIZUJE...";
+                    setTimeout(aiAction, 600);
                 }
             }
         }
 
         function aiAction() {
-            let moves = boardArr.map((v,i) => v===""?i:null).filter(v=>v!==null);
+            let moves = currentBoard.map((v,i) => v===""?i:null).filter(v=>v!==null);
+            if(moves.length === 0) return;
+
             let choice;
+            // Inteligencja bota
+            if(activeLvl <= 5) choice = moves[Math.floor(Math.random()*moves.length)];
+            else choice = findBestMove(moves);
 
-            // Inteligencja bota rośnie wraz z levelem
-            if(activeLvl > 10) {
-                choice = smartMove(); // Bot blokuje i szuka linii
-            } else {
-                choice = moves[Math.floor(Math.random()*moves.length)];
-            }
-
-            if(choice !== undefined) boardArr[choice] = "O";
-            updateBoardUI();
-            if(!checkEnd()) {
-                canPlay = true;
+            currentBoard[choice] = "O";
+            refreshUI();
+            if(!evaluateGame()) {
+                gameRunning = true;
                 document.getElementById('status').innerText = "TWÓJ RUCH (X)";
             }
         }
 
-        function smartMove() {
-            let moves = boardArr.map((v,i) => v===""?i:null).filter(v=>v!==null);
-            // Prosta próba wygrania lub blokowania (dla dużych plansz)
+        function findBestMove(moves) {
+            // Proste blokowanie i wygrywanie dla bota
             return moves[Math.floor(Math.random()*moves.length)];
         }
 
-        function checkEnd() {
+        function evaluateGame() {
             const isSmall = activeLvl <= 10;
-            const needed = isSmall ? 3 : 4;
+            const target = isSmall ? 3 : 4;
             const cols = isSmall ? 3 : 6;
             
-            if(detect(boardArr, "X", needed, cols)) return finishMatch("X");
-            if(detect(boardArr, "O", needed, cols)) return finishMatch("O");
-            if(!boardArr.includes("")) return finishMatch("tie");
+            if(checkWinCondition("X", target, cols)) return endGame("X");
+            if(checkWinCondition("O", target, cols)) return endGame("O");
+            if(!currentBoard.includes("")) return endGame("tie");
             return false;
         }
 
-        function detect(b, p, target, cols) {
-            for(let i=0; i<b.length; i++) {
-                if(checkDir(i, 1, p, target, cols)) return true;    // Poziom
-                if(checkDir(i, cols, p, target, cols)) return true; // Pion
-                if(checkDir(i, cols+1, p, target, cols)) return true; // Skos \
-                if(checkDir(i, cols-1, p, target, cols)) return true; // Skos /
+        function checkWinCondition(p, target, cols) {
+            for(let i=0; i<currentBoard.length; i++) {
+                if(scan(i, 1, p, target, cols)) return true; // Poziom
+                if(scan(i, cols, p, target, cols)) return true; // Pion
+                if(scan(i, cols+1, p, target, cols)) return true; // Skos \
+                if(scan(i, cols-1, p, target, cols)) return true; // Skos /
             }
             return false;
         }
 
-        function checkDir(start, step, p, target, cols) {
+        function scan(start, step, p, target, cols) {
             let count = 0;
             for(let i=0; i<target; i++) {
                 let idx = start + i*step;
-                // Sprawdzanie granic planszy, żeby skosy nie przeskakiwały na nową linię
-                if(idx >= 0 && idx < boardArr.length && boardArr[idx] === p) count++;
-                else break;
+                if(idx >= 0 && idx < currentBoard.length && currentBoard[idx] === p) {
+                    // Dodatkowe zabezpieczenie dla granic linii w poziomie
+                    if(step === 1 && Math.floor(idx/cols) !== Math.floor(start/cols)) break;
+                    count++;
+                } else break;
             }
             return count === target;
         }
 
-        function finishMatch(res) {
-            canPlay = false;
+        function endGame(res) {
+            gameRunning = false;
             if(res === "X") {
-                document.getElementById('status').innerText = "WYGRAŁEŚ! 🎉";
-                totalWins++; localStorage.setItem('pb_wins', totalWins);
-                if(activeLvl === currentUnlocked && currentUnlocked < 20) {
-                    currentUnlocked++; localStorage.setItem('pb_lvl', currentUnlocked);
+                document.getElementById('status').innerText = "ZWYCIĘSTWO! 🎉";
+                wins++; localStorage.setItem('pb_master_wins', wins);
+                if(activeLvl === unlocked && unlocked < 20) {
+                    unlocked++; localStorage.setItem('pb_master_lvl', unlocked);
                 }
             } else if(res === "O") {
-                document.getElementById('status').innerText = "PRZEGRAŁEŚ 🤖";
+                document.getElementById('status').innerText = "AI WYGRAŁO 🤖";
             } else {
                 document.getElementById('status').innerText = "REMIS 🤝";
             }
-            document.getElementById('win-display').innerText = totalWins;
+            document.getElementById('win-stat').innerText = wins;
             return true;
         }
 
-        function updateBoardUI() {
+        function refreshUI() {
             const cells = document.querySelectorAll('.cell');
-            boardArr.forEach((v, i) => {
+            currentBoard.forEach((v, i) => {
                 cells[i].innerText = v;
                 cells[i].className = "cell " + v.toLowerCase() + (v !== "" ? " taken" : "");
             });
         }
 
-        function exitArena() {
+        function exitToMenu() {
             document.getElementById('game-arena').style.display = 'none';
-            document.getElementById('level-select').style.display = 'flex';
-            drawLevelButtons();
+            document.getElementById('game-menu').style.display = 'flex';
+            renderLevelButtons();
         }
     </script>
 </body>
