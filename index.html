@@ -2,309 +2,337 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayBase | Brawl Stars Elite</title>
+    <title>PlayBase | Brawl Stars Mega Update</title>
     <style>
         :root {
-            --bs-yellow: #ffcc00; --bs-blue: #00d4ff; --bs-purple: #a55eea;
-            --bs-red: #eb4d4b; --bs-green: #2ecc71; --bs-dark: #0f172a;
+            --bs-yellow: #ffcc00; --bs-blue: #00d4ff; --bs-red: #ff4d4d;
+            --bs-green: #2ecc71; --bs-purple: #9b59b6; --gold: #f1c40f;
         }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            font-family: 'Arial Black', 'Arial', sans-serif; 
-            background: var(--bs-dark); color: white; overflow: hidden; 
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Arial Black', sans-serif; background: #0b0e14; color: white; overflow: hidden; }
 
         /* --- STYLIZACJA STRONY GŁÓWNEJ --- */
-        #main-page {
-            height: 100vh; overflow-y: auto; padding: 40px;
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        #home-screen { height: 100vh; overflow-y: auto; padding: 40px; text-align: center; background: radial-gradient(circle, #1e272e, #050505); }
+        .intro-text { border-bottom: 2px solid #333; padding-bottom: 30px; margin-bottom: 40px; }
+        .intro-text h1 { font-size: 60px; color: var(--bs-blue); text-shadow: 0 0 15px var(--bs-blue); margin: 0; }
+        
+        .hub-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .game-card { 
+            width: 320px; background: #161b22; border: 4px solid #30363d; border-radius: 30px; padding: 30px;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative;
         }
-        .old-section { border-bottom: 3px solid #334155; margin-bottom: 50px; padding-bottom: 20px; text-align: center; }
-        .old-section h1 { font-size: 60px; color: var(--bs-blue); text-shadow: 0 0 20px rgba(0,212,255,0.4); }
+        .game-card:hover { transform: scale(1.05); border-color: var(--bs-blue); box-shadow: 0 0 40px rgba(0,212,255,0.3); }
+        .game-card.mystery { border-style: dashed; animation: glow 2s infinite; }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 10px #555; } 50% { box-shadow: 0 0 30px var(--bs-purple); } }
 
-        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; max-width: 1100px; margin: 0 auto; }
-        .card {
-            background: #1e293b; border: 4px solid #334155; border-radius: 30px; padding: 40px;
-            text-align: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-        .card:hover { transform: scale(1.05) translateY(-10px); border-color: var(--bs-blue); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .card h2 { font-size: 28px; margin: 15px 0; }
-        .card .icon { font-size: 70px; }
-        .locked-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); border-radius: 26px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-
-        /* --- BRAWL STARS LOBBY --- */
+        /* --- BRAWL LOBBY --- */
         #brawl-lobby {
             display: none; position: fixed; inset: 0; z-index: 100;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://www.transparenttextures.com/patterns/dark-matter.png'), linear-gradient(135deg, #1e3799, #0984e3);
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png'), #1488cc;
             flex-direction: column;
         }
+        .top-nav { display: flex; justify-content: space-between; padding: 20px 40px; background: rgba(0,0,0,0.8); border-bottom: 5px solid var(--bs-yellow); }
+        .resource { background: #000; padding: 10px 25px; border-radius: 30px; border: 3px solid var(--bs-yellow); font-size: 20px; display: flex; align-items: center; gap: 10px; }
 
-        .top-bar { display: flex; justify-content: space-between; padding: 20px 50px; background: rgba(0,0,0,0.7); border-bottom: 4px solid var(--bs-yellow); }
-        .res-box { background: #000; padding: 8px 25px; border-radius: 25px; border: 3px solid var(--bs-yellow); display: flex; align-items: center; gap: 10px; font-size: 20px; }
+        .hero-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .hero-avatar { font-size: 200px; filter: drop-shadow(0 0 30px rgba(255,255,255,0.4)); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+        .hero-tag { background: rgba(0,0,0,0.8); padding: 10px 50px; border-radius: 40px; border: 3px solid white; margin-top: 20px; }
 
-        .character-zone { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .char-main { font-size: 220px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); animation: heroFloat 3s ease-in-out infinite; }
-        @keyframes heroFloat { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-30px) rotate(2deg); } }
-        
-        .char-name-tag {
-            position: absolute; bottom: 40px; background: rgba(0,0,0,0.8);
-            padding: 10px 60px; border-radius: 40px; border: 3px solid white;
-            text-align: center; box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        .footer { height: 150px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-top: 6px solid var(--bs-yellow); }
+        .play-btn-mega {
+            background: linear-gradient(#ffcc00, #f39c12); color: black; padding: 25px 100px;
+            font-size: 40px; border: 5px solid white; border-radius: 20px; cursor: pointer;
+            box-shadow: 0 12px 0 #d35400; transition: 0.1s;
         }
-
-        .action-bar { height: 150px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; align-items: center; border-top: 6px solid var(--bs-yellow); }
-        .nav-button { text-align: center; cursor: pointer; transition: 0.2s; }
-        .nav-button:hover { color: var(--bs-yellow); transform: scale(1.15); }
-        .play-big {
-            background: linear-gradient(#f9ca24, #f0932b); padding: 25px 100px;
-            font-size: 45px; border: 5px solid white; border-radius: 25px; cursor: pointer;
-            box-shadow: 0 12px 0 #b33939; text-transform: uppercase; transition: 0.1s;
-        }
-        .play-big:active { transform: translateY(8px); box-shadow: 0 4px 0 #b33939; }
-
-        /* --- ARENA GRY --- */
-        #game-arena { display: none; position: fixed; inset: 0; z-index: 200; background: #27ae60; }
-        canvas { display: block; cursor: crosshair; }
-        .game-overlay { position: absolute; top: 30px; left: 30px; pointer-events: none; }
-        .hp-bar-main { width: 300px; height: 30px; background: #333; border: 4px solid white; border-radius: 15px; overflow: hidden; }
-        .hp-fill { height: 100%; background: var(--bs-green); transition: 0.3s; width: 100%; }
+        .play-btn-mega:active { transform: translateY(6px); box-shadow: 0 6px 0 #d35400; }
 
         /* --- MODALE --- */
-        .modal {
+        .bs-modal {
             display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; height: 80%; background: #2c3e50; border: 8px solid var(--bs-yellow);
-            border-radius: 50px; z-index: 300; padding: 40px; box-shadow: 0 0 100px rgba(0,0,0,0.9);
+            width: 80%; height: 70%; background: #1e272e; border: 8px solid var(--bs-yellow);
+            border-radius: 40px; z-index: 500; padding: 40px; overflow-y: auto;
         }
-        .grid-select { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-top: 30px; }
-        .select-card { background: #34495e; padding: 25px; border-radius: 25px; text-align: center; border-bottom: 8px solid #000; cursor: pointer; }
-        .select-card:hover { background: #5d6d7e; }
-        .close-x { position: absolute; top: 20px; right: 30px; font-size: 50px; color: var(--bs-red); cursor: pointer; }
+        .close-btn { float: right; font-size: 50px; cursor: pointer; color: var(--bs-red); }
+        .brawler-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .brawler-card { background: #2f3542; padding: 20px; border-radius: 20px; text-align: center; border-bottom: 8px solid #000; cursor: pointer; }
 
+        /* --- GAME ARENA --- */
+        #arena-screen { display: none; position: fixed; inset: 0; z-index: 1000; background: #2ecc71; }
+        .game-ui { position: absolute; top: 20px; left: 20px; z-index: 1001; pointer-events: none; }
+        .hp-cont { width: 300px; height: 30px; background: #333; border: 4px solid white; border-radius: 15px; overflow: hidden; }
+        .hp-bar { width: 100%; height: 100%; background: var(--bs-green); transition: 0.2s; }
+        .super-bar-cont { width: 250px; height: 15px; background: #333; border: 3px solid white; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .super-bar { width: 0%; height: 100%; background: var(--bs-yellow); }
     </style>
 </head>
 <body>
 
-    <div id="main-page">
-        <div class="old-section">
+    <div id="home-screen">
+        <div class="intro-text">
             <h1>PlayBase</h1>
-            <p style="font-size: 20px; color: #94a3b8;">Twoja największa platforma z grami online.</p>
+            <p>Witaj w centrum najlepszych gier. Nic nie usuwamy, tylko ulepszamy!</p>
         </div>
 
         <div class="hub-grid">
-            <div class="card" onclick="openBrawl()">
-                <div class="icon">🔥</div>
+            <div class="game-card" onclick="toggleBrawl(true)">
+                <div style="font-size: 70px;">⭐</div>
                 <h2>BRAWL STARS 2D</h2>
-                <p>Zadyma na całego! Wybieraj postacie i walcz na arenie.</p>
+                <p>Epickie bitwy, zadymiarze i pucharki.</p>
+                <div style="background: var(--bs-red); border-radius: 10px; padding: 5px;">NOWOŚĆ</div>
             </div>
 
-            <div class="card" style="border-style: dashed; opacity: 0.7;">
-                <div class="icon">❓</div>
+            <div class="game-card mystery">
+                <div style="font-size: 70px;">❓</div>
                 <h2>NOWA GRA ????</h2>
-                <p>Pracujemy nad czymś epickim...</p>
-                <div class="locked-overlay">🔒</div>
+                <p>Coś epickiego nadchodzi wkrótce...</p>
             </div>
         </div>
     </div>
 
     <div id="brawl-lobby">
-        <div class="top-bar">
+        <div class="top-nav">
             <div style="display: flex; gap: 20px;">
-                <div class="res-box">💰 <span id="coin-val">2500</span></div>
-                <div class="res-box" style="border-color: #2ecc71;">💎 80</div>
+                <div class="resource">💰 <span id="coin-ui">1500</span></div>
+                <div class="resource" style="border-color: var(--bs-green);">💎 50</div>
             </div>
-            <div class="res-box" style="border-color: var(--bs-blue);">🏆 14,900</div>
+            <div class="resource" style="border-color: var(--bs-blue);">🏆 149,070</div>
         </div>
 
-        <div class="character-zone">
-            <div id="lobby-char" class="char-main">🤠</div>
-            <div class="char-name-tag">
-                <h2 id="current-name" style="margin:0; font-size: 32px;">SHELLY</h2>
-                <div style="color: var(--bs-yellow);">MOC 11</div>
+        <div class="hero-view">
+            <div id="lobby-hero" class="hero-avatar">🤠</div>
+            <div class="hero-tag">
+                <h2 id="hero-name" style="margin:0; font-size: 35px;">SHELLY</h2>
+                <div style="color: var(--bs-green);">MOC 11</div>
             </div>
         </div>
 
-        <div class="action-bar">
-            <div class="nav-button" onclick="openModal('shop-m')">
+        <div class="footer">
+            <div style="text-align:center; cursor:pointer;" onclick="openModal('shop-m')">
                 <div style="font-size: 40px;">🛒</div>
                 <span>SKLEP</span>
             </div>
-            <div class="nav-button" onclick="openModal('char-m')">
+            <div style="text-align:center; cursor:pointer;" onclick="openModal('brawlers-m')">
                 <div style="font-size: 40px;">👥</div>
                 <span>ZADYMIARZE</span>
             </div>
 
-            <button class="play-big" onclick="launchGame()">Zaczynaj</button>
+            <button class="play-btn-mega" onclick="startActualGame()">ZACZYNAJ</button>
 
-            <div class="nav-button">
-                <div style="font-size: 40px;">🎁</div>
-                <span>PASS</span>
+            <div style="text-align:center; cursor:pointer;">
+                <div style="font-size: 40px;">🏆</div>
+                <span>PUCHARY</span>
             </div>
-            <div class="nav-button" onclick="location.reload()">
+            <div style="text-align:center; cursor:pointer;" onclick="toggleBrawl(false)">
                 <div style="font-size: 40px;">🚪</div>
                 <span>WYJDŹ</span>
             </div>
         </div>
     </div>
 
-    <div id="char-m" class="modal">
-        <span class="close-x" onclick="closeModals()">×</span>
-        <h1 style="font-size: 45px; color: var(--bs-yellow);">WYBIERZ ZADYMIARZA</h1>
-        <div class="grid-select">
-            <div class="select-card" onclick="pick('Shelly', '🤠', 4000, 1)"><h3>SHELLY</h3><span style="font-size: 50px;">🤠</span></div>
-            <div class="select-card" onclick="pick('El Primo', '💪', 7000, 0.5)"><h3>EL PRIMO</h3><span style="font-size: 50px;">💪</span></div>
-            <div class="select-card" onclick="pick('Colt', '🔫', 3200, 1.5)"><h3>COLT</h3><span style="font-size: 50px;">🔫</span></div>
-            <div class="select-card" onclick="pick('Crow', '🐦', 2800, 1.2)"><h3>CROW</h3><span style="font-size: 50px;">🐦</span></div>
-            <div class="select-card" onclick="pick('Spike', '🌵', 3000, 1.3)"><h3>SPIKE</h3><span style="font-size: 50px;">🌵</span></div>
+    <div id="brawlers-m" class="bs-modal">
+        <span class="close-btn" onclick="closeModals()">×</span>
+        <h1 style="color: var(--bs-yellow);">WYBIERZ ZADYMIARZA</h1>
+        <div class="brawler-grid">
+            <div class="brawler-card" onclick="selectChar('Shelly', '🤠', 4000, 'shotgun')"><h3>Shelly</h3><span style="font-size: 50px;">🤠</span></div>
+            <div class="brawler-card" onclick="selectChar('El Primo', '💪', 7000, 'melee')"><h3>El Primo</h3><span style="font-size: 50px;">💪</span></div>
+            <div class="brawler-card" onclick="selectChar('Colt', '🔫', 3200, 'dual')"><h3>Colt</h3><span style="font-size: 50px;">🔫</span></div>
+            <div class="brawler-card" onclick="selectChar('Spike', '🌵', 2800, 'spike')"><h3>Spike</h3><span style="font-size: 50px;">🌵</span></div>
+            <div class="brawler-card" onclick="selectChar('Crow', '🐦', 2500, 'poison')"><h3>Crow</h3><span style="font-size: 50px;">🐦</span></div>
         </div>
     </div>
 
-    <div id="game-arena">
-        <div class="game-overlay">
-            <div class="hp-bar-main"><div id="hp-fill" class="hp-fill"></div></div>
-            <h2 id="arena-stats" style="text-shadow: 2px 2px #000;">KILLE: 0</h2>
+    <div id="shop-m" class="bs-modal">
+        <span class="close-btn" onclick="closeModals()">×</span>
+        <h1 style="color: var(--bs-yellow);">SKLEP</h1>
+        <p>Mega Skrzynia: 80 💎</p>
+        <p>Darmowe Monety: 100 💰 (Odbierz!)</p>
+    </div>
+
+    <div id="arena-screen">
+        <div class="game-ui">
+            <div class="hp-cont"><div id="hp-bar" class="hp-bar"></div></div>
+            <div class="super-bar-cont"><div id="super-bar" class="super-bar"></div></div>
+            <h3 id="stat-ui">KILLE: 0</h3>
         </div>
-        <canvas id="c"></canvas>
+        <canvas id="gameCanvas"></canvas>
     </div>
 
     <script>
-        /** * SILNIK GRY PLAYBASE MULTIVERSE v2.0 **/
-        const canvas = document.getElementById('c');
+        /** * SILNIK GRY PLAYBASE BRAWL v3.0 
+         * Kod zawiera zaawansowane systemy kolizji, kamery i efektów cząsteczkowych.
+         */
+        const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        let state = {
-            player: { x: 1000, y: 1000, name: 'Shelly', icon: '🤠', hp: 4000, maxHp: 4000, speed: 6, ammo: 3, reload: 0, kills: 0 },
-            enemies: [], bullets: [], bushes: [], walls: [],
-            keys: {}, cam: { x: 0, y: 0 }, active: false
+        let game = {
+            active: false,
+            score: 0,
+            cam: { x: 0, y: 0 },
+            player: { x: 1000, y: 1000, r: 30, hp: 4000, maxHp: 4000, icon: '🤠', ammo: 3, reload: 0, super: 0, speed: 6 },
+            keys: {},
+            bullets: [],
+            enemies: [],
+            particles: [],
+            bushes: [],
+            walls: []
         };
 
-        function openBrawl() { document.getElementById('brawl-lobby').style.display = 'flex'; }
+        function toggleBrawl(show) { document.getElementById('brawl-lobby').style.display = show ? 'flex' : 'none'; }
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        function closeModals() { document.querySelectorAll('.bs-modal').forEach(m => m.style.display = 'none'); }
 
-        function pick(name, icon, hp, speedMult) {
-            state.player.name = name;
-            state.player.icon = icon;
-            state.player.hp = state.player.maxHp = hp;
-            state.player.speed = 6 * speedMult;
-            document.getElementById('current-name').innerText = name.toUpperCase();
-            document.getElementById('lobby-char').innerText = icon;
+        function selectChar(name, icon, hp, type) {
+            game.player.icon = icon;
+            game.player.hp = game.player.maxHp = hp;
+            document.getElementById('hero-name').innerText = name.toUpperCase();
+            document.getElementById('lobby-hero').innerText = icon;
             closeModals();
         }
 
-        function launchGame() {
-            document.getElementById('brawl-lobby').style.display = 'none';
-            document.getElementById('game-arena').style.display = 'block';
+        function startActualGame() {
+            toggleBrawl(false);
+            document.getElementById('arena-screen').style.display = 'block';
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
             // Map Gen
-            state.bushes = []; state.walls = []; state.enemies = []; state.bullets = [];
-            for(let i=0; i<30; i++) state.bushes.push({x: Math.random()*2500, y: Math.random()*2500, w: 200, h: 150});
-            for(let i=0; i<20; i++) state.walls.push({x: Math.random()*2500, y: Math.random()*2500, w: 100, h: 100});
-            spawnBots(6);
+            game.bushes = []; game.walls = []; game.enemies = []; game.bullets = []; game.particles = [];
+            for(let i=0; i<40; i++) game.bushes.push({x: Math.random()*2500, y: Math.random()*2500, w: 200, h: 150});
+            for(let i=0; i<25; i++) game.walls.push({x: Math.random()*2500, y: Math.random()*2500, w: 100, h: 100});
+            spawnBots(10);
             
-            state.active = true;
-            gameLoop();
+            game.active = true;
+            loop();
+        }
+
+        window.onkeydown = e => game.keys[e.code] = true;
+        window.onkeyup = e => game.keys[e.code] = false;
+        window.onmousedown = e => {
+            if(!game.active || game.player.ammo <= 0) return;
+            fire(e.clientX + game.cam.x, e.clientY + game.cam.y);
+        };
+
+        function fire(tx, ty) {
+            const ang = Math.atan2(ty - game.player.y, tx - game.player.x);
+            // Strzał Shelly (3 pociski)
+            for(let i=-1; i<=1; i++) {
+                game.bullets.push({
+                    x: game.player.x, y: game.player.y,
+                    vx: Math.cos(ang + i*0.15) * 15, vy: Math.sin(ang + i*0.15) * 15,
+                    owner: 'p', dmg: 400, r: 450, sx: game.player.x, sy: game.player.y
+                });
+            }
+            game.player.ammo--;
+            game.player.reload = 60;
         }
 
         function spawnBots(n) {
             for(let i=0; i<n; i++) {
-                state.enemies.push({ x: Math.random()*2500, y: Math.random()*2500, hp: 3000, maxHp: 3000, icon: '🤖', s: 3 });
+                game.enemies.push({ x: Math.random()*2500, y: Math.random()*2500, hp: 3000, maxHp: 3000, icon: '🤖', s: 2.5 });
             }
         }
 
-        window.onkeydown = e => state.keys[e.code] = true;
-        window.onkeyup = e => state.keys[e.code] = false;
-        window.onmousedown = e => {
-            if(!state.active || state.player.ammo <= 0) return;
-            const ang = Math.atan2(e.clientY + state.cam.y - state.player.y, e.clientX + state.cam.x - state.player.x);
-            state.bullets.push({ x: state.player.x, y: state.player.y, vx: Math.cos(ang)*15, vy: Math.sin(ang)*15, r: 500, sx: state.player.x, sy: state.player.y, owner: 'p' });
-            state.player.ammo--;
-            state.player.reload = 60;
-        };
-
-        function gameLoop() {
-            if(!state.active) return;
-            update();
-            draw();
-            requestAnimationFrame(gameLoop);
+        function createExplosion(x, y, col) {
+            for(let i=0; i<8; i++) {
+                game.particles.push({ x, y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life: 1, col });
+            }
         }
 
-        function update() {
-            const p = state.player;
-            if(state.keys['KeyW']) p.y -= p.speed;
-            if(state.keys['KeyS']) p.y += p.speed;
-            if(state.keys['KeyA']) p.x -= p.speed;
-            if(state.keys['KeyD']) p.x += p.speed;
+        function loop() {
+            if(!game.active) return;
+            
+            // Logic
+            let dx = 0, dy = 0;
+            if(game.keys['KeyW']) dy -= game.player.speed;
+            if(game.keys['KeyS']) dy += game.player.speed;
+            if(game.keys['KeyA']) dx -= game.player.speed;
+            if(game.keys['KeyD']) dx += game.player.speed;
+            
+            game.player.x += dx; game.player.y += dy;
+            game.cam.x = game.player.x - canvas.width/2;
+            game.cam.y = game.player.y - canvas.height/2;
 
-            state.cam.x = p.x - canvas.width/2;
-            state.cam.y = p.y - canvas.height/2;
+            if(game.player.ammo < 3 && --game.player.reload <= 0) { game.player.ammo++; game.player.reload = 60; }
 
-            if(p.ammo < 3 && --p.reload <= 0) { p.ammo++; p.reload = 60; }
-
-            state.bullets.forEach((b, i) => {
+            game.bullets.forEach((b, i) => {
                 b.x += b.vx; b.y += b.vy;
-                if(Math.hypot(b.x-b.sx, b.y-b.sy) > b.r) state.bullets.splice(i,1);
+                if(Math.hypot(b.x-b.sx, b.y-b.sy) > b.r) game.bullets.splice(i,1);
                 
                 if(b.owner == 'p') {
-                    state.enemies.forEach((en, ei) => {
+                    game.enemies.forEach((en, ei) => {
                         if(Math.hypot(b.x-en.x, b.y-en.y) < 40) {
-                            en.hp -= 800; state.bullets.splice(i,1);
-                            if(en.hp <= 0) { state.enemies.splice(ei,1); p.kills++; spawnBots(1); }
+                            en.hp -= b.dmg;
+                            createExplosion(en.x, en.y, 'orange');
+                            game.bullets.splice(i,1);
+                            game.player.super = Math.min(100, game.player.super + 5);
+                            if(en.hp <= 0) { game.enemies.splice(ei,1); game.score++; spawnBots(1); }
                         }
                     });
+                } else {
+                    if(Math.hypot(b.x-game.player.x, b.y-game.player.y) < 35) {
+                        game.player.hp -= 200; game.bullets.splice(i,1);
+                        createExplosion(game.player.x, game.player.y, 'red');
+                        if(game.player.hp <= 0) location.reload();
+                    }
                 }
             });
 
-            state.enemies.forEach(en => {
-                const d = Math.hypot(p.x-en.x, p.y-en.y);
+            game.enemies.forEach(en => {
+                const d = Math.hypot(game.player.x-en.x, game.player.y-en.y);
                 if(d < 600) {
-                    const a = Math.atan2(p.y-en.y, p.x-en.x);
+                    const a = Math.atan2(game.player.y-en.y, game.player.x-en.x);
                     en.x += Math.cos(a)*en.s; en.y += Math.sin(a)*en.s;
-                    if(d < 50) { p.hp -= 10; if(p.hp <= 0) location.reload(); }
+                    if(Math.random() < 0.01) game.bullets.push({x:en.x, y:en.y, vx:Math.cos(a)*8, vy:Math.sin(a)*8, owner:'e', dmg:100, r:400, sx:en.x, sy:en.y});
                 }
             });
 
-            document.getElementById('hp-fill').style.width = (p.hp/p.maxHp*100) + "%";
-            document.getElementById('arena-stats').innerText = "KILLE: " + p.kills;
-        }
+            game.particles.forEach((p, i) => { p.x += p.vx; p.y += p.vy; p.life -= 0.02; if(p.life <= 0) game.particles.splice(i,1); });
 
-        function draw() {
-            ctx.fillStyle = '#27ae60'; ctx.fillRect(0,0,canvas.width, canvas.height);
+            // UI
+            document.getElementById('hp-bar').style.width = (game.player.hp/game.player.maxHp*100) + "%";
+            document.getElementById('super-bar').style.width = game.player.super + "%";
+            document.getElementById('stat-ui').innerText = "KILLE: " + game.score;
+
+            // Render
+            ctx.fillStyle = '#2ecc71'; ctx.fillRect(0,0,canvas.width, canvas.height);
             
             // Grid
-            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-            for(let i=0; i<3000; i+=100) {
-                ctx.beginPath(); ctx.moveTo(i-state.cam.x, 0); ctx.lineTo(i-state.cam.x, 3000); ctx.stroke();
-            }
-
-            state.bushes.forEach(b => { ctx.fillStyle = '#1e8449'; ctx.fillRect(b.x-state.cam.x, b.y-state.cam.y, b.w, b.h); });
-            state.walls.forEach(w => { ctx.fillStyle = '#5d4037'; ctx.fillRect(w.x-state.cam.x, w.y-state.cam.y, w.w, w.h); });
+            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+            for(let i=0; i<3000; i+=100) { ctx.beginPath(); ctx.moveTo(i-game.cam.x, 0); ctx.lineTo(i-game.cam.x, canvas.height); ctx.stroke(); }
             
-            state.bullets.forEach(b => { ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(b.x-state.cam.x, b.y-state.cam.y, 8, 0, 7); ctx.fill(); });
+            game.bushes.forEach(b => { ctx.fillStyle = '#1e8449'; ctx.fillRect(b.x-game.cam.x, b.y-game.cam.y, b.w, b.h); });
+            game.walls.forEach(w => { ctx.fillStyle = '#5d4037'; ctx.fillRect(w.x-game.cam.x, w.y-game.cam.y, w.w, w.h); });
+            
+            game.particles.forEach(p => { ctx.globalAlpha = p.life; ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x-game.cam.x, p.y-game.cam.y, 5, 0, 7); ctx.fill(); });
+            ctx.globalAlpha = 1;
 
-            drawEnt(state.player, true);
-            state.enemies.forEach(en => drawEnt(en, false));
+            game.bullets.forEach(b => { ctx.fillStyle = b.owner=='p'?'white':'yellow'; ctx.beginPath(); ctx.arc(b.x-game.cam.x, b.y-game.cam.y, 8, 0, 7); ctx.fill(); });
+
+            drawEnt(game.player, true);
+            game.enemies.forEach(en => drawEnt(en, false));
+
+            requestAnimationFrame(loop);
         }
 
         function drawEnt(e, isP) {
-            const sx = e.x-state.cam.x, sy = e.y-state.cam.y;
+            const sx = e.x - game.cam.x, sy = e.y - game.cam.y;
             ctx.font = "50px Arial"; ctx.textAlign = "center";
-            ctx.fillText(e.icon, sx, sy);
             
-            ctx.fillStyle = 'black'; ctx.fillRect(sx-40, sy-60, 80, 10);
+            // Ukrywanie w krzakach
+            let inBush = false;
+            game.bushes.forEach(b => { if(e.x>b.x && e.x<b.x+b.w && e.y>b.y && e.y<b.y+b.h) inBush = true; });
+            if(inBush) ctx.globalAlpha = 0.4;
+
+            ctx.fillText(e.icon, sx, sy);
+            ctx.fillStyle = 'black'; ctx.fillRect(sx-40, sy-65, 80, 10);
             ctx.fillStyle = isP ? '#2ecc71' : '#e74c3c';
-            ctx.fillRect(sx-40, sy-60, 80 * (e.hp/(e.maxHp || 3000)), 10);
+            ctx.fillRect(sx-40, sy-65, 80 * (e.hp/(e.maxHp || 3000)), 10);
             
             if(isP) {
-                for(let i=0; i<3; i++) {
-                    ctx.fillStyle = i < state.player.ammo ? 'orange' : '#333';
-                    ctx.fillRect(sx-40 + i*28, sy-75, 24, 6);
-                }
+                for(let i=0; i<3; i++) { ctx.fillStyle = i < game.player.ammo ? 'orange' : '#333'; ctx.fillRect(sx-40 + i*28, sy-80, 24, 6); }
             }
+            ctx.globalAlpha = 1;
         }
     </script>
 </body>
