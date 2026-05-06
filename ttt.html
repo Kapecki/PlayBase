@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayBase | Kółko i Krzyżyk Pro</title>
+    <style>
+        :root { --primary: #00d4ff; --bg: #0b0e14; --card: #1d232a; --error: #ff4d4d; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+
+        /* Menu wyboru poziomu */
+        #menu { text-align: center; z-index: 10; }
+        .difficulty-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        
+        /* Arena gry */
+        #game-arena { display: none; flex-direction: column; align-items: center; }
+        .board { display: grid; grid-template-columns: repeat(3, 110px); gap: 10px; background: var(--primary); padding: 10px; border-radius: 15px; box-shadow: 0 0 40px rgba(0,212,255,0.3); }
+        .cell { width: 110px; height: 110px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        .cell:hover { background: #161b22; }
+
+        /* Overlay końca gry */
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .btn { padding: 15px 30px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; font-family: inherit; font-size: 16px; }
+        .btn-diff { background: var(--card); color: white; border: 2px solid #333; }
+        .btn-diff:hover { border-color: var(--primary); transform: scale(1.05); }
+        .btn-main { background: var(--primary); color: #000; margin-top: 20px; }
+        
+        .status { margin-bottom: 20px; font-size: 24px; letter-spacing: 2px; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"></audio>
+
+    <div id="menu">
+        <h1 style="font-size: 50px; color: var(--primary); margin-bottom: 10px;">WYBIERZ POZIOM</h1>
+        <div class="difficulty-grid">
+            <button class="btn btn-diff" onclick="startGame('easy')">ŁATWY</button>
+            <button class="btn btn-diff" onclick="startGame('medium')">ŚREDNI</button>
+            <button class="btn btn-diff" onclick="startGame('hard')">TRUDNY</button>
+            <button class="btn btn-diff" style="border-color: var(--error); color: var(--error);" onclick="startGame('impossible')">NIEMOŻLIWY</button>
+        </div>
+        <button class="btn btn-main" style="background: #333; color: white; margin-top: 40px;" onclick="location.href='index.html'">POWRÓT DO LOBBY</button>
+    </div>
+
+    <div id="game-arena">
+        <div class="status" id="status">TWÓJ RUCH (X)</div>
+        <div class="board" id="board"></div>
+        <button class="btn btn-main" onclick="location.reload()">ZREZYGNUJ</button>
+    </div>
+
+    <div id="overlay">
+        <h1 id="result-msg" style="font-size: 60px; margin-bottom: 20px;">WYNIK</h1>
+        <button class="btn btn-main" onclick="location.reload()">ZAGRAJ PONOWNIE</button>
+        <button class="btn btn-main" style="background:none; color:white; border:1px solid #444" onclick="location.href='index.html'">LOBBY</button>
+    </div>
+
+    <script>
+        let board = Array(9).fill(null);
+        let difficulty = 'easy';
+        let gameActive = true;
+        const music = document.getElementById('bg-music');
+
+        function startGame(level) {
+            difficulty = level;
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('game-arena').style.display = 'flex';
+            music.play().catch(() => {});
+            createBoard();
+        }
+
+        function createBoard() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+            board.forEach((_, i) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.onclick = () => makeMove(i);
+                boardEl.appendChild(cell);
+            });
+        }
+
+        function makeMove(i) {
+            if (!board[i] && gameActive) {
+                board[i] = 'X';
+                updateUI();
+                if (!checkWinner()) {
+                    gameActive = false;
+                    document.getElementById('status').innerText = "AI MYŚLI...";
+                    setTimeout(aiMove, 600);
+                }
+            }
+        }
+
+        function aiMove() {
+            let move;
+            if (difficulty === 'easy') move = randomMove();
+            else if (difficulty === 'medium') move = Math.random() > 0.5 ? bestMove() : randomMove();
+            else if (difficulty === 'hard') move = Math.random() > 0.2 ? bestMove() : randomMove();
+            else move = bestMove(); // Impossible
+
+            if (move !== null) board[move] = 'O';
+            updateUI();
+            if (!checkWinner()) {
+                gameActive = true;
+                document.getElementById('status').innerText = "TWÓJ RUCH (X)";
+            }
+        }
+
+        function randomMove() {
+            let available = board.map((v, i) => v === null ? i : null).filter(v => v !== null);
+            return available.length > 0 ? available[Math.floor(Math.random() * available.length)] : null;
+        }
+
+        // Algorytm Minimax dla trybu Impossible/Hard
+        function bestMove() {
+            let bestScore = -Infinity;
+            let move = null;
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === null) {
+                    board[i] = 'O';
+                    let score = minimax(board, 0, false);
+                    board[i] = null;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        move = i;
+                    }
+                }
+            }
+            return move;
+        }
+
+        function minimax(b, depth, isMaximizing) {
+            let result = evaluate();
+            if (result === 'O') return 10;
+            if (result === 'X') return -10;
+            if (!b.includes(null)) return 0;
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (b[i] === null) {
+                        b[i] = 'O';
+                        let score = minimax(b, depth + 1, false);
+                        b[i] = null;
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (b[i] === null) {
+                        b[i] = 'X';
+                        let score = minimax(b, depth + 1, true);
+                        b[i] = null;
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        function evaluate() {
+            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (let l of lines) {
+                if (board[l[0]] && board[l[0]] === board[l[1]] && board[l[0]] === board[l[2]]) return board[l[0]];
+            }
+            return null;
+        }
+
+        function updateUI() {
+            const cells = document.querySelectorAll('.cell');
+            board.forEach((v, i) => {
+                cells[i].innerText = v;
+                cells[i].style.color = v === 'X' ? '#ff4d4d' : '#00d4ff';
+            });
+        }
+
+        function checkWinner() {
+            let winner = evaluate();
+            if (winner) {
+                endGame(winner === 'X' ? "WYGRAŁEŚ!" : "PRZEGRAŁEŚ!");
+                return true;
+            }
+            if (!board.includes(null)) {
+                endGame("REMIS!");
+                return true;
+            }
+            return false;
+        }
+
+        function endGame(msg) {
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('result-msg').innerText = msg;
+            document.getElementById('result-msg').style.color = msg === "WYGRAŁEŚ!" ? "#00ff99" : (msg === "REMIS!" ? "#ffcc00" : "#ff4d4d");
+            gameActive = false;
+        }
+    </script>
+</body>
+</html>
