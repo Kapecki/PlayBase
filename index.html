@@ -3,114 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayBase | Game Lobby</title>
+    <title>PlayBase | PvP Arena</title>
     <style>
-        body { background-color: #05080a; color: #e6edf3; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
-        .lobby-header { background: #000; padding: 30px; text-align: center; border-bottom: 4px solid #00d4ff; }
-        .lobby-header h1 { font-size: 3rem; margin: 0; color: #00d4ff; text-shadow: 0 0 20px #00d4ff; }
-        .lobby-container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        body { background-color: #05080a; color: #e6edf3; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
         
-        /* Styl okna gry */
-        #game-canvas {
-            background: #111;
-            border: 3px solid #00d4ff;
-            display: block;
-            margin: 20px auto;
-            cursor: crosshair;
-            border-radius: 10px;
+        /* Ekran Lobby */
+        #lobby-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070');
+            background-size: cover;
         }
-        .game-ui { text-align: center; margin-bottom: 20px; color: #00d4ff; font-weight: bold; }
-        
-        .game-entry { background: #161b22; border-radius: 20px; border: 1px solid #30363d; margin-bottom: 50px; overflow: hidden; }
-        .game-details { padding: 30px; }
-        .controls-hint { background: #0d1117; padding: 10px; border-radius: 5px; color: #8b949e; margin-bottom: 10px; font-size: 0.9rem; }
+
+        .lobby-card {
+            background: rgba(22, 27, 34, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #00d4ff;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+        }
+
+        h1 { font-size: 3.5rem; color: #00d4ff; margin-bottom: 10px; }
+        .description { color: #8b949e; margin-bottom: 30px; max-width: 400px; }
+
+        .btn-pvp {
+            background: #00d4ff;
+            color: #000;
+            padding: 20px 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-pvp:hover { transform: scale(1.1); background: #fff; box-shadow: 0 0 30px #00d4ff; }
+
+        /* Ekran Gry */
+        #game-screen { display: none; text-align: center; background: #000; height: 100vh; }
+        canvas { background: #111; border-bottom: 4px solid #00d4ff; cursor: crosshair; }
+        .game-stats { padding: 10px; font-size: 1.2rem; color: #00d4ff; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="lobby-header">
-        <h1>GAME LOBBY</h1>
-    </div>
-
-    <div class="lobby-container">
-        <div class="game-entry">
-            <div style="background: #00d4ff; color: #000; padding: 15px; font-weight: bold; font-size: 1.5rem;">
-                STREFA BOJOWA: SHOOTER 2D (WASD + MYSZKA)
-            </div>
-            
-            <div class="game-details">
-                <div class="controls-hint">STEROWANIE: <b>W, A, S, D</b> - Chodzenie | <b>MYSZKA</b> - Strzelanie | Cel: Pokonaj czerwone boty!</div>
-                <div class="game-ui" id="ui">KILLE: 0 | ZDROWIE: 100%</div>
-                
-                <canvas id="game-canvas" width="800" height="400"></canvas>
-                
-                <div style="color: #8b949e; line-height: 1.6; margin-top: 20px;">
-                    <h3>Opis Misji: Shadow Protocol Strike</h3>
-                    <p>Zostałeś wysłany do sektora zero, aby wyeliminować zbuntowane jednostki treningowe. Wykorzystaj swoją zwinność i refleks. Pamiętaj: boty pojawiają się falami i stają się coraz agresywniejsze. To jest Twoje szkolenie bojowe w PlayBase Lobby.</p>
-                </div>
-            </div>
+    <div id="lobby-screen">
+        <div class="lobby-card">
+            <h1>PLAYBASE LOBBY</h1>
+            <p class="description">Witaj w bazie. Jesteś gotowy na starcie PvP z botami? Wykorzystaj WASD i myszkę, aby przetrwać jak najdłużej.</p>
+            <button class="btn-pvp" onclick="startGame()">ZAGRAJ PVP</button>
         </div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        const ui = document.getElementById('ui');
+    <div id="game-screen">
+        <div class="game-stats" id="stat-bar">KILLE: 0 | ZDROWIE: 100%</div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
 
-        let player = { x: 400, y: 200, size: 20, speed: 4, health: 100, kills: 0 };
-        let bullets = [];
-        let enemies = [];
-        let keys = {};
+    <script>
+        const lobby = document.getElementById('lobby-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let player, bullets, enemies, keys, gameActive;
+
+        function startGame() {
+            // Przełączanie ekranów
+            lobby.style.display = 'none';
+            gameScreen.style.display = 'block';
+            
+            // Ustawienia płótna
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - 50;
+
+            // Inicjalizacja gry
+            player = { x: canvas.width/2, y: canvas.height/2, size: 20, health: 100, kills: 0 };
+            bullets = [];
+            enemies = [];
+            keys = {};
+            gameActive = true;
+
+            gameLoop();
+        }
+
+        function returnToLobby() {
+            gameActive = false;
+            alert("ZOSTAŁEŚ ZABITY! Powrót do lobby. Wynik: " + player.kills + " killi.");
+            gameScreen.style.display = 'none';
+            lobby.style.display = 'flex';
+        }
 
         window.addEventListener('keydown', e => keys[e.code] = true);
         window.addEventListener('keyup', e => keys[e.code] = false);
-        canvas.addEventListener('mousedown', shoot);
+        window.addEventListener('mousedown', e => {
+            if(!gameActive) return;
+            const angle = Math.atan2(e.clientY - 50 - player.y, e.clientX - player.x);
+            bullets.push({ x: player.x, y: player.y, vx: Math.cos(angle) * 8, vy: Math.sin(angle) * 8 });
+        });
 
-        function shoot(e) {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            const angle = Math.atan2(mouseY - player.y, mouseX - player.x);
-            bullets.push({ x: player.x, y: player.y, vx: Math.cos(angle) * 7, vy: Math.sin(angle) * 7 });
-        }
+        function gameLoop() {
+            if(!gameActive) return;
 
-        function spawnEnemy() {
-            if (enemies.length < 5) {
-                enemies.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: 20, speed: 1.5 });
+            // Ruch
+            if(keys['KeyW'] && player.y > 20) player.y -= 5;
+            if(keys['KeyS'] && player.y < canvas.height - 20) player.y += 5;
+            if(keys['KeyA'] && player.x > 20) player.x -= 5;
+            if(keys['KeyD'] && player.x < canvas.width - 20) player.x += 5;
+
+            // Spawnowanie botów
+            if(Math.random() < 0.02) {
+                enemies.push({ 
+                    x: Math.random() > 0.5 ? 0 : canvas.width, 
+                    y: Math.random() * canvas.height, 
+                    size: 20 
+                });
             }
-        }
-        setInterval(spawnEnemy, 2000);
 
-        function update() {
-            // Ruch gracza
-            if (keys['KeyW'] && player.y > 0) player.y -= player.speed;
-            if (keys['KeyS'] && player.y < canvas.height) player.y += player.speed;
-            if (keys['KeyA'] && player.x > 0) player.x -= player.speed;
-            if (keys['KeyD'] && player.x < canvas.width) player.x += player.speed;
-
-            // Pociski
+            // Logika pocisków i wrogów
             bullets.forEach((b, bi) => {
                 b.x += b.vx; b.y += b.vy;
-                if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) bullets.splice(bi, 1);
+                if(b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) bullets.splice(bi, 1);
             });
 
-            // Boty
             enemies.forEach((en, ei) => {
                 const angle = Math.atan2(player.y - en.y, player.x - en.x);
-                en.x += Math.cos(angle) * en.speed;
-                en.y += Math.sin(angle) * en.speed;
+                en.x += Math.cos(angle) * 2;
+                en.y += Math.sin(angle) * 2;
 
-                // Kolizja bot-gracz
-                const dist = Math.hypot(player.x - en.x, player.y - en.y);
-                if (dist < 20) {
-                    player.health -= 0.5;
-                    if (player.health <= 0) { alert('GAME OVER! Kille: ' + player.kills); location.reload(); }
+                // Kolizja z graczem
+                if(Math.hypot(player.x - en.x, player.y - en.y) < 30) {
+                    player.health -= 1;
+                    if(player.health <= 0) returnToLobby();
                 }
 
-                // Kolizja pocisk-bot
+                // Trafienie bota
                 bullets.forEach((b, bi) => {
-                    const bDist = Math.hypot(b.x - en.x, b.y - en.y);
-                    if (bDist < 20) {
+                    if(Math.hypot(b.x - en.x, b.y - en.y) < 25) {
                         enemies.splice(ei, 1);
                         bullets.splice(bi, 1);
                         player.kills++;
@@ -118,27 +152,23 @@
                 });
             });
 
-            ui.innerHTML = `KILLE: ${player.kills} | ZDROWIE: ${Math.ceil(player.health)}%`;
-        }
+            // Rysowanie
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Gracz (Niebieski)
-            ctx.fillStyle = '#00d4ff';
+            ctx.fillStyle = '#00d4ff'; // Gracz
             ctx.beginPath(); ctx.arc(player.x, player.y, player.size, 0, Math.PI*2); ctx.fill();
 
-            // Pociski
-            ctx.fillStyle = '#fff';
-            bullets.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, 5, 0, Math.PI*2); ctx.fill(); });
-
-            // Boty (Czerwone)
-            ctx.fillStyle = '#ff4500';
+            ctx.fillStyle = '#ff4500'; // Boty
             enemies.forEach(en => { ctx.beginPath(); ctx.arc(en.x, en.y, en.size, 0, Math.PI*2); ctx.fill(); });
 
-            requestAnimationFrame(() => { update(); draw(); });
+            ctx.fillStyle = '#fff'; // Strzały
+            bullets.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI*2); ctx.fill(); });
+
+            document.getElementById('stat-bar').innerHTML = `KILLE: ${player.kills} | ZDROWIE: ${Math.ceil(player.health)}%`;
+
+            requestAnimationFrame(gameLoop);
         }
-        draw();
     </script>
 </body>
 </html>
