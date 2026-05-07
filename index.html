@@ -3,312 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Farmer RGB | PlayBase</title>
+    <title>PlayBase | Lobby RGB</title>
     <style>
-        :root {
-            --bg: #05070a;
-            --card: #0f1218;
-            --neon-blue: #00d4ff;
-            --neon-green: #00ff99;
-            --neon-pink: #ff00ff;
-            --gold: #ffcc00;
+        :root { --bg: #05070a; --primary: #00d4ff; --neon-pink: #ff00ff; }
+        body { 
+            margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
+        }
+        
+        h1 { 
+            font-size: 70px; margin-bottom: 50px;
+            background: linear-gradient(to right, var(--primary), var(--neon-pink));
+            -webkit-background-clip: text; -webkit-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0,212,255,0.5));
+            animation: glow 2s infinite alternate;
         }
 
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+        .grid { display: flex; gap: 30px; }
+        
+        .card {
+            width: 280px; height: 350px; background: #0f1218; border: 2px solid #222;
+            border-radius: 40px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; cursor: pointer; transition: 0.4s; text-decoration: none; color: white;
         }
 
-        /* Animowane tło RGB */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, #05070a, #10141d);
-            z-index: -1;
+        .card:hover {
+            border-color: var(--primary); transform: translateY(-15px);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
         }
 
-        /* NAGŁÓWEK RGB */
-        .header {
-            text-align: center;
-            padding: 40px;
-            animation: glowText 3s infinite alternate;
-        }
+        .icon { font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--primary)); }
+        h2 { letter-spacing: 2px; margin: 0; }
+        p { color: #555; margin-top: 10px; }
 
-        @keyframes glowText {
-            from { text-shadow: 0 0 10px var(--neon-blue); }
-            to { text-shadow: 0 0 30px var(--neon-pink), 0 0 10px var(--neon-blue); }
-        }
-
-        h1 {
-            font-size: 60px;
-            margin: 0;
-            letter-spacing: 5px;
-            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* PANEL STATYSTYK */
-        .stats-container {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .pill {
-            background: var(--card);
-            border: 2px solid var(--neon-blue);
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 24px;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-            color: var(--gold);
-        }
-
-        /* GŁÓWNA GRA */
-        .main-game {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 1200px;
-        }
-
-        /* SKLEP RGB */
-        .shop {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-            width: 300px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .shop-item {
-            background: #161b22;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 20px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .shop-item:hover {
-            border-color: var(--neon-green);
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(0, 255, 153, 0.2);
-        }
-
-        .shop-item.active {
-            border-color: var(--neon-pink);
-            background: #1e242c;
-        }
-
-        /* POLE UPRAWNE */
-        .farm-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 150px);
-            gap: 20px;
-        }
-
-        .plot {
-            width: 150px;
-            height: 150px;
-            background: #1a1614;
-            border: 3px solid #333;
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            transition: 0.3s;
-            overflow: hidden;
-        }
-
-        .plot:hover {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-        }
-
-        .plot-icon {
-            font-size: 55px;
-            z-index: 2;
-        }
-
-        /* PASEK POSTĘPU RGB */
-        .prog-bg {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 10px;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .prog-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, var(--neon-blue), var(--neon-green));
-            box-shadow: 0 0 10px var(--neon-green);
-            transition: linear;
-        }
-
-        .ready-glow {
-            animation: readyPulse 1s infinite alternate;
-        }
-
-        @keyframes readyPulse {
-            from { box-shadow: 0 0 5px var(--neon-pink); border-color: var(--neon-pink); }
-            to { box-shadow: 0 0 25px var(--neon-pink); border-color: white; }
-        }
-
-        .floating-money {
-            position: absolute;
-            color: var(--neon-green);
-            font-weight: bold;
-            animation: floatUp 1s forwards;
-        }
-
-        @keyframes floatUp {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-60px); }
-        }
+        @keyframes glow { from { opacity: 0.8; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>CYBER FARMER</h1>
-        <div style="color: var(--neon-pink); letter-spacing: 3px; font-weight: bold;">RGB EDITION</div>
+    <h1>PlayBase</h1>
+
+    <div class="grid">
+        <a href="farma.html" class="card">
+            <div class="icon">🌿</div>
+            <h2>CYBER FARMER</h2>
+            <p>KLIKNIJ ABY WEJŚĆ</p>
+        </a>
     </div>
 
-    <div class="stats-container">
-        <div class="pill">💰 $<span id="balance">50</span></div>
-    </div>
-
-    <div class="main-game">
-        <div class="shop">
-            <h2 style="color: var(--neon-blue); margin-top: 0;">BIO-SKLEP</h2>
-            <div id="shop-items"></div>
-        </div>
-
-        <div class="farm-grid" id="grid">
-            </div>
-    </div>
-
-    <script>
-        let balance = parseInt(localStorage.getItem('rgb_farmer_cash')) || 50;
-        let selectedSeed = null;
-
-        const inventory = [
-            { id: 0, name: "Neon Wheat", icon: "🌾", cost: 10, time: 5, profit: 25 },
-            { id: 1, name: "Laser Carrot", icon: "🥕", cost: 50, time: 15, profit: 140 },
-            { id: 2, name: "Cyber Pumpkin", icon: "🎃", cost: 200, time: 40, profit: 650 }
-        ];
-
-        let plots = Array(9).fill().map(() => ({ plant: null, ready: false }));
-
-        function init() {
-            // Renderuj Sklep
-            const shopDiv = document.getElementById('shop-items');
-            inventory.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'shop-item';
-                div.innerHTML = `
-                    <div style="font-size: 20px;">${item.icon} <b>${item.name}</b></div>
-                    <div style="color: var(--gold); margin-top: 5px;">Koszt: $${item.cost} | Zysk: $${item.profit}</div>
-                `;
-                div.onclick = () => {
-                    if(balance >= item.cost) {
-                        selectedSeed = item;
-                        document.querySelectorAll('.shop-item').forEach(i => i.classList.remove('active'));
-                        div.classList.add('active');
-                    }
-                };
-                shopDiv.appendChild(div);
-            });
-
-            // Renderuj Pola
-            const gridDiv = document.getElementById('grid');
-            plots.forEach((_, i) => {
-                const plot = document.createElement('div');
-                plot.className = 'plot';
-                plot.id = `plot-${i}`;
-                plot.innerHTML = `
-                    <span class="plot-icon" id="icon-${i}"></span>
-                    <div class="prog-bg"><div class="prog-fill" id="bar-${i}"></div></div>
-                `;
-                plot.onclick = () => handlePlot(i);
-                gridDiv.appendChild(plot);
-            });
-            updateUI();
-        }
-
-        function handlePlot(i) {
-            const p = plots[i];
-            const el = document.getElementById(`plot-${i}`);
-            const icon = document.getElementById(`icon-${i}`);
-            const bar = document.getElementById(`bar-${i}`);
-
-            // Sadzenie
-            if (!p.plant && selectedSeed) {
-                balance -= selectedSeed.cost;
-                p.plant = { ...selectedSeed };
-                selectedSeed = null;
-                document.querySelectorAll('.shop-item').forEach(item => item.classList.remove('active'));
-                
-                icon.innerText = "🌱";
-                bar.style.transition = `width ${p.plant.time}s linear`;
-                setTimeout(() => bar.style.width = "100%", 50);
-
-                setTimeout(() => {
-                    p.ready = true;
-                    el.classList.add('ready-glow');
-                    icon.innerText = p.plant.icon;
-                }, p.plant.time * 1000);
-                
-                updateUI();
-            } 
-            // Zbieranie
-            else if (p.ready) {
-                const profit = p.plant.profit;
-                balance += profit;
-                
-                // Efekt pieniędzy
-                const floating = document.createElement('div');
-                floating.className = 'floating-money';
-                floating.innerText = `+$${profit}`;
-                el.appendChild(floating);
-                setTimeout(() => floating.remove(), 1000);
-
-                p.plant = null;
-                p.ready = false;
-                el.classList.remove('ready-glow');
-                icon.innerText = "";
-                bar.style.transition = "none";
-                bar.style.width = "0%";
-                
-                updateUI();
-            }
-        }
-
-        function updateUI() {
-            document.getElementById('balance').innerText = balance;
-            localStorage.setItem('rgb_farmer_cash', balance);
-        }
-
-        init();
-    </script>
 </body>
 </html>
