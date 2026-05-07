@@ -2,289 +2,400 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Cyber Farmer Ultra | RGB Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Farmer Pro | RGB Edition</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 
         :root {
-            --bg: #05070a;
-            --panel: #0f1218;
+            --bg: #020408;
+            --panel: rgba(15, 20, 30, 0.95);
             --neon-blue: #00d4ff;
             --neon-pink: #ff00ff;
             --neon-green: #39ff14;
             --gold: #ffcc00;
+            --rgb-speed: 3s;
         }
 
         body {
-            margin: 0; background: var(--bg); color: white;
+            margin: 0;
+            background: var(--bg);
+            color: white;
             font-family: 'Orbitron', sans-serif;
-            display: flex; flex-direction: column; align-items: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 255, 0.05) 0%, transparent 40%);
         }
 
-        /* HEADER RGB */
-        .top-bar {
-            width: 100%; max-width: 1200px; padding: 25px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-            backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+        /* --- UI NAVIGATION --- */
+        .top-hud {
+            width: 100%;
+            max-width: 1300px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(2, 4, 8, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid rgba(0, 212, 255, 0.2);
         }
 
-        .stats-group { display: flex; gap: 20px; }
-
-        .stat-card {
-            background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue);
-            padding: 10px 25px; border-radius: 15px;
-            display: flex; flex-direction: column; align-items: center;
-            min-width: 120px; box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+        .hud-stats {
+            display: flex;
+            gap: 25px;
         }
 
-        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-size: 20px; font-weight: bold; color: var(--gold); }
-
-        /* GAME AREA */
-        .game-layout {
-            display: grid; grid-template-columns: 350px 1fr;
-            gap: 40px; width: 100%; max-width: 1200px; margin-top: 40px; padding: 0 20px;
+        .hud-card {
+            background: var(--panel);
+            border: 1px solid var(--neon-blue);
+            padding: 12px 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* SHOP */
-        .shop-container {
-            background: var(--panel); border-radius: 30px; padding: 30px;
-            border: 1px solid rgba(255,255,255,0.05); height: fit-content;
+        .hud-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shineHUD 4s infinite;
         }
 
-        .shop-title { color: var(--neon-blue); margin-bottom: 25px; font-size: 22px; text-align: center; }
+        @keyframes shineHUD { to { left: 200%; } }
 
-        .seed-card {
-            background: #05070a; border: 2px solid #222; border-radius: 20px;
-            padding: 20px; margin-bottom: 15px; cursor: pointer;
-            transition: 0.3s; position: relative; overflow: hidden;
+        .hud-label { font-size: 9px; letter-spacing: 2px; color: var(--neon-blue); text-transform: uppercase; display: block; }
+        .hud-value { font-size: 22px; font-weight: 900; color: var(--gold); text-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
+
+        /* --- GAME ENGINE LAYOUT --- */
+        .game-engine {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 50px;
+            width: 100%;
+            max-width: 1300px;
+            margin-top: 50px;
+            padding: 0 40px;
         }
 
-        .seed-card:hover { border-color: var(--neon-green); transform: scale(1.02); }
-        .seed-card.selected { border-color: var(--neon-pink); background: rgba(255, 0, 255, 0.05); }
-
-        .seed-info h4 { margin: 0; font-size: 18px; color: white; }
-        .seed-details { font-size: 11px; color: #666; margin-top: 5px; line-height: 1.4; }
-        .seed-cost { color: var(--gold); font-weight: bold; margin-top: 10px; }
-
-        /* FARM GRID */
-        .farm-wrapper {
-            display: grid; grid-template-columns: repeat(3, 180px); gap: 25px;
-            justify-content: center; align-content: start;
+        /* --- ADVANCED SHOP --- */
+        .lab-shop {
+            background: var(--panel);
+            border-radius: 40px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .plot {
-            width: 180px; height: 180px; background: #0a0c10;
-            border: 2px solid #1a1e26; border-radius: 35px;
-            position: relative; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; cursor: pointer;
-            transition: 0.4s; overflow: hidden;
+        .shop-header {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .plot:hover { border-color: var(--neon-blue); background: #0f141d; }
+        .seed-item {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #1a1e26;
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
 
-        .plot-icon { font-size: 70px; z-index: 5; transition: 0.3s; }
+        .seed-item:hover {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.05);
+            transform: translateX(10px);
+        }
+
+        .seed-item.active {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+
+        .seed-icon-box { font-size: 40px; }
+        .seed-meta h4 { margin: 0; font-size: 18px; }
+        .seed-meta p { margin: 5px 0 0; font-size: 11px; color: #666; }
+        .seed-price { margin-left: auto; color: var(--gold); font-weight: bold; }
+
+        /* --- CYBER GRID --- */
+        .farm-core {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .plot-unit {
+            aspect-ratio: 1/1;
+            background: #080a0f;
+            border: 2px solid #151921;
+            border-radius: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .plot-unit:hover {
+            border-color: var(--neon-blue);
+            background: #0d121b;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .visual-container {
+            font-size: 75px;
+            z-index: 10;
+            transition: 0.5s;
+        }
+
+        .plot-unit.maturing .visual-container { filter: blur(2px) brightness(0.7); transform: scale(0.8); }
         
-        .plot.growing .plot-icon { filter: grayscale(1) opacity(0.5); transform: scale(0.8); }
-        .plot.ready .plot-icon { animation: pulseReady 1s infinite alternate; }
-
-        @keyframes pulseReady {
-            from { transform: scale(1); filter: drop-shadow(0 0 10px var(--neon-pink)); }
-            to { transform: scale(1.15); filter: drop-shadow(0 0 25px var(--neon-pink)); }
+        .plot-unit.finished {
+            animation: neonPulse 1.5s infinite alternate;
         }
 
-        /* PROGRESS RGB BAR */
-        .progress-track {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 12px;
-            background: rgba(0,0,0,0.8);
+        @keyframes neonPulse {
+            from { border-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+            to { border-color: white; box-shadow: 0 0 30px var(--neon-pink), inset 0 0 15px var(--neon-pink); }
         }
 
-        .progress-bar {
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green), var(--neon-blue));
-            background-size: 200% 100%;
-            animation: moveGradient 2s linear infinite;
-            box-shadow: 0 -5px 15px rgba(0, 212, 255, 0.4);
+        /* --- RGB PROGRESS ENGINE --- */
+        .progress-hull {
+            position: absolute;
+            bottom: 25px;
+            width: 70%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
         }
 
-        @keyframes moveGradient { to { background-position: 200% center; } }
-
-        .floating-xp {
-            position: absolute; color: var(--neon-green); font-weight: bold;
-            animation: floatXP 1s forwards; pointer-events: none;
+        .progress-rgb {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff0000, #ff00ff, #00d4ff, #00ff99, #ff0000);
+            background-size: 300% 100%;
+            animation: moveRGB 3s linear infinite;
         }
 
-        @keyframes floatXP {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-80px); }
+        @keyframes moveRGB { to { background-position: 300% center; } }
+
+        /* --- FLOATING FX --- */
+        .cash-fx {
+            position: absolute;
+            font-weight: 900;
+            color: var(--neon-green);
+            pointer-events: none;
+            animation: floatCash 1.2s forwards;
+            z-index: 100;
         }
 
-        .btn-lobby {
-            padding: 10px 25px; background: transparent; border: 1px solid #333;
-            color: #666; border-radius: 10px; cursor: pointer; font-family: inherit;
-            transition: 0.3s; text-decoration: none; font-size: 12px;
+        @keyframes floatCash {
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            30% { opacity: 1; transform: translateY(-40px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
         }
 
-        .btn-lobby:hover { border-color: var(--secondary); color: white; }
+        .btn-exit {
+            text-decoration: none;
+            color: #444;
+            font-size: 11px;
+            border: 1px solid #222;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-exit:hover { color: white; border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <a href="index.html" class="btn-lobby">← POWRÓT DO LOBBY</a>
-        <div class="stats-group">
-            <div class="stat-card">
-                <span class="stat-label">Poziom</span>
-                <span class="stat-value" id="lvl-display" style="color: var(--neon-blue);">1</span>
+    <header class="top-hud">
+        <a href="index.html" class="btn-exit">TERMINATE SESSION</a>
+        
+        <div class="hud-stats">
+            <div class="hud-card">
+                <span class="hud-label">User Level</span>
+                <span class="hud-value" id="lvl">1</span>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">Cyber-Kasa</span>
-                <span class="stat-value" id="money-display">$50</span>
+            <div class="hud-card" style="border-color: var(--neon-pink);">
+                <span class="hud-label">Cyber Credits</span>
+                <span class="hud-value" id="credits">$50</span>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">EXP</span>
-                <span class="stat-value" id="xp-display" style="color: var(--neon-green);">0</span>
+            <div class="hud-card" style="border-color: var(--neon-green);">
+                <span class="hud-label">Core XP</span>
+                <span class="hud-value" id="xp">0</span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="game-layout">
-        <div class="shop-container">
-            <h2 class="shop-title">LABORATORIUM NASION</h2>
-            <div id="shop-list"></div>
-        </div>
+    <main class="game-engine">
+        <section class="lab-shop">
+            <h2 class="shop-header">SEED LABORATORY</h2>
+            <div id="shop-root"></div>
+        </section>
 
-        <div class="farm-wrapper" id="farm-grid">
-            </div>
-    </div>
+        <section class="farm-core" id="grid-root"></section>
+    </main>
 
     <script>
-        // System Danych
-        let gameData = {
-            money: parseInt(localStorage.getItem('cf_money')) || 100,
-            xp: parseInt(localStorage.getItem('cf_xp')) || 0,
-            lvl: parseInt(localStorage.getItem('cf_lvl')) || 1
+        // --- GAME CORE ENGINE ---
+        const state = {
+            credits: parseInt(localStorage.getItem('cc_credits')) || 100,
+            xp: parseInt(localStorage.getItem('cc_xp')) || 0,
+            lvl: parseInt(localStorage.getItem('cc_lvl')) || 1,
+            selectedId: null
         };
 
-        let selectedSeed = null;
-
-        const seedsCatalog = [
-            { id: 1, name: "Neon Wheat", icon: "🌾", cost: 15, time: 5, profit: 40, xp: 10 },
-            { id: 2, name: "Cyber Carrot", icon: "🥕", cost: 80, time: 15, profit: 220, xp: 45 },
-            { id: 3, name: "Plasma Pumpkin", icon: "🎃", cost: 350, time: 40, profit: 1100, xp: 150 },
-            { id: 4, name: "Binary Flower", icon: "🌸", cost: 1200, time: 90, profit: 4500, xp: 600 }
+        const seeds = [
+            { id: 1, name: "Neon Fiber", icon: "🌾", cost: 20, time: 5, yield: 55, xp: 15 },
+            { id: 2, name: "Laser Root", icon: "🥕", cost: 100, time: 15, yield: 280, xp: 50 },
+            { id: 3, name: "Plasma Core", icon: "🎃", cost: 450, time: 40, yield: 1350, xp: 180 },
+            { id: 4, name: "Binary Blossom", icon: "🌸", cost: 1500, time: 80, yield: 5500, xp: 750 }
         ];
 
-        let plotsData = Array(9).fill().map(() => ({ crop: null, isReady: false }));
+        let grid = Array(9).fill().map(() => ({ data: null, state: 'empty' }));
 
         function init() {
-            // Sklep
-            const shop = document.getElementById('shop-list');
-            seedsCatalog.forEach(seed => {
-                const div = document.createElement('div');
-                div.className = 'seed-card';
-                div.innerHTML = `
-                    <div class="seed-info">
-                        <h4>${seed.icon} ${seed.name}</h4>
-                        <div class="seed-details">Wzrost: ${seed.time}s | Doświadczenie: +${seed.xp} XP</div>
-                        <div class="seed-cost">KOSZT: $${seed.cost} | ZYSK: $${seed.profit}</div>
+            // Render Shop
+            const shop = document.getElementById('shop-root');
+            seeds.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'seed-item';
+                item.innerHTML = `
+                    <div class="seed-icon-box">${s.icon}</div>
+                    <div class="seed-meta">
+                        <h4>${s.name}</h4>
+                        <p>Time: ${s.time}s | XP: +${s.xp}</p>
                     </div>
+                    <div class="seed-price">$${s.cost}</div>
                 `;
-                div.onclick = () => {
-                    if(gameData.money >= seed.cost) {
-                        selectedSeed = seed;
-                        document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('selected'));
-                        div.classList.add('selected');
+                item.onclick = () => {
+                    if(state.credits >= s.cost) {
+                        state.selectedId = s.id;
+                        document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('active'));
+                        item.classList.add('active');
                     }
                 };
-                shop.appendChild(div);
+                shop.appendChild(item);
             });
 
-            // Grid
-            const grid = document.getElementById('farm-grid');
-            plotsData.forEach((_, i) => {
-                const div = document.createElement('div');
-                div.className = 'plot';
-                div.id = `plot-${i}`;
-                div.innerHTML = `
-                    <span class="plot-icon" id="icon-${i}"></span>
-                    <div class="progress-track"><div class="progress-bar" id="bar-${i}"></div></div>
+            // Render Grid
+            const root = document.getElementById('grid-root');
+            grid.forEach((_, i) => {
+                const unit = document.createElement('div');
+                unit.className = 'plot-unit';
+                unit.id = `plot-${i}`;
+                unit.innerHTML = `
+                    <div class="visual-container" id="vis-${i}"></div>
+                    <div class="progress-hull" id="hull-${i}">
+                        <div class="progress-rgb" id="bar-${i}"></div>
+                    </div>
                 `;
-                div.onclick = () => handlePlot(i);
-                grid.appendChild(div);
+                unit.onclick = () => interact(i);
+                root.appendChild(unit);
             });
-            updateStats();
+            syncHUD();
         }
 
-        function handlePlot(i) {
-            const plot = plotsData[i];
+        function interact(i) {
+            const plot = grid[i];
+            const visual = document.getElementById(`vis-${i}`);
             const el = document.getElementById(`plot-${i}`);
-            const icon = document.getElementById(`icon-${i}`);
 
-            // Sadzenie
-            if(!plot.crop && selectedSeed) {
-                gameData.money -= selectedSeed.cost;
-                plot.crop = {...selectedSeed};
-                selectedSeed = null;
-                document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('selected'));
+            // Planting Logic
+            if(plot.state === 'empty' && state.selectedId) {
+                const seed = seeds.find(s => s.id === state.selectedId);
+                state.credits -= seed.cost;
+                plot.data = { ...seed };
+                plot.state = 'growing';
+                state.selectedId = null;
+                document.querySelectorAll('.seed-item').forEach(el => el.classList.remove('active'));
+
+                el.classList.add('maturing');
+                visual.innerText = "🌱";
                 
-                el.classList.add('growing');
-                icon.innerText = "🌱";
-                
+                const hull = document.getElementById(`hull-${i}`);
                 const bar = document.getElementById(`bar-${i}`);
-                bar.style.transition = `width ${plot.crop.time}s linear`;
-                setTimeout(() => bar.style.width = "100%", 50);
+                hull.style.display = 'block';
+                bar.style.transition = `width ${seed.time}s linear`;
+                
+                setTimeout(() => bar.style.width = '100%', 50);
 
                 setTimeout(() => {
-                    plot.isReady = true;
-                    el.classList.remove('growing');
-                    el.classList.add('ready');
-                    icon.innerText = plot.crop.icon;
-                }, plot.crop.time * 1000);
-                
-                updateStats();
-            } 
-            // Zbieranie
-            else if(plot.isReady) {
-                const p = plot.crop;
-                gameData.money += p.profit;
-                gameData.xp += p.xp;
-                
-                // Efekt XP
-                const fx = document.createElement('div');
-                fx.className = 'floating-xp';
-                fx.innerText = `+$${p.profit} \n +${p.xp} XP`;
-                el.appendChild(fx);
-                setTimeout(() => fx.remove(), 1000);
+                    plot.state = 'ready';
+                    el.classList.remove('maturing');
+                    el.classList.add('finished');
+                    visual.innerText = seed.icon;
+                    hull.style.display = 'none';
+                    bar.style.width = '0%';
+                }, seed.time * 1000);
 
-                // Level up?
-                if(gameData.xp >= gameData.lvl * 500) {
-                    gameData.lvl++;
-                    alert("LEVEL UP! Nowy poziom: " + gameData.lvl);
+                syncHUD();
+            } 
+            // Harvesting Logic
+            else if(plot.state === 'ready') {
+                const reward = plot.data.yield;
+                const xpGain = plot.data.xp;
+                state.credits += reward;
+                state.xp += xpGain;
+
+                // FX
+                createFX(el, `+$${reward}\n+${xpGain}XP`);
+
+                // Level Check
+                if(state.xp >= state.lvl * 800) {
+                    state.lvl++;
+                    createFX(el, "LEVEL UP!", "#ff00ff");
                 }
 
-                plot.crop = null;
-                plot.isReady = false;
-                el.classList.remove('ready');
-                icon.innerText = "";
-                const bar = document.getElementById(`bar-${i}`);
-                bar.style.transition = "none";
-                bar.style.width = "0%";
-                
-                updateStats();
+                plot.state = 'empty';
+                plot.data = null;
+                el.classList.remove('finished');
+                visual.innerText = "";
+                syncHUD();
             }
         }
 
-        function updateStats() {
-            document.getElementById('money-display').innerText = "$" + gameData.money;
-            document.getElementById('xp-display').innerText = gameData.xp;
-            document.getElementById('lvl-display').innerText = gameData.lvl;
+        function createFX(parent, txt, color = "#39ff14") {
+            const fx = document.createElement('div');
+            fx.className = 'cash-fx';
+            fx.innerText = txt;
+            if(color) fx.style.color = color;
+            parent.appendChild(fx);
+            setTimeout(() => fx.remove(), 1200);
+        }
+
+        function syncHUD() {
+            document.getElementById('credits').innerText = "$" + state.credits;
+            document.getElementById('xp').innerText = state.xp;
+            document.getElementById('lvl').innerText = state.lvl;
             
-            localStorage.setItem('cf_money', gameData.money);
-            localStorage.setItem('cf_xp', gameData.xp);
-            localStorage.setItem('cf_lvl', gameData.lvl);
+            localStorage.setItem('cc_credits', state.credits);
+            localStorage.setItem('cc_xp', state.xp);
+            localStorage.setItem('cc_lvl', state.lvl);
         }
 
         init();
