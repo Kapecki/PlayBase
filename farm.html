@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>PlayBase | Cyber Farmer</title>
+    <style>
+        :root { --bg: #0b0e14; --panel: #161b22; --accent: #00ff99; --gold: #ffcc00; }
+        body { 
+            margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif;
+            display: flex; flex-direction: column; align-items: center; padding: 20px;
+        }
+        .header { display: flex; gap: 30px; background: var(--panel); padding: 20px 50px; border-radius: 50px; border: 2px solid var(--accent); margin-bottom: 30px; }
+        .money { color: var(--gold); font-size: 24px; font-weight: bold; }
+
+        .main-game { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+        
+        /* Sklep */
+        .shop { background: var(--panel); padding: 20px; border-radius: 20px; width: 250px; }
+        .item { 
+            background: #0b0e14; padding: 15px; border-radius: 10px; margin-bottom: 10px; 
+            border: 1px solid #333; cursor: pointer; transition: 0.2s;
+        }
+        .item:hover { border-color: var(--accent); }
+        .item.locked { opacity: 0.5; cursor: not-allowed; }
+
+        /* Pole uprawne */
+        .farm-grid { display: grid; grid-template-columns: repeat(3, 120px); gap: 15px; }
+        .plot { 
+            width: 120px; height: 120px; background: #2a1d15; border: 3px solid #3d2b1f; 
+            border-radius: 15px; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; cursor: pointer; position: relative;
+        }
+        .plot:hover { border-color: var(--accent); }
+        .progress { position: absolute; bottom: 0; left: 0; height: 5px; background: var(--accent); width: 0%; transition: 0.1s; }
+
+        .btn-home { margin-top: 40px; padding: 10px 20px; background: #333; border: none; color: white; border-radius: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="money">💰 KASA: <span id="money-display">50</span></div>
+        <div id="status">Wybierz nasiona w sklepie!</div>
+    </div>
+
+    <div class="main-game">
+        <div class="shop">
+            <h3>SKLEP Z NASIONAMI</h3>
+            <div class="item" onclick="selectSeed('Wheat', 10, 5, 20)">
+                🌾 Pszenica (10$) <br><small>Rośnie: 5s | Zysk: 20$</small>
+            </div>
+            <div class="item" onclick="selectSeed('Carrot', 50, 15, 120)">
+                🥕 Marchew (50$) <br><small>Rośnie: 15s | Zysk: 120$</small>
+            </div>
+            <div class="item" onclick="selectSeed('Pumpkin', 200, 40, 500)">
+                🎃 Dynia (200$) <br><small>Rośnie: 40s | Zysk: 500$</small>
+            </div>
+        </div>
+
+        <div class="farm-grid" id="farm-grid">
+            </div>
+    </div>
+
+    <button class="btn-home" onclick="location.href='index.html'">POWRÓT DO LOBBY</button>
+
+    <script>
+        let money = 50;
+        let selectedSeed = null;
+        const plots = Array(9).fill({ plant: null, ready: false });
+
+        function selectSeed(name, cost, time, profit) {
+            if (money >= cost) {
+                selectedSeed = { name, cost, time, profit };
+                document.getElementById('status').innerText = "Wybrano: " + name + ". Kliknij na pole!";
+            } else {
+                alert("Nie masz kasy!");
+            }
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('farm-grid');
+            grid.innerHTML = '';
+            plots.forEach((p, i) => {
+                const div = document.createElement('div');
+                div.className = 'plot';
+                div.innerHTML = p.plant ? `<span>${p.plant.icon}</span>` : "🟫";
+                if (p.ready) div.innerHTML += "<br><small>ZEBIERZ!</small>";
+                
+                const bar = document.createElement('div');
+                bar.className = 'progress';
+                if (p.growing) bar.style.width = p.progress + "%";
+                div.appendChild(bar);
+
+                div.onclick = () => handlePlotClick(i);
+                grid.appendChild(div);
+            });
+        }
+
+        function handlePlotClick(i) {
+            const p = plots[i];
+            
+            // Sadzenie
+            if (!p.plant && selectedSeed) {
+                money -= selectedSeed.cost;
+                updateUI();
+                plots[i] = { 
+                    plant: { ...selectedSeed, icon: getIcon(selectedSeed.name) }, 
+                    growing: true, 
+                    progress: 0, 
+                    ready: false 
+                };
+                startGrowing(i);
+                selectedSeed = null;
+                document.getElementById('status').innerText = "Zasadzono! Czekaj...";
+            } 
+            // Zbieranie
+            else if (p.ready) {
+                money += p.plant.profit;
+                plots[i] = { plant: null, ready: false };
+                updateUI();
+                document.getElementById('status').innerText = "Zabrano zysk: " + p.plant.profit + "$!";
+            }
+        }
+
+        function startGrowing(i) {
+            let p = plots[i];
+            let step = 100 / (p.plant.time * 10);
+            let interval = setInterval(() => {
+                p.progress += step;
+                if (p.progress >= 100) {
+                    p.progress = 100;
+                    p.growing = false;
+                    p.ready = true;
+                    clearInterval(interval);
+                }
+                createGrid();
+            }, 100);
+        }
+
+        function getIcon(name) {
+            if (name === 'Wheat') return "🌾";
+            if (name === 'Carrot') return "🥕";
+            return "🎃";
+        }
+
+        function updateUI() {
+            document.getElementById('money-display').innerText = money;
+            createGrid();
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
