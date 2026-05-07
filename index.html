@@ -1,493 +1,133 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-SPOTIFY OMNI v15.0 | GIGANT EDITION</title>
-    <style>
-        /* ================================================================
-           CYBER-SPOTIFY OMNI - ARCHITEKTURA 2500+ LINII (LOGIC & STYLE)
-           CORE DESIGN: NEUMORPHIC DARK v4.2
-           ================================================================
-        */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&family=JetBrains+Mono:wght@300;500&display=swap');
+/* ================================================================
+       OMNI-ENGINE JS: UPDATED FOR AUDIO PLAYBACK
+       ================================================================
+    */
 
-        :root {
-            --sp-green: #1ed760;
-            --sp-black: #121212;
-            --sp-dark: #000000;
-            --sp-grey: #282828;
-            --sp-light-grey: #b3b3b3;
-            --cyber-blue: #00f2ff;
-            --cyber-pink: #ff007a;
-            --font-main: 'Montserrat', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
-            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    // Tworzymy globalny obiekt audio
+    const audioPlayer = new Audio();
+    let isPlaying = false;
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 12px; }
-        ::-webkit-scrollbar-thumb { background: #4f4f4f; border-radius: 10px; border: 3px solid var(--sp-black); }
-        ::-webkit-scrollbar-thumb:hover { background: #7a7a7a; }
+    const Database = {
+        tracks: [
+            // Dodałem pole 'url' z przykładowymi dźwiękami (zmień je na swoje linki MP3)
+            { id: 1, title: "Wjeżdża Seta", artist: "Majki, Wujo", img: "https://i1.sndcdn.com/artworks-HwM5F8sP8h8a-0-t500x500.jpg", color: "#45322E", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { id: 2, title: "Ruda Tańczy Jak Szalona", artist: "Czadoman", img: "https://i.scdn.co/image/ab67616d0000b2736b447849e75529f79888942b", color: "#E8115B", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { id: 3, title: "Daily Mix 1", artist: "Ronnie Ferrari, LETNI", img: "https://dailymix-images.scdn.co/v2/img/ab6761610000e5eb4f4f4f4f4f4f4f4f4f4f4f4f/1/pl/default", color: "#1E3264", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { id: 4, title: "Seta na Hejnał", artist: "Biesiadne Hity", img: "https://i.scdn.co/image/ab67616d0000b273b320d3215689132145689741", color: "#8D67AB", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { id: 5, title: "Pokemony", artist: "Majki, Major SPZ", img: "https://i.scdn.co/image/ab67616d0000b27376916897c8449c250912f20a", color: "#F037A5", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
+        ],
+        categories: ["Muzyka", "Podkasty", "Na żywo", "Dla Ciebie", "Nowości", "Radio", "Klubowe", "Pop", "Hip-Hop"]
+    };
 
-        body {
-            background-color: var(--sp-black);
-            color: white;
-            font-family: var(--font-main);
-            height: 100vh;
-            display: grid;
-            grid-template-areas: 
-                "nav main right"
-                "player player player";
-            grid-template-columns: 280px 1fr 300px;
-            grid-template-rows: 1fr 100px;
-            overflow: hidden;
-        }
+    function showView(viewId) {
+        document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+    }
 
-        /* --- SIDEBAR SYSTEM --- */
-        .sidebar {
-            grid-area: nav;
-            background: var(--sp-dark);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    // --- ŁADOWANIE I ODTWARZANIE ---
+    function loadToPlayer(track) {
+        // Aktualizacja UI
+        document.getElementById('player-img').src = track.img;
+        document.getElementById('player-title').innerText = track.title;
+        document.getElementById('player-artist').innerText = track.artist;
+        document.getElementById('main-content').style.background = `linear-gradient(to bottom, ${track.color}, var(--sp-black))`;
 
-        .nav-card {
-            background: #121212;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
+        // Logika Audio
+        audioPlayer.src = track.url;
+        audioPlayer.play();
+        isPlaying = true;
+        updatePlayButton();
+    }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            color: var(--sp-light-grey);
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: white;
-            background: rgba(255,255,255,0.1);
-        }
-
-        /* --- MAIN VIEW SYSTEM --- */
-        main {
-            grid-area: main;
-            background: linear-gradient(to bottom, #222, var(--sp-black));
-            overflow-y: overlay;
-            padding: 20px 30px;
-            position: relative;
-        }
-
-        .top-bar {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-            background: transparent;
-        }
-
-        .search-box {
-            position: relative;
-            flex: 1;
-            max-width: 400px;
-            margin-left: 20px;
-        }
-
-        .search-box input {
-            width: 100%;
-            background: #242424;
-            border: 1px solid transparent;
-            border-radius: 500px;
-            padding: 12px 45px;
-            color: white;
-            font-family: var(--font-main);
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .search-box input:focus {
-            border-color: white;
-            background: #2a2a2a;
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
-        }
-
-        /* --- CONTENT GRIDS --- */
-        .section-title { font-size: 24px; font-weight: 800; margin: 30px 0 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .show-all { font-size: 14px; color: var(--sp-light-grey); cursor: pointer; }
-
-        .omni-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 24px;
-        }
-
-        .sp-card {
-            background: #181818;
-            padding: 16px;
-            border-radius: 12px;
-            transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sp-card:hover { background: #282828; transform: translateY(-5px); }
-        
-        .sp-card img {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            object-fit: cover;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-        }
-
-        .play-overlay {
-            position: absolute;
-            right: 24px;
-            bottom: 85px;
-            width: 50px;
-            height: 50px;
-            background: var(--sp-green);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: black;
-            font-size: 20px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: 0.3s;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-        }
-
-        .sp-card:hover .play-overlay { opacity: 1; transform: translateY(0); }
-
-        /* --- ZAKŁADKA ZĘBATKI (THE GEARS) --- */
-        .view-container { display: none; }
-        .view-container.active { display: block; animation: fadeIn 0.5s forwards; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .gears-panel {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .gear-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #333;
-            border-radius: 20px;
-            padding: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .gear-card h3 { font-family: var(--font-code); color: var(--sp-green); margin-bottom: 20px; }
-        
-        .spinning-gear {
-            position: absolute;
-            right: -30px;
-            top: -30px;
-            font-size: 150px;
-            opacity: 0.03;
-            animation: rotateGear 10s linear infinite;
-        }
-
-        @keyframes rotateGear { 100% { transform: rotate(360deg); } }
-
-        /* --- PLAYER BAR --- */
-        footer {
-            grid-area: player;
-            background: black;
-            border-top: 1px solid #282828;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 300px 1fr 300px;
-            align-items: center;
-        }
-
-        .now-playing { display: flex; align-items: center; gap: 15px; }
-        .now-playing img { width: 60px; height: 60px; border-radius: 6px; }
-        
-        .player-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .progress-container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12px;
-            color: var(--sp-light-grey);
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background: #4f4f4f;
-            border-radius: 2px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .progress-fill { width: 30%; height: 100%; background: white; border-radius: 2px; }
-        .progress-bar:hover .progress-fill { background: var(--sp-green); }
-
-        /* --- RIGHT PANEL (ULTRA SEARCH) --- */
-        .right-panel {
-            grid-area: right;
-            background: var(--sp-dark);
-            border-left: 1px solid #282828;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .search-result-item:hover { background: #1a1a1a; }
-        .search-result-item img { width: 45px; height: 45px; border-radius: 4px; }
-
-    </style>
-</head>
-<body>
-
-    <aside class="sidebar">
-        <div class="nav-card">
-            <div class="nav-item active" onclick="showView('home')">🏠 Główna</div>
-            <div class="nav-item" onclick="showView('search')">🔍 Szukaj</div>
-        </div>
-        <div class="nav-card" style="flex:1">
-            <div style="padding: 10px; font-weight: 800; display:flex; justify-content: space-between;">
-                <span>📚 Twoja Biblioteka</span>
-                <span>+</span>
-            </div>
-            <div class="nav-item">❤️ Polubione utwory</div>
-            <div class="nav-item">💿 Twoje EP 2026</div>
-            <div class="nav-item" onclick="showView('gears')">⚙️ Ustawienia Rdzenia</div>
-        </div>
-    </aside>
-
-    <main id="main-content">
-        <header class="top-bar">
-            <div style="display:flex; gap:10px;">
-                <button style="background:rgba(0,0,0,0.7); border:none; color:white; width:35px; height:35px; border-radius:50%;"><</button>
-                <button style="background:rgba(0,0,0,0.7); border:none; color:white; width:35px; height:35px; border-radius:50%;">></button>
-            </div>
-            <div class="search-box">
-                <input type="text" id="omni-search" placeholder="Czego chcesz posłuchać?">
-            </div>
-            <button style="background:white; color:black; border:none; padding:10px 20px; border-radius:500px; font-weight:800;">Odkryj Premium</button>
-        </header>
-
-        <div id="view-home" class="view-container active">
-            <div class="section-title">
-                <span>Dzień dobry, Kapecki</span>
-            </div>
-            <div class="omni-grid" id="home-grid-quick">
-                </div>
-
-            <div class="section-title">
-                <span>Przygotowano dla Ciebie</span>
-                <span class="show-all">Pokaż wszystko</span>
-            </div>
-            <div class="omni-grid" id="home-grid-daily">
-                </div>
-        </div>
-
-        <div id="view-search" class="view-container">
-            <div class="section-title">Przeglądaj wszystko</div>
-            <div class="omni-grid" id="search-categories">
-                </div>
-        </div>
-
-        <div id="view-gears" class="view-container">
-            <h1 style="font-size: 40px; font-weight: 900;">GEAR_SET_CFG</h1>
-            <div class="gears-panel">
-                <div class="gear-card">
-                    <div class="spinning-gear">⚙️</div>
-                    <h3>AUDIO_RENDERING</h3>
-                    <p style="color:var(--sp-light-grey);">Jakość strumienia: <span style="color:var(--sp-green);">ULTRA_HQ</span></p>
-                    <input type="range" style="width:100%; margin-top:20px; accent-color:var(--sp-green);">
-                </div>
-                <div class="gear-card">
-                    <div class="spinning-gear" style="animation-direction: reverse;">⚙️</div>
-                    <h3>NEURAL_SYNC</h3>
-                    <p style="color:var(--sp-light-grey);">Dopasuj tempo interfejsu do rytmu serca.</p>
-                    <button style="margin-top:20px; background:var(--sp-green); border:none; padding:10px 20px; border-radius:5px; font-weight:700;">KALIBRUJ</button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <aside class="right-panel">
-        <h3 style="margin-bottom: 20px;">Wyniki wyszukiwania</h3>
-        <div id="search-results-list">
-            <p style="color:#555; font-size:13px;">Zacznij pisać, aby wyszukać muzykę...</p>
-        </div>
-    </aside>
-
-    <footer>
-        <div class="now-playing">
-            <img src="https://i.scdn.co/image/ab67616d0000b27376916897c8449c250912f20a" id="player-img">
-            <div>
-                <div style="font-weight:700; font-size:14px;" id="player-title">Wjeżdża Seta</div>
-                <div style="color:var(--sp-light-grey); font-size:11px;" id="player-artist">Majki, Wujo</div>
-            </div>
-            <span style="margin-left: 15px; color:var(--sp-green);">✔️</span>
-        </div>
-
-        <div class="player-controls">
-            <div style="display:flex; align-items:center; gap:25px; font-size:20px;">
-                <span style="color:var(--sp-light-grey)">🔀</span>
-                <span>⏮️</span>
-                <span style="font-size:35px;">▶️</span>
-                <span>⏭️</span>
-                <span style="color:var(--sp-light-grey)">🔁</span>
-            </div>
-            <div class="progress-container">
-                <span>0:33</span>
-                <div class="progress-bar"><div class="progress-fill"></div></div>
-                <span>2:05</span>
-            </div>
-        </div>
-
-        <div style="display:flex; justify-content:flex-end; gap:15px; align-items:center;">
-            <span>🎤</span>
-            <span>📑</span>
-            <span>🔊</span>
-            <div class="progress-bar" style="width:100px;"><div class="progress-fill" style="width:70%"></div></div>
-        </div>
-    </footer>
-
-    <script>
-        /* ================================================================
-           OMNI-ENGINE JS: 2500+ LINES LOGIC UNIT
-           ================================================================
-        */
-
-        const Database = {
-            tracks: [
-                { id: 1, title: "Wjeżdża Seta", artist: "Majki, Wujo", img: "https://i1.sndcdn.com/artworks-HwM5F8sP8h8a-0-t500x500.jpg", color: "#45322E" },
-                { id: 2, title: "Ruda Tańczy Jak Szalona", artist: "Czadoman", img: "https://i.scdn.co/image/ab67616d0000b2736b447849e75529f79888942b", color: "#E8115B" },
-                { id: 3, title: "Daily Mix 1", artist: "Ronnie Ferrari, LETNI", img: "https://dailymix-images.scdn.co/v2/img/ab6761610000e5eb4f4f4f4f4f4f4f4f4f4f4f4f/1/pl/default", color: "#1E3264" },
-                { id: 4, title: "Seta na Hejnał", artist: "Biesiadne Hity", img: "https://i.scdn.co/image/ab67616d0000b273b320d3215689132145689741", color: "#8D67AB" },
-                { id: 5, title: "Pokemony", artist: "Majki, Major SPZ", img: "https://i.scdn.co/image/ab67616d0000b27376916897c8449c250912f20a", color: "#F037A5" }
-            ],
-            categories: ["Muzyka", "Podkasty", "Na żywo", "Dla Ciebie", "Nowości", "Radio", "Klubowe", "Pop", "Hip-Hop"]
-        };
-
-        // --- INICJALIZACJA WIDOKÓW ---
-        function showView(viewId) {
-            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            // Mockujemy aktywność w menu
-            event.currentTarget.classList.add('active');
-        }
-
-        // --- SILNIK WYSZUKIWANIA (AS-YOU-TYPE) ---
-        const searchInput = document.getElementById('omni-search');
-        const resultsList = document.getElementById('search-results-list');
-
-        searchInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            if(val.length < 1) {
-                resultsList.innerHTML = '<p style="color:#555; font-size:13px;">Zacznij pisać...</p>';
-                return;
+    // Funkcja do obsługi przycisku Play/Pause
+    function togglePlay() {
+        if (audioPlayer.src) {
+            if (isPlaying) {
+                audioPlayer.pause();
+            } else {
+                audioPlayer.play();
             }
+            isPlaying = !isPlaying;
+            updatePlayButton();
+        }
+    }
 
-            const filtered = Database.tracks.filter(t => 
-                t.title.toLowerCase().includes(val) || 
-                t.artist.toLowerCase().includes(val)
-            );
+    function updatePlayButton() {
+        const playBtn = document.querySelector('footer .player-controls span[style*="font-size:35px"]');
+        playBtn.innerText = isPlaying ? "⏸️" : "▶️";
+    }
 
-            resultsList.innerHTML = '';
-            if(filtered.length === 0) {
-                resultsList.innerHTML = '<p style="color:#555; font-size:13px;">Brak wyników dla "' + val + '"</p>';
-            }
+    // Podpięcie kliknięcia pod główny przycisk play w footerze
+    document.querySelector('footer .player-controls span[style*="font-size:35px"]').onclick = togglePlay;
 
-            filtered.forEach(track => {
-                const div = document.createElement('div');
-                div.className = 'search-result-item';
-                div.innerHTML = `
-                    <img src="${track.img}">
-                    <div>
-                        <div style="font-size:14px; font-weight:600;">${track.title}</div>
-                        <div style="font-size:12px; color:var(--sp-light-grey);">${track.artist}</div>
-                    </div>
-                `;
-                div.onclick = () => loadToPlayer(track);
-                resultsList.appendChild(div);
-            });
+    // --- SEARCH ENGINE ---
+    const searchInput = document.getElementById('omni-search');
+    const resultsList = document.getElementById('search-results-list');
+
+    searchInput.addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        if(val.length < 1) {
+            resultsList.innerHTML = '<p style="color:#555; font-size:13px;">Zacznij pisać...</p>';
+            return;
+        }
+
+        const filtered = Database.tracks.filter(t => 
+            t.title.toLowerCase().includes(val) || 
+            t.artist.toLowerCase().includes(val)
+        );
+
+        resultsList.innerHTML = '';
+        filtered.forEach(track => {
+            const div = document.createElement('div');
+            div.className = 'search-result-item';
+            div.innerHTML = `
+                <img src="${track.img}">
+                <div>
+                    <div style="font-size:14px; font-weight:600;">${track.title}</div>
+                    <div style="font-size:12px; color:var(--sp-light-grey);">${track.artist}</div>
+                </div>
+            `;
+            div.onclick = () => loadToPlayer(track);
+            resultsList.appendChild(div);
+        });
+    });
+
+    // --- RENDEROWANIE ---
+    function renderHome() {
+        const dailyGrid = document.getElementById('home-grid-daily');
+        Database.tracks.forEach(track => {
+            const card = document.createElement('div');
+            card.className = 'sp-card';
+            card.innerHTML = `
+                <img src="${track.img}">
+                <div class="play-overlay">▶</div>
+                <div style="font-weight:700; margin-bottom:8px;">${track.title}</div>
+                <div style="font-size:13px; color:var(--sp-light-grey);">${track.artist}</div>
+            `;
+            card.onclick = () => loadToPlayer(track);
+            dailyGrid.appendChild(card);
         });
 
-        // --- RENDEROWANIE STRONY GŁÓWNEJ ---
-        function renderHome() {
-            const dailyGrid = document.getElementById('home-grid-daily');
-            Database.tracks.forEach(track => {
-                const card = document.createElement('div');
-                card.className = 'sp-card';
-                card.innerHTML = `
-                    <img src="${track.img}">
-                    <div class="play-overlay">▶</div>
-                    <div style="font-weight:700; margin-bottom:8px;">${track.title}</div>
-                    <div style="font-size:13px; color:var(--sp-light-grey);">${track.artist}</div>
-                `;
-                card.onclick = () => loadToPlayer(track);
-                dailyGrid.appendChild(card);
-            });
+        const catGrid = document.getElementById('search-categories');
+        Database.categories.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'sp-card';
+            div.style.background = `hsl(${Math.random()*360}, 50%, 30%)`;
+            div.style.height = '150px';
+            div.innerHTML = `<h3 style="padding:10px;">${cat}</h3>`;
+            catGrid.appendChild(div);
+        });
+    }
 
-            // Renderowanie kategorii w wyszukiwarce
-            const catGrid = document.getElementById('search-categories');
-            Database.categories.forEach(cat => {
-                const div = document.createElement('div');
-                div.className = 'sp-card';
-                div.style.background = `hsl(${Math.random()*360}, 50%, 30%)`;
-                div.style.height = '150px';
-                div.innerHTML = `<h3 style="padding:10px;">${cat}</h3>`;
-                catGrid.appendChild(div);
-            });
-        }
+    // Aktualizacja paska postępu (wizualna)
+    audioPlayer.ontimeupdate = () => {
+        const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        document.querySelector('.progress-fill').style.width = progress + "%";
+        
+        // Aktualizacja cyferek czasu
+        const currentMin = Math.floor(audioPlayer.currentTime / 60);
+        const currentSec = Math.floor(audioPlayer.currentTime % 60).toString().padStart(2, '0');
+        document.querySelector('.progress-container span:first-child').innerText = `${currentMin}:${currentSec}`;
+    };
 
-        // --- PLAYER CONTROLLER ---
-        function loadToPlayer(track) {
-            document.getElementById('player-img').src = track.img;
-            document.getElementById('player-title').innerText = track.title;
-            document.getElementById('player-artist').innerText = track.artist;
-            // Animacja tła głównego okna pod kolor okładki (jak w Spotify)
-            document.getElementById('main-content').style.background = `linear-gradient(to bottom, ${track.color}, var(--sp-black))`;
-        }
-
-        window.onload = renderHome;
-
-    </script>
-</body>
-</html>
+    window.onload = renderHome;
