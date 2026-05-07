@@ -3,80 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayBase | Lobby</title>
+    <title>PlayBase | Home</title>
     <style>
-        :root { --primary: #00d4ff; --bg: #0b0e14; --card: #1d232a; --accent: #ffcc00; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        body::before { content: ''; position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, #16213e 0%, #0b0e14 100%); z-index: -1; }
-
-        #top-bar { position: fixed; top: 20px; right: 20px; z-index: 10; }
-        .pill { background: rgba(29, 35, 42, 0.9); border: 2px solid var(--primary); padding: 10px 25px; border-radius: 50px; display: flex; align-items: center; gap: 15px; backdrop-filter: blur(5px); }
-        
-        .grid { display: flex; gap: 40px; margin-top: 30px; }
-        .card { 
-            width: 300px; background: var(--card); border: 2px solid #333; border-radius: 30px; padding: 40px; 
-            text-align: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        :root { --primary: #00d4ff; --bg: #0b0e14; --card: #1d232a; --accent: #00ff99; }
+        body { 
+            margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; overflow: hidden;
         }
-        .card:hover { border-color: var(--primary); transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,212,255,0.4); }
-        .card h2 { color: var(--primary); margin: 15px 0; }
-        
-        #settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-box { background: var(--card); padding: 40px; border-radius: 30px; border: 2px solid var(--primary); text-align: center; width: 350px; }
-        input { width: 100%; padding: 15px; margin: 20px 0; border-radius: 12px; border: 1px solid #444; background: #0b0e14; color: white; text-align: center; font-size: 18px; }
-        .btn { padding: 12px 25px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; background: var(--primary); color: #000; }
+        body::before {
+            content: ''; position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #16213e 0%, #0b0e14 100%); z-index: -1;
+        }
+
+        .container { text-align: center; animation: fadeIn 1s ease-in; }
+        h1 { font-size: 80px; margin: 0; color: var(--primary); text-shadow: 0 0 30px rgba(0,212,255,0.5); }
+        .subtitle { color: var(--accent); letter-spacing: 5px; font-weight: bold; margin-bottom: 50px; }
+
+        .grid { display: flex; gap: 30px; justify-content: center; }
+        .card {
+            width: 280px; background: var(--card); border: 2px solid #333; border-radius: 30px;
+            padding: 40px; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none; color: white;
+        }
+        .card:hover {
+            border-color: var(--primary); transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(0,212,255,0.3);
+        }
+        .card i { font-size: 50px; display: block; margin-bottom: 15px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="top-bar">
-        <div class="pill">
-            <span id="display-nick">GRACZ</span>
-            <span style="cursor:pointer; font-size: 20px;" onclick="toggleSettings()">⚙️</span>
+    <div class="container">
+        <h1>PlayBase</h1>
+        <p class="subtitle">PREMIUM GAMING HUB</p>
+
+        <div class="grid">
+            <a href="ttt.html" class="card">
+                <i>❌</i>
+                <h2>TIC-TAC-TOE</h2>
+                <p style="color: #888;">Zmierz się z AI.</p>
+            </a>
+            
+            <a href="farm.html" class="card">
+                <i>🌿</i>
+                <h2>CYBER FARMER</h2>
+                <p style="color: #888;">Sadź, kupuj i zarabiaj.</p>
+            </a>
+
+            <a href="reflex.html" class="card">
+                <i>🎯</i>
+                <h2>REFLEX</h2>
+                <p style="color: #888;">Testuj szybkość.</p>
+            </a>
         </div>
     </div>
 
-    <div id="settings-modal">
-        <div class="modal-box">
-            <h2 style="color:var(--primary); margin-top:0;">USTAWIENIA</h2>
-            <input type="text" id="input-nick" maxlength="12">
-            <button class="btn" onclick="saveNick()">ZAPISZ</button>
-        </div>
-    </div>
-
-    <h1 style="font-size: 80px; color: var(--primary); margin-bottom: 0px; text-shadow: 0 0 30px rgba(0,212,255,0.6);">PlayBase</h1>
-    <p style="color: var(--accent); letter-spacing: 5px; margin-bottom: 40px; font-weight: bold;">PREMIUM GAMING HUB</p>
-    
-    <div class="grid">
-        <div class="card" onclick="window.location.href='ttt.html'">
-            <span style="font-size: 60px;">❌</span>
-            <h2>TIC-TAC-TOE</h2>
-            <p style="color: #888;">Tryby: Łatwy do Niemożliwy.</p>
-        </div>
-        
-        <div class="card" onclick="window.location.href='reflex.html'">
-            <span style="font-size: 60px;">🎯</span>
-            <h2>REFLEX HUNTER</h2>
-            <p style="color: #888;">Testuj swój czas reakcji.</p>
-        </div>
-    </div>
-
-    <script>
-        const nick = localStorage.getItem('p_nick') || "Gracz_" + Math.floor(Math.random()*99);
-        document.getElementById('display-nick').innerText = nick.toUpperCase();
-
-        function toggleSettings() {
-            const m = document.getElementById('settings-modal');
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-            document.getElementById('input-nick').value = nick;
-        }
-
-        function saveNick() {
-            const newNick = document.getElementById('input-nick').value.trim();
-            if(newNick) {
-                localStorage.setItem('p_nick', newNick);
-                location.reload();
-            }
-        }
-    </script>
 </body>
 </html>
