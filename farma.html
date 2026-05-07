@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>PlayBase | Gra Farma</title>
+    <style>
+        :root { --bg: #05070a; --card: #0f1218; --neon-blue: #00d4ff; --neon-green: #00ff99; --neon-pink: #ff00ff; --gold: #ffcc00; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+        /* PANEL GÓRNY */
+        .top-bar { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; padding: 30px; }
+        .btn-back { padding: 10px 20px; background: transparent; border: 1px solid #333; color: #555; text-decoration: none; border-radius: 12px; transition: 0.3s; }
+        .btn-back:hover { color: var(--neon-pink); border-color: var(--neon-pink); box-shadow: 0 0 15px var(--neon-pink); }
+        .money { background: var(--card); border: 2px solid var(--neon-blue); padding: 12px 30px; border-radius: 50px; font-size: 22px; color: var(--gold); font-weight: bold; }
+
+        .game-area { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; padding: 20px; }
+        
+        /* SKLEP */
+        .shop { background: var(--card); padding: 25px; border-radius: 30px; width: 260px; border: 1px solid #222; }
+        .item { background: #161b22; padding: 15px; border-radius: 20px; margin-bottom: 12px; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
+        .item:hover { border-color: var(--neon-green); transform: scale(1.05); }
+        .item.selected { border-color: var(--neon-pink); background: #1e242c; }
+
+        /* GRUPOWANIE PÓL */
+        .grid { display: grid; grid-template-columns: repeat(3, 140px); gap: 15px; }
+        .plot { width: 140px; height: 140px; background: #1a1614; border: 3px solid #333; border-radius: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; transition: 0.3s; }
+        .plot:hover { border-color: var(--neon-blue); }
+        
+        .progress-box { position: absolute; bottom: 0; width: 100%; height: 8px; background: rgba(0,0,0,0.5); }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(to right, var(--neon-blue), var(--neon-green)); transition: linear; }
+        
+        .ready { animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { border-color: var(--neon-pink); box-shadow: 0 0 5px var(--neon-pink); } to { border-color: white; box-shadow: 0 0 20px var(--neon-pink); } }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="index.html" class="btn-back">← LOBBY</a>
+        <div class="money">💰 $<span id="bal">50</span></div>
+    </div>
+
+    <div class="game-area">
+        <div class="shop" id="shop-items">
+            <h3 style="margin-top:0; color:var(--neon-blue)">BIO-SKLEP</h3>
+        </div>
+        <div class="grid" id="farm-grid"></div>
+    </div>
+
+    <script>
+        let money = parseInt(localStorage.getItem('rgb_money')) || 50;
+        let selected = null;
+        const catalog = [
+            { id: 0, name: "Wheat", icon: "🌾", cost: 10, time: 5, win: 25 },
+            { id: 1, name: "Carrot", icon: "🥕", cost: 50, time: 15, win: 150 },
+            { id: 2, name: "Pumpkin", icon: "🎃", cost: 200, time: 40, win: 700 }
+        ];
+
+        let state = Array(9).fill().map(() => ({ plant: null, ready: false }));
+
+        function setup() {
+            const shopDiv = document.getElementById('shop-items');
+            catalog.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `<b>${item.icon} ${item.name}</b><br><small>$${item.cost} -> $${item.win}</small>`;
+                div.onclick = () => {
+                    if(money >= item.cost) {
+                        selected = item;
+                        document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+                        div.classList.add('selected');
+                    }
+                };
+                shopDiv.appendChild(div);
+            });
+
+            const gridDiv = document.getElementById('farm-grid');
+            state.forEach((_, i) => {
+                const p = document.createElement('div');
+                p.className = 'plot';
+                p.id = `p-${i}`;
+                p.innerHTML = `<span style="font-size:50px" id="i-${i}"></span><div class="progress-box"><div class="progress-bar" id="b-${i}"></div></div>`;
+                p.onclick = () => clickPlot(i);
+                gridDiv.appendChild(p);
+            });
+            refresh();
+        }
+
+        function clickPlot(i) {
+            const plot = state[i];
+            const el = document.getElementById(`p-${i}`);
+            if(!plot.plant && selected) {
+                money -= selected.cost;
+                plot.plant = {...selected};
+                selected = null;
+                document.querySelectorAll('.item').forEach(btn => btn.classList.remove('selected'));
+                
+                document.getElementById(`i-${i}`).innerText = "🌱";
+                const bar = document.getElementById(`b-${i}`);
+                bar.style.transition = `width ${plot.plant.time}s linear`;
+                setTimeout(() => bar.style.width = "100%", 50);
+
+                setTimeout(() => {
+                    plot.ready = true;
+                    el.classList.add('ready');
+                    document.getElementById(`i-${i}`).innerText = plot.plant.icon;
+                }, plot.plant.time * 1000);
+            } else if(plot.ready) {
+                money += plot.plant.win;
+                plot.plant = null;
+                plot.ready = false;
+                el.classList.remove('ready');
+                document.getElementById(`i-${i}`).innerText = "";
+                document.getElementById(`b-${i}`).style.transition = "none";
+                document.getElementById(`b-${i}`).style.width = "0%";
+            }
+            refresh();
+        }
+
+        function refresh() {
+            document.getElementById('bal').innerText = money;
+            localStorage.setItem('rgb_money', money);
+        }
+
+        setup();
+    </script>
+</body>
+</html>
