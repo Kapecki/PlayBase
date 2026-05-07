@@ -22,15 +22,16 @@
 
         .grid { display: flex; gap: 30px; justify-content: center; }
         .card {
-            width: 280px; background: var(--card); border: 2px solid #333; border-radius: 30px;
+            width: 300px; background: var(--card); border: 2px solid #333; border-radius: 35px;
             padding: 40px; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-decoration: none; color: white;
+            text-decoration: none; color: white; display: block;
         }
         .card:hover {
             border-color: var(--primary); transform: translateY(-15px);
             box-shadow: 0 20px 40px rgba(0,212,255,0.3);
         }
-        .card i { font-size: 50px; display: block; margin-bottom: 15px; }
+        .card .icon { font-size: 60px; margin-bottom: 20px; display: block; }
+        .card h2 { margin: 10px 0; letter-spacing: 2px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -42,24 +43,12 @@
         <p class="subtitle">PREMIUM GAMING HUB</p>
 
         <div class="grid">
-            <a href="ttt.html" class="card">
-                <i>❌</i>
-                <h2>TIC-TAC-TOE</h2>
-                <p style="color: #888;">Zmierz się z AI.</p>
-            </a>
-            
-            <a href="farm.html" class="card">
-                <i>🌿</i>
+            <a href="farma.html" class="card">
+                <span class="icon">🌿</span>
                 <h2>CYBER FARMER</h2>
-                <p style="color: #888;">Sadź, kupuj i zarabiaj.</p>
+                <p style="color: #888;">Zbuduj swoje imperium roślinne.</p>
             </a>
-
-            <a href="reflex.html" class="card">
-                <i>🎯</i>
-                <h2>REFLEX</h2>
-                <p style="color: #888;">Testuj szybkość.</p>
-            </a>
-        </div>
+            </div>
     </div>
 
 </body>
