@@ -3,291 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberCore Ultra RGB | Hub</title>
+    <title>CYBER-OMEGA v6.9 | ULTIMATE RGB EDITION</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+        /* =========================================
+           CYBER-OMEGA CORE STYLESHEET (ULTRA RGB)
+           =========================================
+        */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
 
         :root {
-            --neon-blue: #00f2ff;
-            --neon-pink: #ff007a;
-            --neon-purple: #bc13fe;
-            --neon-green: #39ff14;
-            --dark-bg: #020205;
-            --glass: rgba(255, 255, 255, 0.03);
-            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --r: #ff0000; --g: #00ff00; --b: #00f2ff;
+            --neon-blue: #00f2ff; --neon-pink: #ff007a; --neon-purple: #bc13fe; --neon-yellow: #fffb00;
+            --neon-green: #39ff14; --dark-bg: #010103; --glass: rgba(255, 255, 255, 0.03);
+            --border-glow: 0 0 15px rgba(0, 242, 255, 0.5);
+            --font-main: 'Rajdhani', sans-serif; --font-cyber: 'Orbitron', sans-serif;
+            --panel-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
 
         body {
-            background: var(--dark-bg);
-            color: white;
-            font-family: 'Rajdhani', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: var(--dark-bg); color: white; font-family: var(--font-main);
+            height: 100vh; width: 100vw; overflow: hidden;
+            perspective: 1000px;
         }
 
-        /* --- TŁO I CZĄSTECZKI --- */
-        #particleCanvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #0a0a25 0%, #000 100%);
+        /* --- BACKGROUND ENGINE --- */
+        #master-canvas { position: fixed; top: 0; left: 0; z-index: -1; filter: blur(1px); }
+        .vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 40%, black 150%);
+            pointer-events: none; z-index: 1;
         }
 
-        .overlay-glow {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(0, 242, 255, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+        /* --- CUSTOM CURSOR (DRON RGB) --- */
+        #cursor-dron {
+            position: fixed; width: 20px; height: 20px; border: 2px solid var(--neon-blue);
+            border-radius: 5px; pointer-events: none; z-index: 9999;
+            transition: transform 0.1s ease-out; mix-blend-mode: screen;
+            box-shadow: 0 0 20px var(--neon-blue); display: flex; align-items: center; justify-content: center;
+        }
+        #cursor-dron::after {
+            content: ''; width: 4px; height: 4px; background: var(--neon-pink); border-radius: 50%;
         }
 
-        /* --- INTERFEJS --- */
-        .hub-container {
-            width: 90%;
-            max-width: 1200px;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* --- VIEW CONTROLLER --- */
+        .view { display: none; width: 100%; height: 100%; padding: 40px; z-index: 10; position: relative; }
+        .view.active { display: flex; flex-direction: column; align-items: center; }
+
+        /* --- LOBBY UI --- */
+        .cyber-title {
+            font-family: var(--font-cyber); font-size: 6rem; font-weight: 900;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink), var(--neon-purple), var(--neon-blue));
+            background-size: 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: rgb-flow 8s linear infinite; filter: drop-shadow(0 0 20px rgba(0,242,255,0.3));
+            letter-spacing: 25px; margin-bottom: 50px; position: relative;
         }
 
-        .main-header {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 5rem;
-            font-weight: 900;
-            letter-spacing: 20px;
-            margin-bottom: 60px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink), var(--neon-purple), var(--neon-blue));
-            background-size: 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: moveGradient 5s linear infinite;
-            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.5));
+        @keyframes rgb-flow { 0% { background-position: 0% 50%; } 100% { background-position: 400% 50%; } }
+
+        .main-menu { display: flex; gap: 60px; margin-top: 50px; }
+
+        .mega-card {
+            width: 350px; height: 500px; background: var(--glass);
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 40px;
+            backdrop-filter: blur(20px); position: relative;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        @keyframes moveGradient {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
+        .mega-card:hover {
+            transform: scale(1.1) translateY(-20px) rotateY(15deg);
+            border-color: var(--neon-blue); box-shadow: 0 0 80px rgba(0, 242, 255, 0.4);
         }
 
-        /* --- GRID GIER --- */
-        .games-wrapper {
-            display: flex;
-            gap: 50px;
-            margin-bottom: 80px;
+        .mega-card i { font-size: 120px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* --- SETTINGS BAR --- */
+        .ultra-settings {
+            margin-top: 80px; width: 80%; max-width: 1000px;
+            background: rgba(0,0,0,0.8); border: 1px solid var(--neon-purple);
+            border-radius: 100px; padding: 20px 50px; display: flex; justify-content: space-between;
+            align-items: center; box-shadow: 0 0 30px rgba(188, 19, 254, 0.2);
         }
 
-        .card {
-            width: 320px;
-            height: 450px;
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 40px;
-            backdrop-filter: blur(25px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            text-decoration: none;
-            color: white;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        .s-group { display: flex; flex-direction: column; gap: 5px; }
+        .s-label { font-size: 10px; color: var(--neon-purple); font-weight: 900; letter-spacing: 2px; }
+
+        input[type="text"] {
+            background: transparent; border: none; border-bottom: 2px solid #333;
+            color: white; font-family: var(--font-cyber); padding: 5px; transition: 0.3s;
+        }
+        input[type="text"]:focus { border-color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+
+        /* --- FARMING HUD --- */
+        .farm-hud {
+            width: 100%; height: 100px; display: flex; justify-content: space-around; align-items: center;
+            background: rgba(0,0,0,0.5); border-bottom: 2px solid var(--neon-blue);
+            backdrop-filter: blur(15px); position: absolute; top: 0; left: 0;
         }
 
-        /* Efekt dla aktywnej gry */
-        .card.active-game:hover {
-            transform: scale(1.15) translateY(-10px);
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 60px rgba(0, 242, 255, 0.3);
+        .hud-stat { text-align: center; }
+        .hud-val { font-family: var(--font-cyber); font-size: 28px; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 15px var(--neon-green); }
+
+        /* --- FARM GRID & SLOTS --- */
+        .farm-container { display: flex; gap: 40px; margin-top: 140px; }
+        .shop-side { width: 350px; background: var(--glass); border-radius: 30px; padding: 20px; border-right: 4px solid var(--neon-pink); }
+        
+        .seed-item {
+            background: #000; border: 2px solid #222; border-radius: 20px;
+            padding: 20px; margin-bottom: 15px; transition: 0.3s;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .seed-item:hover { border-color: var(--neon-blue); transform: translateX(10px); }
+        .seed-item.active { border-color: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink); }
+
+        .grid-core { display: grid; grid-template-columns: repeat(3, 190px); gap: 20px; }
+        .plot-mech {
+            width: 190px; height: 190px; background: #050508; border: 2px solid #111;
+            border-radius: 30px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 0.4s;
         }
 
-        .card.active-game::after {
-            content: "PLAY NOW";
-            position: absolute;
-            bottom: -40px;
-            font-family: 'Orbitron';
-            font-size: 14px;
-            color: var(--neon-blue);
-            letter-spacing: 5px;
-            opacity: 0;
-            transition: 0.3s;
+        .plot-mech:hover { border-color: var(--neon-blue); box-shadow: 0 0 40px rgba(0, 242, 255, 0.2); transform: translateY(-5px); }
+        
+        .gear-bg {
+            position: absolute; font-size: 180px; color: rgba(255,255,255,0.02);
+            z-index: 0; pointer-events: none;
+        }
+        .growing .gear-bg { animation: spin 2s linear infinite; color: rgba(0, 242, 255, 0.1); }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .progress-rgb {
+            position: absolute; bottom: 0; left: 0; height: 6px; width: 0%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue), var(--neon-green));
+            background-size: 200%; animation: rgb-flow 2s linear infinite;
         }
 
-        .card.active-game:hover::after {
-            opacity: 1;
-            bottom: 30px;
+        /* --- BUTTONS & MODALS --- */
+        .cyber-btn {
+            background: transparent; border: 2px solid var(--neon-blue);
+            color: white; padding: 15px 40px; border-radius: 50px;
+            font-family: var(--font-cyber); font-weight: 900; cursor: none;
+            transition: 0.3s; text-transform: uppercase;
+        }
+        .cyber-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 30px var(--neon-blue); }
+
+        #level-up-fx {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 10rem; font-family: var(--font-cyber); font-weight: 900;
+            color: white; text-shadow: 0 0 100px var(--neon-blue);
+            z-index: 1000; pointer-events: none; display: none;
+            animation: level-anim 2s forwards;
         }
 
-        .card.locked {
-            opacity: 0.4;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-
-        .card .icon {
-            font-size: 100px;
-            margin-bottom: 20px;
-            transition: var(--transition);
-        }
-
-        .card.active-game:hover .icon {
-            transform: scale(1.2) rotate(5deg);
-            filter: drop-shadow(0 0 20px var(--neon-blue));
-        }
-
-        .card h2 {
-            font-family: 'Orbitron';
-            letter-spacing: 3px;
-            font-size: 1.5rem;
-        }
-
-        /* --- PANEL USTAWIEŃ --- */
-        .settings-bar {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 30px 50px;
-            border-radius: 100px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            gap: 40px;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .setting-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .setting-group label {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--neon-pink);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        #nickField {
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid #333;
-            color: white;
-            font-family: 'Orbitron';
-            font-size: 16px;
-            padding: 5px;
-            transition: 0.3s;
-            width: 150px;
-        }
-
-        #nickField:focus {
-            border-color: var(--neon-blue);
-            width: 200px;
-        }
-
-        .control-btn {
-            background: #111;
-            border: 1px solid #444;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            font-size: 12px;
-            transition: 0.3s;
-        }
-
-        .control-btn.active {
-            background: var(--neon-blue);
-            color: black;
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
-        }
-
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100px;
-            height: 4px;
-            background: #333;
-            border-radius: 5px;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 15px; width: 15px;
-            border-radius: 50%;
-            background: var(--neon-pink);
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        /* --- FOOTER --- */
-        .version {
-            position: fixed;
-            bottom: 20px;
-            right: 30px;
-            font-size: 12px;
-            color: #444;
-            letter-spacing: 2px;
+        @keyframes level-anim {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -150%) scale(2); }
         }
 
     </style>
 </head>
 <body>
 
-    <canvas id="particleCanvas"></canvas>
-    <div class="overlay-glow" id="glow"></div>
+    <div id="cursor-dron"></div>
+    <div class="vignette"></div>
+    <canvas id="master-canvas"></canvas>
+    <div id="level-up-fx">LEVEL UP</div>
 
-    <div class="hub-container">
-        <h1 class="main-header">CyberBase</h1>
+    <div id="view-lobby" class="view active">
+        <h1 class="cyber-title">CYBER OMEGA</h1>
+        
+        <div class="main-menu">
+            <div class="mega-card" onclick="switchView('view-farm')">
+                <div style="font-size: 80px;">🌾</div>
+                <h2 style="font-family: var(--font-cyber); margin-top: 20px;">FARM ENGINE</h2>
+                <p style="color: var(--neon-blue); margin-top: 10px; letter-spacing: 5px;">ACTIVE CONNECTION</p>
+                <div style="position: absolute; bottom: 30px;" class="cyber-btn">START SIM</div>
+            </div>
 
-        <div class="games-wrapper">
-            <a href="farma.html" class="card active-game">
-                <div class="icon">🌾</div>
-                <h2>NEON FARM</h2>
-                <p style="font-size: 10px; opacity: 0.5; margin-top: 10px;">VERSION 5.2 STABLE</p>
-            </a>
-
-            <div class="card locked">
-                <div class="icon">🏎️</div>
-                <h2>COMING SOON</h2>
-                <p style="font-size: 10px; margin-top: 10px;">LOCKED BY SYSTEM</p>
+            <div class="mega-card" style="opacity: 0.2; filter: grayscale(1);">
+                <div style="font-size: 80px;">⚡</div>
+                <h2 style="font-family: var(--font-cyber); margin-top: 20px;">ARENA</h2>
+                <p style="margin-top: 10px;">LOCKED BY ADMIN</p>
             </div>
         </div>
 
-        <div class="settings-bar">
-            <div class="setting-group">
-                <label>Operator Name</label>
-                <input type="text" id="nickField" placeholder="ENTER NICK...">
+        <div class="ultra-settings">
+            <div class="s-group">
+                <span class="s-label">Operator Nickname</span>
+                <input type="text" id="nick-field" maxlength="14" placeholder="PILOT_01">
             </div>
-
-            <div class="setting-group">
-                <label>Audio Engine</label>
-                <button class="control-btn" id="musicBtn">MUSIC: OFF</button>
+            <div class="s-group">
+                <span class="s-label">Audio Protocol</span>
+                <button class="cyber-btn" style="padding: 8px 20px; font-size: 10px;" id="music-toggle">MUSIC: OFF</button>
             </div>
-
-            <div class="setting-group">
-                <label>Master Volume</label>
-                <input type="range" id="volRange" min="0" max="100" value="50">
+            <div class="s-group" style="text-align: right;">
+                <span class="s-label">System Version</span>
+                <div style="font-family: 'Share Tech Mono'; color: white; font-size: 14px;">v6.9.420_BETA</div>
             </div>
         </div>
     </div>
 
-    <div class="version">ULTRA RGB ENGINE v5.2 // BY GEMINI</div>
+    <div id="view-farm" class="view">
+        <div class="farm-hud">
+            <div class="hud-stat"><span class="s-label">CREDITS</span><div class="hud-val" id="hud-m">$0</div></div>
+            <div class="hud-stat"><span class="s-label">OPERATOR</span><div class="hud-val" id="hud-nick" style="color:var(--neon-blue); text-shadow:0 0 10px var(--neon-blue)">PLAYER</div></div>
+            <div class="hud-stat"><span class="s-label">XP LEVEL</span><div class="hud-val" id="hud-l" style="color:var(--neon-pink); text-shadow:0 0 10px var(--neon-pink)">1</div></div>
+            <button class="cyber-btn" style="padding: 10px 20px; font-size: 12px;" onclick="switchView('view-lobby')">TERMINATE</button>
+        </div>
+
+        <div class="farm-container">
+            <div class="shop-side" id="seed-shop">
+                <h2 style="font-family: var(--font-cyber); font-size: 18px; margin-bottom: 25px; color: var(--neon-pink);">BIOLAB RECEPTORS</h2>
+            </div>
+            <div class="grid-core" id="farm-grid">
+                </div>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        // --- CZĄSTECZKI W TLE ---
-        const canvas = document.getElementById('particleCanvas');
+        /* =========================================
+           CYBER-OMEGA LOGIC ENGINE (1000+ LOGIC)
+           =========================================
+        */
+
+        const State = {
+            m: parseInt(localStorage.getItem('co_m')) || 250,
+            x: parseInt(localStorage.getItem('co_x')) || 0,
+            l: parseInt(localStorage.getItem('co_l')) || 1,
+            nick: localStorage.getItem('co_nick') || "PILOT_01",
+            music: localStorage.getItem('co_music') === 'true',
+            selected: null
+        };
+
+        const Seeds = [
+            { name: "Neon Sprout", icon: "🌱", cost: 25, time: 5, win: 80, xp: 40 },
+            { name: "Cyber Blossom", icon: "🌸", cost: 150, time: 15, win: 550, xp: 180 },
+            { name: "Void Crystal", icon: "💎", cost: 800, time: 40, win: 3500, xp: 900 },
+            { name: "Omega Core", icon: "⚛️", cost: 5000, time: 120, win: 25000, xp: 6000 }
+        ];
+
+        let Plots = Array(9).fill().map(() => ({ seed: null, timer: 0, ready: false }));
+
+        // --- BACKGROUND CANVAS ENGINE ---
+        const canvas = document.getElementById('master-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
 
@@ -298,92 +266,210 @@
 
         class Particle {
             constructor() {
-                this.reset();
-            }
-            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5;
-                this.color = Math.random() > 0.5 ? '#00f2ff' : '#ff007a';
-                this.opacity = Math.random();
+                this.z = Math.random() * canvas.width;
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
+                this.z -= 5;
+                if(this.z <= 0) {
+                    this.z = canvas.width;
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
                 }
             }
             draw() {
-                ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = this.color;
+                let sx = (this.x - canvas.width/2) * (canvas.width/this.z) + canvas.width/2;
+                let sy = (this.y - canvas.height/2) * (canvas.width/this.z) + canvas.height/2;
+                let r = (canvas.width / this.z) * 1.5;
+                ctx.fillStyle = `rgba(0, 242, 255, ${1 - this.z / canvas.width})`;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.arc(sx, sy, r, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
-        function init() {
+        function initBackground() {
             resize();
-            for (let i = 0; i < 150; i++) {
-                particles.push(new Particle());
-            }
-            animate();
+            for(let i=0; i<400; i++) particles.push(new Particle());
+            render();
         }
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
+        function render() {
+            ctx.fillStyle = '#010103';
+            ctx.fillRect(0,0,canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(render);
+        }
+
+        // --- VIEW CONTROLLER ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            updateUI();
+        }
+
+        // --- CORE GAMEPLAY ---
+        function initGame() {
+            const grid = document.getElementById('farm-grid');
+            const shop = document.getElementById('seed-shop');
+
+            // Generate Grid
+            Plots.forEach((_, i) => {
+                const div = document.createElement('div');
+                div.className = 'plot-mech';
+                div.id = `plot-${i}`;
+                div.innerHTML = `
+                    <div class="gear-bg">⚙️</div>
+                    <div id="emoji-${i}" style="font-size: 70px; z-index: 1;"></div>
+                    <div class="progress-rgb" id="prog-${i}"></div>
+                    <div id="time-${i}" style="font-family: 'Share Tech Mono'; font-size: 12px; margin-top: 10px; z-index: 1;"></div>
+                `;
+                div.onclick = () => handlePlotClick(i);
+                grid.appendChild(div);
             });
-            requestAnimationFrame(animate);
+
+            // Generate Shop
+            Seeds.forEach((s, i) => {
+                const div = document.createElement('div');
+                div.className = 'seed-item';
+                div.innerHTML = `
+                    <div style="font-size: 35px;">${s.icon}</div>
+                    <div style="flex:1">
+                        <div style="font-weight: 700; font-size: 18px;">${s.name}</div>
+                        <div style="font-size: 11px; color: var(--neon-green)">YIELD: +$${s.win} | XP: +${s.xp}</div>
+                    </div>
+                    <div style="font-family: 'Orbitron'; color: var(--neon-blue)">$${s.cost}</div>
+                `;
+                div.onclick = () => {
+                    if(State.m >= s.cost) {
+                        State.selected = s;
+                        document.querySelectorAll('.seed-item').forEach(x => x.classList.remove('active'));
+                        div.classList.add('active');
+                    }
+                };
+                shop.appendChild(div);
+            });
+
+            // Settings Sync
+            const nickInp = document.getElementById('nick-field');
+            nickInp.value = State.nick;
+            nickInp.oninput = (e) => { State.nick = e.target.value; localStorage.setItem('co_nick', State.nick); };
+
+            const musicBtn = document.getElementById('music-toggle');
+            musicBtn.onclick = () => {
+                State.music = !State.music;
+                localStorage.setItem('co_music', State.music);
+                syncMusic();
+            };
+
+            syncMusic();
+            setInterval(gameTick, 1000);
+            initBackground();
         }
 
-        // --- MOUSE GLOW ---
+        function handlePlotClick(i) {
+            const plot = Plots[i];
+            if(!plot.seed && State.selected) {
+                State.m -= State.selected.cost;
+                plot.seed = {...State.selected};
+                plot.timer = plot.seed.time;
+                State.selected = null;
+                document.querySelectorAll('.seed-item').forEach(x => x.classList.remove('active'));
+                
+                document.getElementById(`plot-${i}`).classList.add('growing');
+                document.getElementById(`emoji-${i}`).innerText = "🌱";
+                
+                const bar = document.getElementById(`prog-${i}`);
+                bar.style.transition = `width ${plot.seed.time}s linear`;
+                setTimeout(() => bar.style.width = '100%', 50);
+                
+                updateUI();
+            } else if(plot.ready) {
+                // Collect
+                State.m += plot.seed.win;
+                State.x += plot.seed.xp;
+                
+                checkLevelUp();
+                
+                // Reset Plot
+                plot.seed = null; plot.ready = false;
+                document.getElementById(`plot-${i}`).classList.remove('growing');
+                document.getElementById(`emoji-${i}`).innerText = "";
+                document.getElementById(`time-${i}`).innerText = "";
+                const bar = document.getElementById(`prog-${i}`);
+                bar.style.transition = 'none';
+                bar.style.width = '0%';
+                
+                updateUI();
+                save();
+            }
+        }
+
+        function gameTick() {
+            Plots.forEach((p, i) => {
+                if(p.seed && p.timer > 0) {
+                    p.timer--;
+                    document.getElementById(`time-${i}`).innerText = `${p.timer}s`;
+                    if(p.timer === 0) {
+                        p.ready = true;
+                        document.getElementById(`emoji-${i}`).innerText = p.seed.icon;
+                        document.getElementById(`time-${i}`).innerText = "READY";
+                        document.getElementById(`time-${i}`).style.color = "var(--neon-green)";
+                    }
+                }
+            });
+            save();
+        }
+
+        function checkLevelUp() {
+            let nextLevelXp = State.l * 2000;
+            if(State.x >= nextLevelXp) {
+                State.l++;
+                const fx = document.getElementById('level-up-fx');
+                fx.style.display = 'block';
+                setTimeout(() => fx.style.display = 'none', 2000);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('hud-m').innerText = `$${State.m}`;
+            document.getElementById('hud-x').innerText = State.x;
+            document.getElementById('hud-l').innerText = State.l;
+            document.getElementById('hud-nick').innerText = State.nick;
+        }
+
+        function save() {
+            localStorage.setItem('co_m', State.m);
+            localStorage.setItem('co_x', State.x);
+            localStorage.setItem('co_l', State.l);
+        }
+
+        function syncMusic() {
+            const m = document.getElementById('bg-music');
+            const btn = document.getElementById('music-toggle');
+            if(State.music) {
+                m.play().catch(() => {});
+                btn.innerText = "MUSIC: ON";
+                btn.style.borderColor = "var(--neon-green)";
+            } else {
+                m.pause();
+                btn.innerText = "MUSIC: OFF";
+                btn.style.borderColor = "var(--neon-pink)";
+            }
+        }
+
+        // --- CURSOR DRON LOGIC ---
+        const dron = document.getElementById('cursor-dron');
         window.addEventListener('mousemove', (e) => {
-            const glow = document.getElementById('glow');
-            const x = (e.clientX / window.innerWidth) * 100;
-            const y = (e.clientY / window.innerHeight) * 100;
-            glow.style.setProperty('--x', x + '%');
-            glow.style.setProperty('--y', y + '%');
+            dron.style.left = e.clientX + 'px';
+            dron.style.top = e.clientY + 'px';
+            dron.style.transform = `translate(-50%, -50%) rotate(${e.clientX / 10}deg)`;
         });
 
-        // --- SYSTEM USTAWIEŃ ---
-        const nickField = document.getElementById('nickField');
-        const musicBtn = document.getElementById('musicBtn');
-        const volRange = document.getElementById('volRange');
-
-        // Wczytaj dane
-        nickField.value = localStorage.getItem('cyber_nick') || "PILOT_01";
-        let musicOn = localStorage.getItem('cyber_music') === 'true';
-        let volume = localStorage.getItem('cyber_vol') || 50;
-        volRange.value = volume;
-
-        function updateMusicUI() {
-            if (musicOn) {
-                musicBtn.classList.add('active');
-                musicBtn.innerText = "MUSIC: ON";
-            } else {
-                musicBtn.classList.remove('active');
-                musicBtn.innerText = "MUSIC: OFF";
-            }
-        }
-
-        nickField.oninput = () => localStorage.setItem('cyber_nick', nickField.value);
-        volRange.oninput = () => localStorage.setItem('cyber_vol', volRange.value);
-        
-        musicBtn.onclick = () => {
-            musicOn = !musicOn;
-            localStorage.setItem('cyber_music', musicOn);
-            updateMusicUI();
-        };
-
-        window.addEventListener('resize', resize);
-        updateMusicUI();
-        init();
+        // Start
+        window.onclick = () => { if(State.music) document.getElementById('bg-music').play(); };
+        initGame();
 
     </script>
 </body>
