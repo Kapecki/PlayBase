@@ -2,103 +2,143 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Cyber-Terminal | Lobby</title>
+    <title>Cyber-Base Ultra RGB</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap');
-        
+
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff007a;
+            --neon-green: #39ff14;
+        }
+
         body {
-            margin: 0; background: #05050a; color: white;
+            margin: 0; background: #000; color: white;
             font-family: 'Orbitron', sans-serif;
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-image: radial-gradient(circle at center, #0a0a20 0%, #000 100%);
+            overflow: hidden;
+        }
+
+        /* --- TŁO RGB --- */
+        .bg-glow {
+            position: absolute; width: 100%; height: 100%;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            opacity: 0.05; filter: blur(100px); z-index: -1;
+        }
+
+        .container { text-align: center; z-index: 1; }
+
+        h1 {
+            font-size: 4rem; text-transform: uppercase; letter-spacing: 10px;
+            margin-bottom: 50px; text-shadow: 0 0 20px var(--neon-blue);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; text-shadow: 0 0 40px var(--neon-blue); } }
+
+        /* --- MENU GIER --- */
+        .menu { display: flex; gap: 40px; justify-content: center; }
+
+        .game-card {
+            width: 250px; height: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 242, 255, 0.3);
+            border-radius: 30px; backdrop-filter: blur(15px);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; overflow: hidden;
-            background: radial-gradient(circle, #0a0a2e 0%, #05050a 100%);
+            cursor: pointer; text-decoration: none; color: white;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Płynne rośnięcie */
+            position: relative; overflow: hidden;
         }
 
-        .main-panel {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px);
-            padding: 50px; border-radius: 40px; border: 1px solid rgba(0, 212, 255, 0.3);
-            box-shadow: 0 0 50px rgba(0, 212, 255, 0.1); text-align: center;
+        /* EFEKT ROŚNIĘCIA I ŚWIECENIA */
+        .game-card:hover {
+            transform: scale(1.15); /* Rośnie przy najechaniu */
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 50px rgba(255, 0, 122, 0.5);
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        h1 { font-size: 3rem; text-shadow: 0 0 20px #00d4ff; margin-bottom: 30px; }
+        .game-card i { font-size: 80px; margin-bottom: 20px; transition: 0.5s; }
+        .game-card:hover i { transform: scale(1.2); filter: drop-shadow(0 0 15px var(--neon-pink)); }
 
-        .settings-box { margin: 20px 0; display: flex; flex-direction: column; gap: 15px; }
+        .game-title { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; }
 
-        input {
-            background: #000; border: 2px solid #00d4ff; color: #0ff;
-            padding: 10px; border-radius: 10px; text-align: center; font-family: 'Orbitron';
+        /* --- USTAWIENIA --- */
+        .settings {
+            margin-top: 60px; padding: 20px;
+            background: rgba(0, 0, 0, 0.6); border-radius: 20px;
+            border: 1px solid #333; width: 400px;
         }
 
-        .btn {
-            background: #00d4ff; color: #000; border: none; padding: 15px 40px;
-            border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s;
-            text-decoration: none; display: inline-block; font-size: 1.2rem;
-        }
-        .btn:hover { box-shadow: 0 0 30px #00d4ff; transform: scale(1.1); }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
 
-        .audio-controls { margin-top: 20px; }
-        .audio-btn {
-            background: transparent; border: 1px solid white; color: white;
-            padding: 5px 15px; border-radius: 5px; cursor: pointer; opacity: 0.6;
+        input[type="text"] {
+            background: #000; border: 1px solid var(--neon-blue);
+            color: var(--neon-blue); padding: 8px; border-radius: 5px;
+            font-family: 'Orbitron'; text-align: center;
         }
-        .audio-btn:hover { opacity: 1; }
+
+        .toggle-btn {
+            background: var(--neon-blue); color: black; border: none;
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: 900;
+        }
     </style>
 </head>
 <body>
 
-    <div class="main-panel">
-        <h1>CYBER-BASE</h1>
-        
-        <div class="settings-box">
-            <label>TWÓJ CYBER-NICK:</label>
-            <input type="text" id="nickInput" placeholder="Wpisz nick...">
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <h1>Cyber-Lobby</h1>
+
+        <div class="menu">
+            <a href="farma.html" class="game-card">
+                <div style="font-size: 60px;">🌾</div>
+                <span class="game-title">FARMA PRO</span>
+                <p style="font-size: 10px; color: var(--neon-blue);">ULTRASONIC SIMULATOR</p>
+            </a>
+
+            <div class="game-card" style="opacity: 0.5; cursor: not-allowed;">
+                <div style="font-size: 60px;">🚀</div>
+                <span class="game-title">SOON</span>
+                <p style="font-size: 10px;">LOCKED</p>
+            </div>
         </div>
 
-        <div class="audio-controls">
-            <button class="audio-btn" id="musicToggle">MUZYKA: OFF</button>
+        <div class="settings">
+            <div class="setting-row">
+                <span>NICK:</span>
+                <input type="text" id="nickInput" placeholder="Twoja ksywa...">
+            </div>
+            <div class="setting-row">
+                <span>MUZYKA:</span>
+                <button class="toggle-btn" id="musicBtn">ON</button>
+            </div>
         </div>
-
-        <br><br>
-        <a href="farma.html" class="btn" onclick="saveSettings()">START SIMULATION</a>
     </div>
 
-    <audio id="bgMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
-        const music = document.getElementById('bgMusic');
-        const btn = document.getElementById('musicToggle');
-        const input = document.getElementById('nickInput');
+        const nickInput = document.getElementById('nickInput');
+        const musicBtn = document.getElementById('musicBtn');
 
-        // Wczytaj ustawienia
-        input.value = localStorage.getItem('nick') || "Player1";
-        let isPlaying = localStorage.getItem('musicOn') === 'true';
+        // Wczytywanie danych
+        nickInput.value = localStorage.getItem('nick') || "Player_One";
+        let musicOn = localStorage.getItem('musicOn') === 'true';
+        updateMusicBtn();
 
-        function updateMusic() {
-            if(isPlaying) {
-                music.play().catch(() => console.log("Czekam na interakcję..."));
-                btn.innerText = "MUZYKA: ON";
-                btn.style.borderColor = "#39ff14";
-            } else {
-                music.pause();
-                btn.innerText = "MUZYKA: OFF";
-                btn.style.borderColor = "red";
-            }
-        }
+        nickInput.oninput = () => localStorage.setItem('nick', nickInput.value);
 
-        btn.onclick = () => {
-            isPlaying = !isPlaying;
-            localStorage.setItem('musicOn', isPlaying);
-            updateMusic();
+        musicBtn.onclick = () => {
+            musicOn = !musicOn;
+            localStorage.setItem('musicOn', musicOn);
+            updateMusicBtn();
         };
 
-        function saveSettings() {
-            localStorage.setItem('nick', input.value);
+        function updateMusicBtn() {
+            musicBtn.innerText = musicOn ? "ON" : "OFF";
+            musicBtn.style.background = musicOn ? "#39ff14" : "#ff007a";
         }
-
-        // Próba auto-startu muzyki przy kliknięciu gdziekolwiek
-        window.onclick = () => { if(isPlaying) music.play(); };
     </script>
 </body>
 </html>
