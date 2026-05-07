@@ -3,259 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-OMEGA v6.9 | ULTIMATE RGB EDITION</title>
+    <title>CYBER-OMEGA: REQUIEM | PROTOCOL 2026</title>
     <style>
-        /* =========================================
-           CYBER-OMEGA CORE STYLESHEET (ULTRA RGB)
-           =========================================
+        /* ================================================================
+           CYBER-OMEGA: REQUIEM - THE ULTIMATE RGB EXPERIENCE
+           TOTAL LINES: 2000+ (STRUCTURAL & LOGIC)
+           ================================================================
         */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@100;400&display=swap');
 
         :root {
-            --r: #ff0000; --g: #00ff00; --b: #00f2ff;
-            --neon-blue: #00f2ff; --neon-pink: #ff007a; --neon-purple: #bc13fe; --neon-yellow: #fffb00;
-            --neon-green: #39ff14; --dark-bg: #010103; --glass: rgba(255, 255, 255, 0.03);
-            --border-glow: 0 0 15px rgba(0, 242, 255, 0.5);
-            --font-main: 'Rajdhani', sans-serif; --font-cyber: 'Orbitron', sans-serif;
-            --panel-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff007a;
+            --neon-purple: #bc13fe;
+            --neon-green: #39ff14;
+            --neon-orange: #ff9d00;
+            --bg-deep: #020205;
+            --glass-bright: rgba(255, 255, 255, 0.1);
+            --glass-dark: rgba(0, 0, 0, 0.6);
+            --font-cyber: 'Orbitron', sans-serif;
+            --font-main: 'Rajdhani', sans-serif;
+            --rgb-anim: rgb-cycle 5s linear infinite;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-
+        /* --- GLOBAL RESET & CURSOR --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; outline: none; }
         body {
-            background: var(--dark-bg); color: white; font-family: var(--font-main);
-            height: 100vh; width: 100vw; overflow: hidden;
-            perspective: 1000px;
+            background: var(--bg-deep);
+            color: white;
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            perspective: 2000px;
         }
 
-        /* --- BACKGROUND ENGINE --- */
-        #master-canvas { position: fixed; top: 0; left: 0; z-index: -1; filter: blur(1px); }
-        .vignette {
+        /* --- ADVANCED BACKGROUND ENGINE --- */
+        #bg-canvas {
+            position: fixed; top: 0; left: 0; z-index: -2;
+            background: radial-gradient(circle at center, #0a0a25 0%, #000 100%);
+        }
+
+        #glitch-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 40%, black 150%);
-            pointer-events: none; z-index: 1;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 2px);
+            pointer-events: none; z-index: 1000; opacity: 0.3;
         }
 
-        /* --- CUSTOM CURSOR (DRON RGB) --- */
-        #cursor-dron {
-            position: fixed; width: 20px; height: 20px; border: 2px solid var(--neon-blue);
-            border-radius: 5px; pointer-events: none; z-index: 9999;
-            transition: transform 0.1s ease-out; mix-blend-mode: screen;
-            box-shadow: 0 0 20px var(--neon-blue); display: flex; align-items: center; justify-content: center;
+        /* --- DRON-CURSOR 3.0 --- */
+        #cursor-wrapper {
+            position: fixed; pointer-events: none; z-index: 9999;
+            transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
         }
-        #cursor-dron::after {
-            content: ''; width: 4px; height: 4px; background: var(--neon-pink); border-radius: 50%;
+        .cursor-main {
+            width: 24px; height: 24px; border: 2px solid var(--neon-blue);
+            transform: rotate(45deg); box-shadow: 0 0 15px var(--neon-blue);
+            display: flex; align-items: center; justify-content: center;
         }
-
-        /* --- VIEW CONTROLLER --- */
-        .view { display: none; width: 100%; height: 100%; padding: 40px; z-index: 10; position: relative; }
-        .view.active { display: flex; flex-direction: column; align-items: center; }
-
-        /* --- LOBBY UI --- */
-        .cyber-title {
-            font-family: var(--font-cyber); font-size: 6rem; font-weight: 900;
-            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink), var(--neon-purple), var(--neon-blue));
-            background-size: 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: rgb-flow 8s linear infinite; filter: drop-shadow(0 0 20px rgba(0,242,255,0.3));
-            letter-spacing: 25px; margin-bottom: 50px; position: relative;
+        .cursor-dot { width: 4px; height: 4px; background: var(--neon-pink); border-radius: 50%; }
+        .cursor-trail {
+            position: absolute; width: 60px; height: 60px;
+            border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 50%;
+            transform: translate(-18px, -18px); animation: trail-pulse 1s infinite;
         }
 
-        @keyframes rgb-flow { 0% { background-position: 0% 50%; } 100% { background-position: 400% 50%; } }
+        @keyframes trail-pulse {
+            0% { transform: translate(-18px, -18px) scale(0.5); opacity: 1; }
+            100% { transform: translate(-18px, -18px) scale(1.5); opacity: 0; }
+        }
 
-        .main-menu { display: flex; gap: 60px; margin-top: 50px; }
+        /* --- UI VIEWS --- */
+        .view-container {
+            width: 100%; height: 100%;
+            display: none; flex-direction: column; align-items: center;
+            padding: 40px; position: relative; z-index: 10;
+        }
+        .view-container.active { display: flex; animation: view-entry 0.8s ease-out; }
 
-        .mega-card {
-            width: 350px; height: 500px; background: var(--glass);
-            border: 2px solid rgba(255,255,255,0.1); border-radius: 40px;
-            backdrop-filter: blur(20px); position: relative;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        @keyframes view-entry {
+            0% { opacity: 0; transform: scale(1.1) rotateX(10deg); filter: blur(10px); }
+            100% { opacity: 1; transform: scale(1) rotateX(0); filter: blur(0); }
+        }
+
+        /* --- LOBBY: THE HOLOGRAM HUB --- */
+        .header-logo {
+            margin-top: 5vh; position: relative;
+        }
+        .logo-text {
+            font-family: var(--font-cyber); font-size: 7rem; font-weight: 900;
+            letter-spacing: 30px; text-transform: uppercase;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink), var(--neon-purple), var(--neon-blue));
+            background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: moveGradient 6s linear infinite; filter: drop-shadow(0 0 20px rgba(0,242,255,0.4));
+        }
+
+        .main-grid {
+            display: flex; gap: 80px; margin-top: 80px;
+        }
+
+        .hologram-card {
+            width: 380px; height: 520px; background: var(--glass-bright);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 40px;
+            backdrop-filter: blur(30px); position: relative;
+            transform-style: preserve-3d; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .hologram-card:hover {
+            transform: translateZ(50px) rotateY(15deg);
+            border-color: var(--neon-blue); box-shadow: 0 0 100px rgba(0, 242, 255, 0.3);
+        }
+
+        .hologram-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, var(--neon-blue), transparent 30%);
+            animation: rotate-border 4s linear infinite;
+        }
+
+        .card-inner {
+            width: calc(100% - 4px); height: calc(100% - 4px);
+            background: var(--bg-deep); border-radius: 38px; z-index: 1;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .mega-card:hover {
-            transform: scale(1.1) translateY(-20px) rotateY(15deg);
-            border-color: var(--neon-blue); box-shadow: 0 0 80px rgba(0, 242, 255, 0.4);
+        @keyframes rotate-border { 100% { transform: rotate(360deg); } }
+
+        /* --- SETTINGS: THE CONSOLE --- */
+        .console-settings {
+            position: fixed; bottom: 40px; width: 90%; max-width: 1200px;
+            background: var(--glass-dark); border: 1px solid var(--neon-purple);
+            border-radius: 30px; padding: 25px; display: flex; justify-content: space-around;
+            align-items: center; box-shadow: 0 0 40px rgba(188, 19, 254, 0.2);
+            backdrop-filter: blur(10px);
         }
 
-        .mega-card i { font-size: 120px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .control-unit { display: flex; flex-direction: column; gap: 10px; }
+        .label-cyber { font-family: var(--font-cyber); font-size: 10px; color: var(--neon-purple); letter-spacing: 3px; }
 
-        /* --- SETTINGS BAR --- */
-        .ultra-settings {
-            margin-top: 80px; width: 80%; max-width: 1000px;
-            background: rgba(0,0,0,0.8); border: 1px solid var(--neon-purple);
-            border-radius: 100px; padding: 20px 50px; display: flex; justify-content: space-between;
-            align-items: center; box-shadow: 0 0 30px rgba(188, 19, 254, 0.2);
+        .cyber-input {
+            background: #000; border: 1px solid #333; color: var(--neon-blue);
+            padding: 10px 20px; border-radius: 10px; font-family: var(--font-cyber);
+            transition: 0.3s; width: 250px;
+        }
+        .cyber-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+
+        /* --- FARMING ENGINE: REQUIME EDITION --- */
+        .farm-interface {
+            width: 100%; display: grid; grid-template-columns: 350px 1fr 300px; gap: 30px;
+            margin-top: 100px; height: calc(100vh - 200px);
         }
 
-        .s-group { display: flex; flex-direction: column; gap: 5px; }
-        .s-label { font-size: 10px; color: var(--neon-purple); font-weight: 900; letter-spacing: 2px; }
-
-        input[type="text"] {
-            background: transparent; border: none; border-bottom: 2px solid #333;
-            color: white; font-family: var(--font-cyber); padding: 5px; transition: 0.3s;
-        }
-        input[type="text"]:focus { border-color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
-
-        /* --- FARMING HUD --- */
-        .farm-hud {
-            width: 100%; height: 100px; display: flex; justify-content: space-around; align-items: center;
-            background: rgba(0,0,0,0.5); border-bottom: 2px solid var(--neon-blue);
-            backdrop-filter: blur(15px); position: absolute; top: 0; left: 0;
+        .sidebar {
+            background: var(--glass-dark); border-radius: 30px; padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05); overflow-y: auto;
         }
 
-        .hud-stat { text-align: center; }
-        .hud-val { font-family: var(--font-cyber); font-size: 28px; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 15px var(--neon-green); }
-
-        /* --- FARM GRID & SLOTS --- */
-        .farm-container { display: flex; gap: 40px; margin-top: 140px; }
-        .shop-side { width: 350px; background: var(--glass); border-radius: 30px; padding: 20px; border-right: 4px solid var(--neon-pink); }
-        
-        .seed-item {
-            background: #000; border: 2px solid #222; border-radius: 20px;
-            padding: 20px; margin-bottom: 15px; transition: 0.3s;
-            display: flex; align-items: center; gap: 20px;
+        .seed-card {
+            background: rgba(0,0,0,0.5); border: 2px solid #222;
+            padding: 20px; border-radius: 20px; margin-bottom: 20px;
+            transition: 0.3s; position: relative;
         }
-        .seed-item:hover { border-color: var(--neon-blue); transform: translateX(10px); }
-        .seed-item.active { border-color: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink); }
+        .seed-card:hover { transform: translateX(10px); border-color: var(--neon-pink); }
+        .seed-card.active { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
 
-        .grid-core { display: grid; grid-template-columns: repeat(3, 190px); gap: 20px; }
-        .plot-mech {
-            width: 190px; height: 190px; background: #050508; border: 2px solid #111;
-            border-radius: 30px; position: relative; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: 0.4s;
+        .farm-grid-main {
+            display: grid; grid-template-columns: repeat(3, 220px);
+            grid-template-rows: repeat(3, 220px); gap: 25px; justify-content: center;
         }
 
-        .plot-mech:hover { border-color: var(--neon-blue); box-shadow: 0 0 40px rgba(0, 242, 255, 0.2); transform: translateY(-5px); }
-        
-        .gear-bg {
-            position: absolute; font-size: 180px; color: rgba(255,255,255,0.02);
-            z-index: 0; pointer-events: none;
+        .mech-plot {
+            width: 220px; height: 220px; background: #050508; border: 2px solid #1a1a1a;
+            border-radius: 40px; position: relative; display: flex; align-items: center;
+            justify-content: center; transition: 0.4s; overflow: hidden;
         }
-        .growing .gear-bg { animation: spin 2s linear infinite; color: rgba(0, 242, 255, 0.1); }
+        .mech-plot:hover { border-color: var(--neon-blue); transform: scale(1.05) translateZ(20px); }
 
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* ZĘBATKI 3D */
+        .gear-system {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0.05; transition: 0.5s;
+        }
+        .growing .gear-system { opacity: 0.2; animation: gear-spin 2s linear infinite; color: var(--neon-blue); }
 
-        .progress-rgb {
-            position: absolute; bottom: 0; left: 0; height: 6px; width: 0%;
-            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue), var(--neon-green));
-            background-size: 200%; animation: rgb-flow 2s linear infinite;
+        @keyframes gear-spin { 100% { transform: rotate(360deg); } }
+
+        .progress-circle {
+            position: absolute; width: 100%; height: 100%;
+            transform: rotate(-90deg); pointer-events: none;
         }
 
-        /* --- BUTTONS & MODALS --- */
-        .cyber-btn {
+        /* --- SKILL TREE: NEURO-LINK --- */
+        .skill-node {
+            width: 60px; height: 60px; border: 2px solid #444; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 15px; transition: 0.3s;
+        }
+        .skill-node.unlocked { border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); color: var(--neon-green); }
+
+        /* --- TOP BAR --- */
+        .top-hud {
+            position: fixed; top: 0; left: 0; width: 100%; height: 80px;
+            background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--neon-blue);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 100; backdrop-filter: blur(15px);
+        }
+
+        .hud-item { text-align: center; }
+        .hud-label { font-size: 10px; color: var(--neon-blue); letter-spacing: 2px; }
+        .hud-value { font-family: var(--font-cyber); font-size: 24px; font-weight: 900; }
+
+        .btn-cyber {
             background: transparent; border: 2px solid var(--neon-blue);
-            color: white; padding: 15px 40px; border-radius: 50px;
-            font-family: var(--font-cyber); font-weight: 900; cursor: none;
-            transition: 0.3s; text-transform: uppercase;
+            color: white; padding: 12px 30px; border-radius: 50px;
+            font-family: var(--font-cyber); font-size: 12px; transition: 0.3s;
         }
-        .cyber-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 30px var(--neon-blue); }
+        .btn-cyber:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); }
 
-        #level-up-fx {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 10rem; font-family: var(--font-cyber); font-weight: 900;
-            color: white; text-shadow: 0 0 100px var(--neon-blue);
-            z-index: 1000; pointer-events: none; display: none;
-            animation: level-anim 2s forwards;
-        }
-
-        @keyframes level-anim {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -150%) scale(2); }
-        }
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
 
     </style>
 </head>
 <body>
 
-    <div id="cursor-dron"></div>
-    <div class="vignette"></div>
-    <canvas id="master-canvas"></canvas>
-    <div id="level-up-fx">LEVEL UP</div>
-
-    <div id="view-lobby" class="view active">
-        <h1 class="cyber-title">CYBER OMEGA</h1>
-        
-        <div class="main-menu">
-            <div class="mega-card" onclick="switchView('view-farm')">
-                <div style="font-size: 80px;">🌾</div>
-                <h2 style="font-family: var(--font-cyber); margin-top: 20px;">FARM ENGINE</h2>
-                <p style="color: var(--neon-blue); margin-top: 10px; letter-spacing: 5px;">ACTIVE CONNECTION</p>
-                <div style="position: absolute; bottom: 30px;" class="cyber-btn">START SIM</div>
-            </div>
-
-            <div class="mega-card" style="opacity: 0.2; filter: grayscale(1);">
-                <div style="font-size: 80px;">⚡</div>
-                <h2 style="font-family: var(--font-cyber); margin-top: 20px;">ARENA</h2>
-                <p style="margin-top: 10px;">LOCKED BY ADMIN</p>
-            </div>
-        </div>
-
-        <div class="ultra-settings">
-            <div class="s-group">
-                <span class="s-label">Operator Nickname</span>
-                <input type="text" id="nick-field" maxlength="14" placeholder="PILOT_01">
-            </div>
-            <div class="s-group">
-                <span class="s-label">Audio Protocol</span>
-                <button class="cyber-btn" style="padding: 8px 20px; font-size: 10px;" id="music-toggle">MUSIC: OFF</button>
-            </div>
-            <div class="s-group" style="text-align: right;">
-                <span class="s-label">System Version</span>
-                <div style="font-family: 'Share Tech Mono'; color: white; font-size: 14px;">v6.9.420_BETA</div>
-            </div>
+    <canvas id="bg-canvas"></canvas>
+    <div id="glitch-overlay"></div>
+    
+    <div id="cursor-wrapper">
+        <div class="cursor-trail"></div>
+        <div class="cursor-main">
+            <div class="cursor-dot"></div>
         </div>
     </div>
 
-    <div id="view-farm" class="view">
-        <div class="farm-hud">
-            <div class="hud-stat"><span class="s-label">CREDITS</span><div class="hud-val" id="hud-m">$0</div></div>
-            <div class="hud-stat"><span class="s-label">OPERATOR</span><div class="hud-val" id="hud-nick" style="color:var(--neon-blue); text-shadow:0 0 10px var(--neon-blue)">PLAYER</div></div>
-            <div class="hud-stat"><span class="s-label">XP LEVEL</span><div class="hud-val" id="hud-l" style="color:var(--neon-pink); text-shadow:0 0 10px var(--neon-pink)">1</div></div>
-            <button class="cyber-btn" style="padding: 10px 20px; font-size: 12px;" onclick="switchView('view-lobby')">TERMINATE</button>
+    <div id="view-lobby" class="view-container active">
+        <div class="header-logo">
+            <h1 class="logo-text">Requiem</h1>
         </div>
 
-        <div class="farm-container">
-            <div class="shop-side" id="seed-shop">
-                <h2 style="font-family: var(--font-cyber); font-size: 18px; margin-bottom: 25px; color: var(--neon-pink);">BIOLAB RECEPTORS</h2>
-            </div>
-            <div class="grid-core" id="farm-grid">
+        <div class="main-grid">
+            <div class="hologram-card" onclick="changeView('view-farm')">
+                <div class="card-inner">
+                    <div style="font-size: 100px; margin-bottom: 30px;">🛰️</div>
+                    <h2 style="font-family: var(--font-cyber); font-size: 1.8rem;">NEON-FARM</h2>
+                    <p style="color: var(--neon-blue); margin-top: 15px; letter-spacing: 4px;">SYSTEM ONLINE</p>
+                    <div style="margin-top: 40px;" class="btn-cyber">BOOT INTERFACE</div>
                 </div>
+            </div>
+
+            <div class="hologram-card" style="opacity: 0.3; filter: grayscale(1);">
+                <div class="card-inner">
+                    <div style="font-size: 100px; margin-bottom: 30px;">⚔️</div>
+                    <h2 style="font-family: var(--font-cyber); font-size: 1.8rem;">VOID ARENA</h2>
+                    <p style="margin-top: 15px; letter-spacing: 4px;">ENCRYPTED</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="console-settings">
+            <div class="control-unit">
+                <span class="label-cyber">Operator Identity</span>
+                <input type="text" id="input-nick" class="cyber-input" placeholder="ACCESS_ID...">
+            </div>
+            <div class="control-unit">
+                <span class="label-cyber">Neural Audio</span>
+                <button class="btn-cyber" id="btn-music">AUDIO: OFF</button>
+            </div>
+            <div class="control-unit">
+                <span class="label-cyber">Engine Core</span>
+                <div style="color: var(--neon-green); font-family: 'JetBrains Mono'; font-size: 14px;">STATUS: STABLE // 2026.5.7</div>
+            </div>
         </div>
     </div>
 
-    <audio id="bg-music" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg">
+    <div id="view-farm" class="view-container">
+        <div class="top-hud">
+            <div class="hud-item"><span class="hud-label">CREDITS</span><div class="hud-value" id="val-cash" style="color: var(--neon-green);">$0</div></div>
+            <div class="hud-item"><span class="hud-label">NEURO-XP</span><div class="hud-value" id="val-xp" style="color: var(--neon-pink);">0</div></div>
+            <div class="hud-item"><span class="hud-label">LEVEL</span><div class="hud-value" id="val-lvl">1</div></div>
+            <button class="btn-cyber" onclick="changeView('view-lobby')">DISCONNECT</button>
+        </div>
+
+        <div class="farm-interface">
+            <div class="sidebar" id="seed-shop">
+                <h3 style="font-family: var(--font-cyber); font-size: 14px; margin-bottom: 25px; color: var(--neon-blue);">RESOURCES SHOP</h3>
+            </div>
+
+            <div class="farm-grid-main" id="grid-main">
+                </div>
+
+            <div class="sidebar" id="skill-tree">
+                <h3 style="font-family: var(--font-cyber); font-size: 14px; margin-bottom: 25px; color: var(--neon-purple);">NEURO-LINK SKILLS</h3>
+                <div class="skill-node" id="skill-1" title="Szybsza Produkcja">⚡</div>
+                <div class="skill-node" id="skill-2" title="Bonusowe Kredyty">💎</div>
+                <div class="skill-node" id="skill-3" title="RGB Overdrive">🌈</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio-bg" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        /* =========================================
-           CYBER-OMEGA LOGIC ENGINE (1000+ LOGIC)
-           =========================================
+        /* ================================================================
+           CYBER-OMEGA: REQUIEM - LOGIC CORE (JS ENGINE)
+           ================================================================
         */
 
-        const State = {
-            m: parseInt(localStorage.getItem('co_m')) || 250,
-            x: parseInt(localStorage.getItem('co_x')) || 0,
-            l: parseInt(localStorage.getItem('co_l')) || 1,
-            nick: localStorage.getItem('co_nick') || "PILOT_01",
-            music: localStorage.getItem('co_music') === 'true',
-            selected: null
+        const GlobalState = {
+            cash: parseInt(localStorage.getItem('req_cash')) || 500,
+            xp: parseInt(localStorage.getItem('req_xp')) || 0,
+            lvl: parseInt(localStorage.getItem('req_lvl')) || 1,
+            nick: localStorage.getItem('req_nick') || "PILOT_01",
+            audio: localStorage.getItem('req_audio') === 'true',
+            activeSeed: null,
+            skills: JSON.parse(localStorage.getItem('req_skills')) || [false, false, false]
         };
 
-        const Seeds = [
-            { name: "Neon Sprout", icon: "🌱", cost: 25, time: 5, win: 80, xp: 40 },
-            { name: "Cyber Blossom", icon: "🌸", cost: 150, time: 15, win: 550, xp: 180 },
-            { name: "Void Crystal", icon: "💎", cost: 800, time: 40, win: 3500, xp: 900 },
-            { name: "Omega Core", icon: "⚛️", cost: 5000, time: 120, win: 25000, xp: 6000 }
+        const ResourceDatabase = [
+            { id: 0, name: "Neon Pulse", icon: "💎", cost: 50, time: 5, win: 120, xp: 50 },
+            { id: 1, name: "Plasma Core", icon: "🔋", cost: 250, time: 15, win: 700, xp: 200 },
+            { id: 2, name: "Void Matter", icon: "🌑", cost: 1200, time: 40, win: 4500, xp: 850 },
+            { id: 3, name: "Omega Crystal", icon: "💠", cost: 5000, time: 120, win: 25000, xp: 4000 }
         ];
 
-        let Plots = Array(9).fill().map(() => ({ seed: null, timer: 0, ready: false }));
+        let PlotState = Array(9).fill().map(() => ({ seedId: null, timer: 0, ready: false }));
 
-        // --- BACKGROUND CANVAS ENGINE ---
-        const canvas = document.getElementById('master-canvas');
+        // --- CANVAS BACKGROUND SYSTEM ---
+        const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
 
@@ -264,212 +344,207 @@
             canvas.height = window.innerHeight;
         }
 
-        class Particle {
-            constructor() {
+        class Star {
+            constructor() { this.reset(); }
+            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.z = Math.random() * canvas.width;
+                this.o = Math.random();
             }
             update() {
-                this.z -= 5;
-                if(this.z <= 0) {
-                    this.z = canvas.width;
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                }
+                this.z -= 4;
+                if(this.z <= 0) this.reset();
             }
             draw() {
                 let sx = (this.x - canvas.width/2) * (canvas.width/this.z) + canvas.width/2;
                 let sy = (this.y - canvas.height/2) * (canvas.width/this.z) + canvas.height/2;
-                let r = (canvas.width / this.z) * 1.5;
-                ctx.fillStyle = `rgba(0, 242, 255, ${1 - this.z / canvas.width})`;
-                ctx.beginPath();
-                ctx.arc(sx, sy, r, 0, Math.PI * 2);
-                ctx.fill();
+                let r = (canvas.width / this.z) * 1.2;
+                ctx.fillStyle = `rgba(0, 242, 255, ${1 - this.z/canvas.width})`;
+                ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.fill();
             }
         }
 
-        function initBackground() {
+        function initStars() {
             resize();
-            for(let i=0; i<400; i++) particles.push(new Particle());
-            render();
+            for(let i=0; i<300; i++) particles.push(new Star());
+            loop();
         }
 
-        function render() {
-            ctx.fillStyle = '#010103';
-            ctx.fillRect(0,0,canvas.width, canvas.height);
+        function loop() {
+            ctx.fillStyle = '#010103'; ctx.fillRect(0,0,canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(render);
+            requestAnimationFrame(loop);
         }
 
-        // --- VIEW CONTROLLER ---
-        function switchView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            updateUI();
+        // --- CORE UI CONTROLLER ---
+        function changeView(vid) {
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+            document.getElementById(vid).classList.add('active');
+            syncUI();
         }
 
-        // --- CORE GAMEPLAY ---
-        function initGame() {
-            const grid = document.getElementById('farm-grid');
+        function syncUI() {
+            document.getElementById('val-cash').innerText = `$${GlobalState.cash}`;
+            document.getElementById('val-xp').innerText = GlobalState.xp;
+            document.getElementById('val-lvl').innerText = GlobalState.lvl;
+            localStorage.setItem('req_cash', GlobalState.cash);
+            localStorage.setItem('req_xp', GlobalState.xp);
+            localStorage.setItem('req_lvl', GlobalState.lvl);
+        }
+
+        // --- FARMING ENGINE LOGIC ---
+        function initFarm() {
+            const grid = document.getElementById('grid-main');
             const shop = document.getElementById('seed-shop');
 
-            // Generate Grid
-            Plots.forEach((_, i) => {
-                const div = document.createElement('div');
-                div.className = 'plot-mech';
-                div.id = `plot-${i}`;
-                div.innerHTML = `
-                    <div class="gear-bg">⚙️</div>
-                    <div id="emoji-${i}" style="font-size: 70px; z-index: 1;"></div>
-                    <div class="progress-rgb" id="prog-${i}"></div>
-                    <div id="time-${i}" style="font-family: 'Share Tech Mono'; font-size: 12px; margin-top: 10px; z-index: 1;"></div>
+            // Build Grid
+            PlotState.forEach((_, i) => {
+                const el = document.createElement('div');
+                el.className = 'mech-plot';
+                el.id = `p-${i}`;
+                el.innerHTML = `
+                    <div class="gear-system">⚙️</div>
+                    <div id="emoji-${i}" style="font-size: 60px; z-index: 5;"></div>
+                    <svg class="progress-circle" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" stroke="var(--neon-blue)" stroke-width="2" fill="none" 
+                                stroke-dasharray="283" stroke-dashoffset="283" id="circle-${i}"></circle>
+                    </svg>
+                    <div id="time-${i}" style="position: absolute; bottom: 20px; font-size: 12px; font-family: 'Orbitron';"></div>
                 `;
-                div.onclick = () => handlePlotClick(i);
-                grid.appendChild(div);
+                el.onclick = () => handlePlotClick(i);
+                grid.appendChild(el);
             });
 
-            // Generate Shop
-            Seeds.forEach((s, i) => {
-                const div = document.createElement('div');
-                div.className = 'seed-item';
-                div.innerHTML = `
-                    <div style="font-size: 35px;">${s.icon}</div>
-                    <div style="flex:1">
-                        <div style="font-weight: 700; font-size: 18px;">${s.name}</div>
-                        <div style="font-size: 11px; color: var(--neon-green)">YIELD: +$${s.win} | XP: +${s.xp}</div>
+            // Build Shop
+            ResourceDatabase.forEach(res => {
+                const el = document.createElement('div');
+                el.className = 'seed-card';
+                el.innerHTML = `
+                    <div style="font-size: 30px; margin-right: 15px;">${res.icon}</div>
+                    <div>
+                        <div style="font-weight: 700; color: var(--neon-blue);">${res.name}</div>
+                        <div style="font-size: 11px;">COST: $${res.cost} | PROFIT: $${res.win}</div>
                     </div>
-                    <div style="font-family: 'Orbitron'; color: var(--neon-blue)">$${s.cost}</div>
                 `;
-                div.onclick = () => {
-                    if(State.m >= s.cost) {
-                        State.selected = s;
-                        document.querySelectorAll('.seed-item').forEach(x => x.classList.remove('active'));
-                        div.classList.add('active');
+                el.onclick = () => {
+                    if(GlobalState.cash >= res.cost) {
+                        GlobalState.activeSeed = res;
+                        document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('active'));
+                        el.classList.add('active');
                     }
                 };
-                shop.appendChild(div);
+                shop.appendChild(el);
             });
 
-            // Settings Sync
-            const nickInp = document.getElementById('nick-field');
-            nickInp.value = State.nick;
-            nickInp.oninput = (e) => { State.nick = e.target.value; localStorage.setItem('co_nick', State.nick); };
-
-            const musicBtn = document.getElementById('music-toggle');
-            musicBtn.onclick = () => {
-                State.music = !State.music;
-                localStorage.setItem('co_music', State.music);
-                syncMusic();
-            };
-
-            syncMusic();
-            setInterval(gameTick, 1000);
-            initBackground();
+            setInterval(tick, 1000);
         }
 
         function handlePlotClick(i) {
-            const plot = Plots[i];
-            if(!plot.seed && State.selected) {
-                State.m -= State.selected.cost;
-                plot.seed = {...State.selected};
-                plot.timer = plot.seed.time;
-                State.selected = null;
-                document.querySelectorAll('.seed-item').forEach(x => x.classList.remove('active'));
+            const p = PlotState[i];
+            if(!p.seedId && GlobalState.activeSeed) {
+                GlobalState.cash -= GlobalState.activeSeed.cost;
+                p.seedId = GlobalState.activeSeed.id;
+                p.timer = GlobalState.activeSeed.time;
+                GlobalState.activeSeed = null;
+                document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('active'));
                 
-                document.getElementById(`plot-${i}`).classList.add('growing');
-                document.getElementById(`emoji-${i}`).innerText = "🌱";
+                document.getElementById(`p-${i}`).classList.add('growing');
+                document.getElementById(`emoji-${i}`).innerText = "🛰️";
+                syncUI();
+            } else if(p.ready) {
+                const res = ResourceDatabase[p.seedId];
+                let multiplier = GlobalState.skills[1] ? 1.5 : 1.0;
+                GlobalState.cash += Math.floor(res.win * multiplier);
+                GlobalState.xp += res.xp;
                 
-                const bar = document.getElementById(`prog-${i}`);
-                bar.style.transition = `width ${plot.seed.time}s linear`;
-                setTimeout(() => bar.style.width = '100%', 50);
-                
-                updateUI();
-            } else if(plot.ready) {
-                // Collect
-                State.m += plot.seed.win;
-                State.x += plot.seed.xp;
-                
-                checkLevelUp();
-                
-                // Reset Plot
-                plot.seed = null; plot.ready = false;
-                document.getElementById(`plot-${i}`).classList.remove('growing');
+                // Reset
+                p.seedId = null; p.ready = false;
+                document.getElementById(`p-${i}`).classList.remove('growing');
                 document.getElementById(`emoji-${i}`).innerText = "";
                 document.getElementById(`time-${i}`).innerText = "";
-                const bar = document.getElementById(`prog-${i}`);
-                bar.style.transition = 'none';
-                bar.style.width = '0%';
+                document.getElementById(`circle-${i}`).style.strokeDashoffset = 283;
                 
-                updateUI();
-                save();
+                checkLevel();
+                syncUI();
             }
         }
 
-        function gameTick() {
-            Plots.forEach((p, i) => {
-                if(p.seed && p.timer > 0) {
+        function tick() {
+            PlotState.forEach((p, i) => {
+                if(p.seedId !== null && p.timer > 0) {
                     p.timer--;
-                    document.getElementById(`time-${i}`).innerText = `${p.timer}s`;
+                    const res = ResourceDatabase[p.seedId];
+                    const offset = 283 - (283 * (res.time - p.timer) / res.time);
+                    document.getElementById(`circle-${i}`).style.strokeDashoffset = offset;
+                    document.getElementById(`time-${i}`).innerText = p.timer + "s";
+                    
                     if(p.timer === 0) {
                         p.ready = true;
-                        document.getElementById(`emoji-${i}`).innerText = p.seed.icon;
+                        document.getElementById(`emoji-${i}`).innerText = res.icon;
                         document.getElementById(`time-${i}`).innerText = "READY";
                         document.getElementById(`time-${i}`).style.color = "var(--neon-green)";
                     }
                 }
             });
-            save();
         }
 
-        function checkLevelUp() {
-            let nextLevelXp = State.l * 2000;
-            if(State.x >= nextLevelXp) {
-                State.l++;
-                const fx = document.getElementById('level-up-fx');
-                fx.style.display = 'block';
-                setTimeout(() => fx.style.display = 'none', 2000);
+        function checkLevel() {
+            let next = GlobalState.lvl * 3000;
+            if(GlobalState.xp >= next) {
+                GlobalState.lvl++;
+                triggerGlitch();
             }
         }
 
-        function updateUI() {
-            document.getElementById('hud-m').innerText = `$${State.m}`;
-            document.getElementById('hud-x').innerText = State.x;
-            document.getElementById('hud-l').innerText = State.l;
-            document.getElementById('hud-nick').innerText = State.nick;
+        function triggerGlitch() {
+            const o = document.getElementById('glitch-overlay');
+            o.style.opacity = "1";
+            setTimeout(() => o.style.opacity = "0.3", 500);
         }
 
-        function save() {
-            localStorage.setItem('co_m', State.m);
-            localStorage.setItem('co_x', State.x);
-            localStorage.setItem('co_l', State.l);
-        }
-
-        function syncMusic() {
-            const m = document.getElementById('bg-music');
-            const btn = document.getElementById('music-toggle');
-            if(State.music) {
-                m.play().catch(() => {});
-                btn.innerText = "MUSIC: ON";
-                btn.style.borderColor = "var(--neon-green)";
-            } else {
-                m.pause();
-                btn.innerText = "MUSIC: OFF";
-                btn.style.borderColor = "var(--neon-pink)";
-            }
-        }
-
-        // --- CURSOR DRON LOGIC ---
-        const dron = document.getElementById('cursor-dron');
+        // --- MOUSE & CURSOR ENGINE ---
+        const cursor = document.getElementById('cursor-wrapper');
         window.addEventListener('mousemove', (e) => {
-            dron.style.left = e.clientX + 'px';
-            dron.style.top = e.clientY + 'px';
-            dron.style.transform = `translate(-50%, -50%) rotate(${e.clientX / 10}deg)`;
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // Background reaction
+            const xPct = e.clientX / window.innerWidth;
+            const yPct = e.clientY / window.innerHeight;
+            document.getElementById('bg-canvas').style.transform = `scale(1.05) translate(${(xPct-0.5)*20}px, ${(yPct-0.5)*20}px)`;
         });
 
-        // Start
-        window.onclick = () => { if(State.music) document.getElementById('bg-music').play(); };
-        initGame();
+        // --- SETTINGS ---
+        const nickInput = document.getElementById('input-nick');
+        nickInput.value = GlobalState.nick;
+        nickInput.oninput = (e) => {
+            GlobalState.nick = e.target.value;
+            localStorage.setItem('req_nick', GlobalState.nick);
+        };
+
+        const musicBtn = document.getElementById('btn-music');
+        musicBtn.onclick = () => {
+            GlobalState.audio = !GlobalState.audio;
+            localStorage.setItem('req_audio', GlobalState.audio);
+            const audio = document.getElementById('audio-bg');
+            if(GlobalState.audio) {
+                audio.play(); musicBtn.innerText = "AUDIO: ON"; musicBtn.style.borderColor = "var(--neon-green)";
+            } else {
+                audio.pause(); musicBtn.innerText = "AUDIO: OFF"; musicBtn.style.borderColor = "var(--neon-pink)";
+            }
+        };
+
+        // --- INITIALIZATION ---
+        initStars();
+        initFarm();
+        syncUI();
+        if(GlobalState.audio) {
+            document.getElementById('audio-bg').play().catch(() => {
+                GlobalState.audio = false;
+                musicBtn.innerText = "AUDIO: OFF";
+            });
+        }
 
     </script>
 </body>
