@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>RGB HYPER FARMER | PlayBase</title>
+    <title>RGB HYPER FARMER PRO | PlayBase</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@900&display=swap');
 
@@ -19,7 +19,6 @@
             background-image: radial-gradient(circle at center, #110022 0%, #000 100%);
         }
 
-        /* --- TĘCZOWY PASEK NA GÓRZE --- */
         .top-glow {
             width: 100%; height: 5px; background: var(--neon-rgb);
             background-size: 400%; animation: rgb-move 5s linear infinite;
@@ -27,99 +26,80 @@
 
         @keyframes rgb-move { 0% { background-position: 0%; } 100% { background-position: 400%; } }
 
-        /* --- STATYSTYKI --- */
-        .hud {
-            display: flex; gap: 20px; padding: 30px;
-        }
-
+        /* --- HUD --- */
+        .hud { display: flex; gap: 20px; padding: 25px; }
         .hud-box {
-            background: #111; border: 3px solid #fff;
-            padding: 15px 30px; border-radius: 10px;
-            box-shadow: 0 0 15px #ff00ff, inset 0 0 10px #00ffff;
-            animation: border-flicker 2s infinite;
+            background: #111; border: 3px solid #0ff;
+            padding: 12px 25px; border-radius: 10px;
+            box-shadow: 0 0 20px #0ff;
+            text-align: center;
         }
+        .hud-val { font-family: 'Press Start 2P', cursive; font-size: 12px; display: block; margin-top: 5px; }
 
-        @keyframes border-flicker {
-            0%, 100% { border-color: #00ffff; box-shadow: 0 0 20px #00ffff; }
-            50% { border-color: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
-        }
-
-        .hud-val { font-family: 'Press Start 2P', cursive; font-size: 14px; color: #fff; }
-
-        /* --- GAME LAYOUT --- */
-        .wrapper { display: flex; gap: 40px; margin-top: 20px; padding: 20px; }
+        /* --- LAYOUT --- */
+        .wrapper { display: flex; gap: 40px; margin-top: 10px; padding: 20px; align-items: flex-start; }
 
         /* --- SKLEP --- */
         .shop {
-            background: rgba(20, 20, 20, 0.9); padding: 25px;
-            border-radius: 20px; border: 2px solid #333;
-            box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 10, 0.95); padding: 20px;
+            border-radius: 20px; border: 2px solid #333; width: 280px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
         }
-
         .seed {
-            background: #000; border: 2px solid #444; padding: 15px;
-            margin-bottom: 15px; cursor: pointer; border-radius: 15px;
-            transition: 0.2s; position: relative; overflow: hidden;
+            background: #000; border: 2px solid #444; padding: 12px;
+            margin-bottom: 12px; cursor: pointer; border-radius: 15px;
+            transition: 0.2s;
         }
-
-        .seed:hover {
-            transform: scale(1.05); border-color: #00ff00;
-            box-shadow: 0 0 30px #00ff00;
-        }
-
-        .seed.active { border-color: #ff0000; box-shadow: 0 0 30px #ff0000; animation: shake 0.2s infinite; }
-
-        @keyframes shake { 0% { left: 0; } 50% { left: 2px; } 100% { left: 0; } }
+        .seed:hover { transform: scale(1.03); border-color: #0f0; box-shadow: 0 0 20px #0f0; }
+        .seed.active { border-color: #f0f; box-shadow: 0 0 20px #f0f; }
+        .seed b { color: #0ff; font-size: 14px; }
+        .seed-stats { font-size: 10px; color: #aaa; margin-top: 5px; line-height: 1.4; }
+        .xp-text { color: #39ff14; font-weight: bold; }
 
         /* --- GRID --- */
-        .grid {
-            display: grid; grid-template-columns: repeat(3, 160px); gap: 25px;
-        }
-
+        .grid { display: grid; grid-template-columns: repeat(3, 150px); gap: 20px; }
         .plot {
-            width: 160px; height: 160px; background: #050505;
-            border-radius: 20px; position: relative; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            border: 4px solid transparent;
+            width: 150px; height: 150px; background: #050505;
+            border-radius: 25px; position: relative; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 3px solid transparent;
             background-image: linear-gradient(#050505, #050505), var(--neon-rgb);
             background-origin: border-box; background-clip: content-box, border-box;
-            background-size: 100% 100%, 400% 400%;
-            animation: rgb-move 5s linear infinite;
+            background-size: 100% 100%, 400% 400%; animation: rgb-move 5s linear infinite;
         }
 
-        .plot:hover { transform: scale(1.1) rotate(2deg); z-index: 10; }
+        .plot-icon { font-size: 60px; filter: drop-shadow(0 0 10px #fff); }
+        
+        /* TIMER NA NASIONIE */
+        .timer-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px; color: #fff; margin-top: 10px;
+            text-shadow: 0 0 5px #0ff;
+        }
 
-        .plot-icon { font-size: 80px; filter: drop-shadow(0 0 15px #fff); }
-
-        /* --- PROGRESS BAR --- */
         .bar-wrap {
-            position: absolute; bottom: 10px; width: 80%; height: 12px;
-            background: #222; border-radius: 10px; overflow: hidden; display: none;
+            position: absolute; bottom: 15px; width: 70%; height: 8px;
+            background: #222; border-radius: 5px; overflow: hidden; display: none;
         }
+        .bar-fill { height: 100%; width: 0%; background: var(--neon-rgb); background-size: 400%; }
 
-        .bar-fill {
-            height: 100%; width: 0%; background: var(--neon-rgb);
-            background-size: 400%; animation: rgb-move 2s linear infinite;
-        }
-
-        /* --- WYBUCH KASY --- */
-        .cash-pop {
+        /* FX */
+        .pop {
             position: absolute; font-family: 'Press Start 2P';
-            font-size: 20px; color: #0f0; animation: explode 0.8s forwards;
-            text-shadow: 0 0 10px #0f0; pointer-events: none;
+            font-size: 16px; animation: explode 0.8s forwards; pointer-events: none;
         }
 
         @keyframes explode {
             0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(2.5) translateY(-100px); opacity: 0; }
+            100% { transform: scale(2) translateY(-80px); opacity: 0; }
         }
 
-        .back-btn {
-            margin-top: 50px; text-decoration: none; color: #ff0000;
-            font-size: 12px; border: 2px solid #ff0000; padding: 10px 20px;
-            border-radius: 5px; box-shadow: 0 0 15px #ff0000; transition: 0.3s;
+        .btn-back {
+            margin: 30px; text-decoration: none; color: #ff007a;
+            border: 2px solid #ff007a; padding: 10px 20px; border-radius: 8px;
+            font-size: 10px; transition: 0.3s;
         }
-        .back-btn:hover { background: #ff0000; color: #000; }
+        .btn-back:hover { background: #ff007a; color: #000; box-shadow: 0 0 20px #ff007a; }
     </style>
 </head>
 <body>
@@ -127,42 +107,52 @@
     <div class="top-glow"></div>
 
     <div class="hud">
-        <div class="hud-box"><span class="hud-label">MONEY:</span> <span id="m" class="hud-val">$100</span></div>
-        <div class="hud-box"><span class="hud-label">LVL:</span> <span id="l" class="hud-val">1</span></div>
+        <div class="hud-box"><span>CASH</span> <span id="m" class="hud-val">$100</span></div>
+        <div class="hud-box"><span>XP</span> <span id="x" class="hud-val">0</span></div>
+        <div class="hud-box"><span>LVL</span> <span id="l" class="hud-val">1</span></div>
     </div>
 
     <div class="wrapper">
         <div class="shop" id="shop">
-            <h2 style="color:#0ff; text-align:center; margin-bottom:20px;">RGB STORE</h2>
-            </div>
+            <h2 style="color:#0ff; text-align:center; font-size: 18px;">RGB LAB</h2>
+        </div>
 
-        <div class="grid" id="grid">
-            </div>
+        <div class="grid" id="grid"></div>
     </div>
 
-    <a href="index.html" class="back-btn">EXIT TO LOBBY</a>
+    <a href="index.html" class="btn-back">BACK TO TERMINAL</a>
 
     <script>
-        let money = 100;
-        let selectedSeed = null;
+        let state = {
+            money: parseInt(localStorage.getItem('rgb_m')) || 100,
+            xp: parseInt(localStorage.getItem('rgb_x')) || 0,
+            lvl: parseInt(localStorage.getItem('rgb_l')) || 1,
+            selected: null
+        };
 
         const seeds = [
-            { id: 1, name: "NEON WHEAT", icon: "🌾", cost: 10, time: 3, win: 30 },
-            { id: 2, name: "CYBER ROOT", icon: "🥕", cost: 50, time: 7, win: 150 },
-            { id: 3, name: "GIGA PUMPKIN", icon: "🎃", cost: 200, time: 15, win: 700 }
+            { id: 1, name: "NEON WHEAT", icon: "🌾", cost: 10, time: 5, win: 35, xp: 20 },
+            { id: 2, name: "CYBER ROOT", icon: "🥕", cost: 60, time: 15, win: 210, xp: 80 },
+            { id: 3, name: "GIGA CORE", icon: "🎃", cost: 250, time: 45, win: 950, xp: 300 }
         ];
 
-        let farmState = Array(9).fill().map(() => ({ seed: null, ready: false }));
+        let plots = Array(9).fill().map(() => ({ seed: null, ready: false, timeLeft: 0 }));
 
         function init() {
             const sDiv = document.getElementById('shop');
             seeds.forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'seed';
-                div.innerHTML = `<b style="color:#0ff">${s.name}</b><br><small>Cost: $${s.cost}</small>`;
+                div.innerHTML = `
+                    <b>${s.icon} ${s.name}</b>
+                    <div class="seed-stats">
+                        Koszt: $${s.cost} | Zysk: $${s.win}<br>
+                        Bonus: <span class="xp-text">+${s.xp} XP</span>
+                    </div>
+                `;
                 div.onclick = () => {
-                    if(money >= s.cost) {
-                        selectedSeed = s;
+                    if(state.money >= s.cost) {
+                        state.selected = s;
                         document.querySelectorAll('.seed').forEach(x => x.classList.remove('active'));
                         div.classList.add('active');
                     }
@@ -171,62 +161,88 @@
             });
 
             const gDiv = document.getElementById('grid');
-            for(let i=0; i<9; i++) {
+            plots.forEach((_, i) => {
                 const p = document.createElement('div');
                 p.className = 'plot';
                 p.innerHTML = `<div class="plot-icon" id="i-${i}"></div>
+                               <div id="t-${i}" class="timer-text"></div>
                                <div class="bar-wrap" id="w-${i}"><div class="bar-fill" id="f-${i}"></div></div>`;
                 p.onclick = () => clickPlot(i);
                 gDiv.appendChild(p);
-            }
+            });
             updateUI();
+            
+            // Timer Engine
+            setInterval(tick, 1000);
         }
 
         function clickPlot(i) {
-            const plot = farmState[i];
-            const iconEl = document.getElementById(`i-${i}`);
-
-            if(!plot.seed && selectedSeed) {
-                money -= selectedSeed.cost;
-                plot.seed = {...selectedSeed};
-                selectedSeed = null;
+            const p = plots[i];
+            if(!p.seed && state.selected) {
+                state.money -= state.selected.cost;
+                p.seed = {...state.selected};
+                p.timeLeft = p.seed.time;
+                state.selected = null;
                 document.querySelectorAll('.seed').forEach(x => x.classList.remove('active'));
 
-                iconEl.innerText = "🌱";
-                const wrap = document.getElementById(`w-${i}`);
+                document.getElementById(`i-${i}`).innerText = "🌱";
                 const fill = document.getElementById(`f-${i}`);
-                wrap.style.display = 'block';
-                fill.style.transition = `width ${plot.seed.time}s linear`;
-                
+                document.getElementById(`w-${i}`).style.display = 'block';
+                fill.style.transition = `width ${p.seed.time}s linear`;
                 setTimeout(() => fill.style.width = '100%', 50);
+                updateUI();
+            } else if(p.ready) {
+                pop(i, `+$${p.seed.win}`, "#0f0");
+                pop(i, `+${p.seed.xp}XP`, "#39ff14");
+                
+                state.money += p.seed.win;
+                state.xp += p.seed.xp;
 
-                setTimeout(() => {
-                    plot.ready = true;
-                    iconEl.innerText = plot.seed.icon;
-                    wrap.style.display = 'none';
-                }, plot.seed.time * 1000);
-            } else if(plot.ready) {
-                pop(i, `+$${plot.seed.win}`);
-                money += plot.seed.win;
-                plot.seed = null;
-                plot.ready = false;
-                iconEl.innerText = "";
+                if(state.xp >= state.lvl * 1000) {
+                    state.lvl++;
+                    pop(i, "LVL UP!", "#f0f");
+                }
+
+                p.seed = null; p.ready = false;
+                document.getElementById(`i-${i}`).innerText = "";
+                document.getElementById(`t-${i}`).innerText = "";
                 document.getElementById(`f-${i}`).style.width = '0%';
                 document.getElementById(`f-${i}`).style.transition = 'none';
+                updateUI();
             }
-            updateUI();
         }
 
-        function pop(i, txt) {
+        function tick() {
+            plots.forEach((p, i) => {
+                if(p.seed && p.timeLeft > 0) {
+                    p.timeLeft--;
+                    document.getElementById(`t-${i}`).innerText = p.timeLeft + "s";
+                    if(p.timeLeft === 0) {
+                        p.ready = true;
+                        document.getElementById(`i-${i}`).innerText = p.seed.icon;
+                        document.getElementById(`t-${i}`).innerText = "READY";
+                        document.getElementById(`w-${i}`).style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        function pop(i, txt, col) {
             const plotEl = document.querySelectorAll('.plot')[i];
             const p = document.createElement('div');
-            p.className = 'cash-pop'; p.innerText = txt;
+            p.className = 'pop'; p.innerText = txt; p.style.color = col;
+            p.style.textShadow = `0 0 10px ${col}`;
             plotEl.appendChild(p);
             setTimeout(() => p.remove(), 800);
         }
 
         function updateUI() {
-            document.getElementById('m').innerText = `$${money}`;
+            document.getElementById('m').innerText = `$${state.money}`;
+            document.getElementById('x').innerText = state.xp;
+            document.getElementById('l').innerText = state.lvl;
+            localStorage.setItem('rgb_m', state.money);
+            localStorage.setItem('rgb_x', state.xp);
+            localStorage.setItem('rgb_l', state.lvl);
         }
 
         init();
