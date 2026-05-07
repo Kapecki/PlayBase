@@ -2,266 +2,231 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Farmer | PlayBase</title>
+    <title>RGB HYPER FARMER | PlayBase</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@900&display=swap');
 
         :root {
-            --bg: #f8fafc;
-            --accent: #10b981; /* Piękna zieleń */
-            --dark: #0f172a;
-            --card: #ffffff;
-            --text-main: #1e293b;
-            --text-sub: #64748b;
-            --gold: #f59e0b;
+            --bg: #000000;
+            --neon-rgb: linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
         }
 
         body {
-            margin: 0; background: var(--bg); color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0; background: var(--bg); color: #fff;
+            font-family: 'Orbitron', sans-serif;
             display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
+            min-height: 100vh; overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #110022 0%, #000 100%);
         }
 
-        /* --- Czysty, nowoczesny HUD --- */
-        .header {
-            width: 100%; max-width: 900px; padding: 30px 20px;
-            display: flex; justify-content: space-between; align-items: center;
+        /* --- TĘCZOWY PASEK NA GÓRZE --- */
+        .top-glow {
+            width: 100%; height: 5px; background: var(--neon-rgb);
+            background-size: 400%; animation: rgb-move 5s linear infinite;
         }
 
-        .stats { display: flex; gap: 15px; }
-        
-        .stat-box {
-            background: var(--card); padding: 12px 24px; border-radius: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; border: 1px solid #e2e8f0;
+        @keyframes rgb-move { 0% { background-position: 0%; } 100% { background-position: 400%; } }
+
+        /* --- STATYSTYKI --- */
+        .hud {
+            display: flex; gap: 20px; padding: 30px;
         }
 
-        .stat-label { font-size: 10px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-val { font-size: 18px; font-weight: 800; color: var(--dark); }
-
-        /* --- Layout Gry --- */
-        .main-container {
-            display: grid; grid-template-columns: 260px 1fr;
-            gap: 30px; width: 100%; max-width: 950px; padding: 0 20px;
+        .hud-box {
+            background: #111; border: 3px solid #fff;
+            padding: 15px 30px; border-radius: 10px;
+            box-shadow: 0 0 15px #ff00ff, inset 0 0 10px #00ffff;
+            animation: border-flicker 2s infinite;
         }
 
-        /* --- Sklep (Sidebar) --- */
-        .sidebar {
-            background: var(--card); border-radius: 24px; padding: 24px;
-            border: 1px solid #e2e8f0; height: fit-content;
+        @keyframes border-flicker {
+            0%, 100% { border-color: #00ffff; box-shadow: 0 0 20px #00ffff; }
+            50% { border-color: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
         }
 
-        .sidebar h3 { margin: 0 0 20px 0; font-size: 16px; font-weight: 800; }
+        .hud-val { font-family: 'Press Start 2P', cursive; font-size: 14px; color: #fff; }
 
-        .seed-card {
-            padding: 16px; border-radius: 16px; border: 1px solid #f1f5f9;
-            background: #f8fafc; cursor: pointer; transition: 0.2s;
-            margin-bottom: 12px; display: flex; align-items: center; gap: 12px;
+        /* --- GAME LAYOUT --- */
+        .wrapper { display: flex; gap: 40px; margin-top: 20px; padding: 20px; }
+
+        /* --- SKLEP --- */
+        .shop {
+            background: rgba(20, 20, 20, 0.9); padding: 25px;
+            border-radius: 20px; border: 2px solid #333;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
         }
 
-        .seed-card:hover { transform: translateY(-2px); border-color: var(--accent); background: #f0fdf4; }
-        .seed-card.active { border-color: var(--accent); background: #f0fdf4; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        .seed {
+            background: #000; border: 2px solid #444; padding: 15px;
+            margin-bottom: 15px; cursor: pointer; border-radius: 15px;
+            transition: 0.2s; position: relative; overflow: hidden;
+        }
 
-        .seed-icon { font-size: 24px; }
-        .seed-info b { display: block; font-size: 14px; }
-        .seed-info span { font-size: 11px; color: var(--text-sub); }
+        .seed:hover {
+            transform: scale(1.05); border-color: #00ff00;
+            box-shadow: 0 0 30px #00ff00;
+        }
 
-        /* --- Siatka Farmy --- */
-        .farm-grid {
-            display: grid; grid-template-columns: repeat(3, 140px);
-            gap: 20px; justify-content: center;
+        .seed.active { border-color: #ff0000; box-shadow: 0 0 30px #ff0000; animation: shake 0.2s infinite; }
+
+        @keyframes shake { 0% { left: 0; } 50% { left: 2px; } 100% { left: 0; } }
+
+        /* --- GRID --- */
+        .grid {
+            display: grid; grid-template-columns: repeat(3, 160px); gap: 25px;
         }
 
         .plot {
-            width: 140px; height: 140px; background: var(--card);
-            border-radius: 28px; border: 1px solid #e2e8f0;
+            width: 160px; height: 160px; background: #050505;
+            border-radius: 20px; position: relative; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; transition: 0.2s;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02);
+            border: 4px solid transparent;
+            background-image: linear-gradient(#050505, #050505), var(--neon-rgb);
+            background-origin: border-box; background-clip: content-box, border-box;
+            background-size: 100% 100%, 400% 400%;
+            animation: rgb-move 5s linear infinite;
         }
 
-        .plot:hover { border-color: var(--accent); transform: scale(1.02); }
-        
-        .plant-emoji { font-size: 50px; transition: 0.3s; }
+        .plot:hover { transform: scale(1.1) rotate(2deg); z-index: 10; }
 
-        /* --- Pasek postępu (Subtelny) --- */
-        .prog-container {
-            position: absolute; bottom: 15px; width: 60%; height: 6px;
-            background: #f1f5f9; border-radius: 10px; overflow: hidden;
-            display: none;
+        .plot-icon { font-size: 80px; filter: drop-shadow(0 0 15px #fff); }
+
+        /* --- PROGRESS BAR --- */
+        .bar-wrap {
+            position: absolute; bottom: 10px; width: 80%; height: 12px;
+            background: #222; border-radius: 10px; overflow: hidden; display: none;
         }
 
-        .prog-bar {
-            height: 100%; width: 0%; background: var(--accent);
-            border-radius: 10px; transition: linear;
+        .bar-fill {
+            height: 100%; width: 0%; background: var(--neon-rgb);
+            background-size: 400%; animation: rgb-move 2s linear infinite;
         }
 
-        /* --- Animacja Gotowości --- */
-        .plot.ready .plant-emoji {
-            animation: bounce 1s infinite;
+        /* --- WYBUCH KASY --- */
+        .cash-pop {
+            position: absolute; font-family: 'Press Start 2P';
+            font-size: 20px; color: #0f0; animation: explode 0.8s forwards;
+            text-shadow: 0 0 10px #0f0; pointer-events: none;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2.5) translateY(-100px); opacity: 0; }
         }
 
-        .back-link {
-            margin-top: 40px; color: var(--text-sub); text-decoration: none;
-            font-size: 13px; font-weight: 600; transition: 0.2s;
+        .back-btn {
+            margin-top: 50px; text-decoration: none; color: #ff0000;
+            font-size: 12px; border: 2px solid #ff0000; padding: 10px 20px;
+            border-radius: 5px; box-shadow: 0 0 15px #ff0000; transition: 0.3s;
         }
-        .back-link:hover { color: var(--dark); }
-
-        /* Floating Money FX */
-        .gain-fx {
-            position: absolute; font-weight: 800; color: var(--accent);
-            animation: floatUp 1s forwards; pointer-events: none;
-        }
-
-        @keyframes floatUp {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-40px); }
-        }
+        .back-btn:hover { background: #ff0000; color: #000; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="stats">
-            <div class="stat-box">
-                <span class="stat-label">Portfel</span>
-                <span class="stat-val" id="cash-ui">$50</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">Doświadczenie</span>
-                <span class="stat-val" id="xp-ui">0</span>
-            </div>
-        </div>
-        <div class="stat-box" style="border-color: var(--dark);">
-            <span class="stat-label">Poziom</span>
-            <span class="stat-val" id="lvl-ui">1</span>
-        </div>
+    <div class="top-glow"></div>
+
+    <div class="hud">
+        <div class="hud-box"><span class="hud-label">MONEY:</span> <span id="m" class="hud-val">$100</span></div>
+        <div class="hud-box"><span class="hud-label">LVL:</span> <span id="l" class="hud-val">1</span></div>
     </div>
 
-    <div class="main-container">
-        <div class="sidebar">
-            <h3>Nasiona</h3>
-            <div id="shop-root"></div>
-        </div>
+    <div class="wrapper">
+        <div class="shop" id="shop">
+            <h2 style="color:#0ff; text-align:center; margin-bottom:20px;">RGB STORE</h2>
+            </div>
 
-        <div class="farm-grid" id="grid-root"></div>
+        <div class="grid" id="grid">
+            </div>
     </div>
 
-    <a href="index.html" class="back-link">← Wróć do Lobby</a>
+    <a href="index.html" class="back-btn">EXIT TO LOBBY</a>
 
     <script>
-        const game = {
-            money: parseInt(localStorage.getItem('m_v4')) || 50,
-            xp: parseInt(localStorage.getItem('x_v4')) || 0,
-            lvl: parseInt(localStorage.getItem('l_v4')) || 1,
-            selected: null
-        };
+        let money = 100;
+        let selectedSeed = null;
 
         const seeds = [
-            { id: 1, name: "Pszenica", icon: "🌾", cost: 10, time: 5, yield: 25, xp: 15 },
-            { id: 2, name: "Marchew", icon: "🥕", cost: 45, time: 12, yield: 120, xp: 40 },
-            { id: 3, name: "Pomidor", icon: "🍅", cost: 150, time: 30, yield: 450, xp: 120 }
+            { id: 1, name: "NEON WHEAT", icon: "🌾", cost: 10, time: 3, win: 30 },
+            { id: 2, name: "CYBER ROOT", icon: "🥕", cost: 50, time: 7, win: 150 },
+            { id: 3, name: "GIGA PUMPKIN", icon: "🎃", cost: 200, time: 15, win: 700 }
         ];
 
-        let plots = Array(9).fill().map(() => ({ seed: null, ready: false }));
+        let farmState = Array(9).fill().map(() => ({ seed: null, ready: false }));
 
         function init() {
-            const shop = document.getElementById('shop-root');
+            const sDiv = document.getElementById('shop');
             seeds.forEach(s => {
                 const div = document.createElement('div');
-                div.className = 'seed-card';
-                div.innerHTML = `
-                    <div class="seed-icon">${s.icon}</div>
-                    <div class="seed-info">
-                        <b>${s.name}</b>
-                        <span>$${s.cost} • ${s.time}s</span>
-                    </div>
-                `;
+                div.className = 'seed';
+                div.innerHTML = `<b style="color:#0ff">${s.name}</b><br><small>Cost: $${s.cost}</small>`;
                 div.onclick = () => {
-                    if(game.money >= s.cost) {
-                        game.selected = s;
-                        document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('active'));
+                    if(money >= s.cost) {
+                        selectedSeed = s;
+                        document.querySelectorAll('.seed').forEach(x => x.classList.remove('active'));
                         div.classList.add('active');
                     }
                 };
-                shop.appendChild(div);
+                sDiv.appendChild(div);
             });
 
-            const grid = document.getElementById('grid-root');
-            plots.forEach((_, i) => {
+            const gDiv = document.getElementById('grid');
+            for(let i=0; i<9; i++) {
                 const p = document.createElement('div');
                 p.className = 'plot';
-                p.id = `plot-${i}`;
-                p.innerHTML = `<div class="plant-emoji" id="e-${i}"></div>
-                               <div class="prog-container" id="c-${i}"><div class="prog-bar" id="b-${i}"></div></div>`;
-                p.onclick = () => handlePlot(i);
-                grid.appendChild(p);
-            });
-            update();
+                p.innerHTML = `<div class="plot-icon" id="i-${i}"></div>
+                               <div class="bar-wrap" id="w-${i}"><div class="bar-fill" id="f-${i}"></div></div>`;
+                p.onclick = () => clickPlot(i);
+                gDiv.appendChild(p);
+            }
+            updateUI();
         }
 
-        function handlePlot(i) {
-            const p = plots[i];
-            const el = document.getElementById(`plot-${i}`);
-            const emoji = document.getElementById(`e-${i}`);
+        function clickPlot(i) {
+            const plot = farmState[i];
+            const iconEl = document.getElementById(`i-${i}`);
 
-            if(!p.seed && game.selected) {
-                game.money -= game.selected.cost;
-                p.seed = {...game.selected};
-                game.selected = null;
-                document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('active'));
+            if(!plot.seed && selectedSeed) {
+                money -= selectedSeed.cost;
+                plot.seed = {...selectedSeed};
+                selectedSeed = null;
+                document.querySelectorAll('.seed').forEach(x => x.classList.remove('active'));
 
-                emoji.innerText = "🌱";
-                const cont = document.getElementById(`c-${i}`);
-                const bar = document.getElementById(`b-${i}`);
-                cont.style.display = 'block';
-                bar.style.transition = `width ${p.seed.time}s linear`;
-                setTimeout(() => bar.style.width = '100%', 50);
+                iconEl.innerText = "🌱";
+                const wrap = document.getElementById(`w-${i}`);
+                const fill = document.getElementById(`f-${i}`);
+                wrap.style.display = 'block';
+                fill.style.transition = `width ${plot.seed.time}s linear`;
+                
+                setTimeout(() => fill.style.width = '100%', 50);
 
                 setTimeout(() => {
-                    p.ready = true;
-                    el.classList.add('ready');
-                    emoji.innerText = p.seed.icon;
-                    cont.style.display = 'none';
-                    bar.style.transition = 'none';
-                    bar.style.width = '0%';
-                }, p.seed.time * 1000);
-                update();
-            } else if(p.ready) {
-                game.money += p.seed.yield;
-                game.xp += p.seed.xp;
-                
-                // Efekt pieniędzy
-                const fx = document.createElement('div');
-                fx.className = 'gain-fx';
-                fx.innerText = `+$${p.seed.yield}`;
-                el.appendChild(fx);
-                setTimeout(() => fx.remove(), 1000);
-
-                if(game.xp >= game.lvl * 500) { game.lvl++; }
-
-                p.seed = null;
-                p.ready = false;
-                el.classList.remove('ready');
-                emoji.innerText = "";
-                update();
+                    plot.ready = true;
+                    iconEl.innerText = plot.seed.icon;
+                    wrap.style.display = 'none';
+                }, plot.seed.time * 1000);
+            } else if(plot.ready) {
+                pop(i, `+$${plot.seed.win}`);
+                money += plot.seed.win;
+                plot.seed = null;
+                plot.ready = false;
+                iconEl.innerText = "";
+                document.getElementById(`f-${i}`).style.width = '0%';
+                document.getElementById(`f-${i}`).style.transition = 'none';
             }
+            updateUI();
         }
 
-        function update() {
-            document.getElementById('cash-ui').innerText = `$${game.money}`;
-            document.getElementById('xp-ui').innerText = game.xp;
-            document.getElementById('lvl-ui').innerText = game.lvl;
-            localStorage.setItem('m_v4', game.money);
-            localStorage.setItem('x_v4', game.xp);
-            localStorage.setItem('l_v4', game.lvl);
+        function pop(i, txt) {
+            const plotEl = document.querySelectorAll('.plot')[i];
+            const p = document.createElement('div');
+            p.className = 'cash-pop'; p.innerText = txt;
+            plotEl.appendChild(p);
+            setTimeout(() => p.remove(), 800);
+        }
+
+        function updateUI() {
+            document.getElementById('m').innerText = `$${money}`;
         }
 
         init();
