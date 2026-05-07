@@ -3,549 +3,420 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-OMEGA: REQUIEM | PROTOCOL 2026</title>
+    <title>CYBER-OMEGA: DEUS EX | GEAR PROTOCOL 2026</title>
     <style>
         /* ================================================================
-           CYBER-OMEGA: REQUIEM - THE ULTIMATE RGB EXPERIENCE
-           TOTAL LINES: 2000+ (STRUCTURAL & LOGIC)
+           CYBER-OMEGA: DEUS EX - ENGINE CORE
+           ARCHITECTURE: HEX-RGB v9.0
            ================================================================
         */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@100;400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@300;500&display=swap');
 
         :root {
-            --neon-blue: #00f2ff;
-            --neon-pink: #ff007a;
-            --neon-purple: #bc13fe;
-            --neon-green: #39ff14;
-            --neon-orange: #ff9d00;
-            --bg-deep: #020205;
-            --glass-bright: rgba(255, 255, 255, 0.1);
-            --glass-dark: rgba(0, 0, 0, 0.6);
+            --primary: #00f2ff;
+            --secondary: #ff007a;
+            --accent: #bc13fe;
+            --success: #39ff14;
+            --warning: #ff9d00;
+            --bg-ultra: #020205;
+            --glass: rgba(255, 255, 255, 0.05);
             --font-cyber: 'Orbitron', sans-serif;
             --font-main: 'Rajdhani', sans-serif;
-            --rgb-anim: rgb-cycle 5s linear infinite;
+            --font-code: 'Fira Code', monospace;
+            --gear-speed: 5s;
         }
 
-        /* --- GLOBAL RESET & CURSOR --- */
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; outline: none; }
+
         body {
-            background: var(--bg-deep);
+            background: var(--bg-ultra);
             color: white;
             font-family: var(--font-main);
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            perspective: 2000px;
+            perspective: 1500px;
         }
 
-        /* --- ADVANCED BACKGROUND ENGINE --- */
-        #bg-canvas {
+        /* --- BACKGROUND SHADER SYSTEM --- */
+        #render-canvas {
             position: fixed; top: 0; left: 0; z-index: -2;
-            background: radial-gradient(circle at center, #0a0a25 0%, #000 100%);
+            filter: contrast(120%) brightness(80%);
         }
 
-        #glitch-overlay {
+        .noise-filter {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 2px);
-            pointer-events: none; z-index: 1000; opacity: 0.3;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.05; pointer-events: none; z-index: 1000;
         }
 
-        /* --- DRON-CURSOR 3.0 --- */
-        #cursor-wrapper {
-            position: fixed; pointer-events: none; z-index: 9999;
-            transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
+        /* --- DRON-CURSOR V4 (REACTIVE) --- */
+        #pointer-dron {
+            position: fixed; pointer-events: none; z-index: 10000;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .cursor-main {
-            width: 24px; height: 24px; border: 2px solid var(--neon-blue);
-            transform: rotate(45deg); box-shadow: 0 0 15px var(--neon-blue);
+        .dron-chassis {
+            width: 30px; height: 30px; border: 2px solid var(--primary);
             display: flex; align-items: center; justify-content: center;
+            transform: rotate(45deg); box-shadow: 0 0 20px var(--primary);
         }
-        .cursor-dot { width: 4px; height: 4px; background: var(--neon-pink); border-radius: 50%; }
-        .cursor-trail {
-            position: absolute; width: 60px; height: 60px;
-            border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 50%;
-            transform: translate(-18px, -18px); animation: trail-pulse 1s infinite;
+        .dron-eye { width: 6px; height: 6px; background: var(--secondary); border-radius: 50%; box-shadow: 0 0 10px var(--secondary); }
+        .dron-wings {
+            position: absolute; width: 50px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: wing-beat 0.1s infinite;
+        }
+        @keyframes wing-beat { 50% { transform: scaleY(5); opacity: 0.5; } }
+
+        /* --- NAVIGATION SYSTEM --- */
+        .nav-sidebar {
+            position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 25px; z-index: 500;
+        }
+        .nav-item {
+            width: 60px; height: 60px; background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; transition: 0.4s; backdrop-filter: blur(10px);
+        }
+        .nav-item:hover, .nav-item.active {
+            border-color: var(--primary); box-shadow: 0 0 30px var(--primary);
+            transform: scale(1.1) translateX(10px); color: var(--primary);
         }
 
-        @keyframes trail-pulse {
-            0% { transform: translate(-18px, -18px) scale(0.5); opacity: 1; }
-            100% { transform: translate(-18px, -18px) scale(1.5); opacity: 0; }
-        }
-
-        /* --- UI VIEWS --- */
-        .view-container {
-            width: 100%; height: 100%;
+        /* --- VIEWS --- */
+        .view {
+            width: 100%; height: 100%; padding-left: 120px;
             display: none; flex-direction: column; align-items: center;
-            padding: 40px; position: relative; z-index: 10;
+            justify-content: center; position: relative;
         }
-        .view-container.active { display: flex; animation: view-entry 0.8s ease-out; }
+        .view.active { display: flex; animation: view-slide 0.6s forwards; }
+        @keyframes view-slide { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 
-        @keyframes view-entry {
-            0% { opacity: 0; transform: scale(1.1) rotateX(10deg); filter: blur(10px); }
-            100% { opacity: 1; transform: scale(1) rotateX(0); filter: blur(0); }
+        /* --- GEARS VIEW (NOWOŚĆ) --- */
+        .gears-matrix {
+            display: grid; grid-template-columns: repeat(2, 450px); gap: 30px;
+            margin-top: 50px;
         }
+        .gear-config-card {
+            background: var(--glass); border: 2px solid #1a1a1a; border-radius: 30px;
+            padding: 30px; position: relative; overflow: hidden;
+            transition: 0.3s;
+        }
+        .gear-config-card:hover { border-color: var(--accent); background: rgba(188, 19, 254, 0.05); }
 
-        /* --- LOBBY: THE HOLOGRAM HUB --- */
-        .header-logo {
-            margin-top: 5vh; position: relative;
-        }
-        .logo-text {
-            font-family: var(--font-cyber); font-size: 7rem; font-weight: 900;
-            letter-spacing: 30px; text-transform: uppercase;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink), var(--neon-purple), var(--neon-blue));
-            background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: moveGradient 6s linear infinite; filter: drop-shadow(0 0 20px rgba(0,242,255,0.4));
-        }
-
-        .main-grid {
-            display: flex; gap: 80px; margin-top: 80px;
+        .big-gear-anim {
+            position: absolute; right: -50px; top: -50px; font-size: 200px;
+            opacity: 0.1; animation: spin var(--gear-speed) linear infinite;
         }
 
-        .hologram-card {
-            width: 380px; height: 520px; background: var(--glass-bright);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 40px;
-            backdrop-filter: blur(30px); position: relative;
-            transform-style: preserve-3d; transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            overflow: hidden;
+        /* --- FARM GRID (DOKOKSZONA) --- */
+        .farm-grid {
+            display: grid; grid-template-columns: repeat(3, 220px); gap: 20px;
+            perspective: 1000px;
         }
-
-        .hologram-card:hover {
-            transform: translateZ(50px) rotateY(15deg);
-            border-color: var(--neon-blue); box-shadow: 0 0 100px rgba(0, 242, 255, 0.3);
-        }
-
-        .hologram-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(transparent, var(--neon-blue), transparent 30%);
-            animation: rotate-border 4s linear infinite;
-        }
-
-        .card-inner {
-            width: calc(100% - 4px); height: calc(100% - 4px);
-            background: var(--bg-deep); border-radius: 38px; z-index: 1;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-
-        @keyframes rotate-border { 100% { transform: rotate(360deg); } }
-
-        /* --- SETTINGS: THE CONSOLE --- */
-        .console-settings {
-            position: fixed; bottom: 40px; width: 90%; max-width: 1200px;
-            background: var(--glass-dark); border: 1px solid var(--neon-purple);
-            border-radius: 30px; padding: 25px; display: flex; justify-content: space-around;
-            align-items: center; box-shadow: 0 0 40px rgba(188, 19, 254, 0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .control-unit { display: flex; flex-direction: column; gap: 10px; }
-        .label-cyber { font-family: var(--font-cyber); font-size: 10px; color: var(--neon-purple); letter-spacing: 3px; }
-
-        .cyber-input {
-            background: #000; border: 1px solid #333; color: var(--neon-blue);
-            padding: 10px 20px; border-radius: 10px; font-family: var(--font-cyber);
-            transition: 0.3s; width: 250px;
-        }
-        .cyber-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
-
-        /* --- FARMING ENGINE: REQUIME EDITION --- */
-        .farm-interface {
-            width: 100%; display: grid; grid-template-columns: 350px 1fr 300px; gap: 30px;
-            margin-top: 100px; height: calc(100vh - 200px);
-        }
-
-        .sidebar {
-            background: var(--glass-dark); border-radius: 30px; padding: 25px;
-            border: 1px solid rgba(255,255,255,0.05); overflow-y: auto;
-        }
-
-        .seed-card {
-            background: rgba(0,0,0,0.5); border: 2px solid #222;
-            padding: 20px; border-radius: 20px; margin-bottom: 20px;
-            transition: 0.3s; position: relative;
-        }
-        .seed-card:hover { transform: translateX(10px); border-color: var(--neon-pink); }
-        .seed-card.active { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
-
-        .farm-grid-main {
-            display: grid; grid-template-columns: repeat(3, 220px);
-            grid-template-rows: repeat(3, 220px); gap: 25px; justify-content: center;
-        }
-
-        .mech-plot {
+        .plot {
             width: 220px; height: 220px; background: #050508; border: 2px solid #1a1a1a;
-            border-radius: 40px; position: relative; display: flex; align-items: center;
-            justify-content: center; transition: 0.4s; overflow: hidden;
+            border-radius: 40px; position: relative; transition: 0.5s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .mech-plot:hover { border-color: var(--neon-blue); transform: scale(1.05) translateZ(20px); }
-
-        /* ZĘBATKI 3D */
-        .gear-system {
-            position: absolute; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0.05; transition: 0.5s;
+        .plot:hover { transform: translateZ(30px); border-color: var(--primary); box-shadow: 0 0 50px rgba(0, 242, 255, 0.2); }
+        
+        .plot-core { font-size: 80px; z-index: 5; filter: drop-shadow(0 0 15px white); }
+        
+        .progress-hex {
+            position: absolute; bottom: 20px; width: 70%; height: 6px;
+            background: #111; border-radius: 10px; overflow: hidden;
         }
-        .growing .gear-system { opacity: 0.2; animation: gear-spin 2s linear infinite; color: var(--neon-blue); }
-
-        @keyframes gear-spin { 100% { transform: rotate(360deg); } }
-
-        .progress-circle {
-            position: absolute; width: 100%; height: 100%;
-            transform: rotate(-90deg); pointer-events: none;
+        .progress-bar {
+            height: 100%; width: 0%; background: linear-gradient(90deg, var(--secondary), var(--primary));
+            box-shadow: 0 0 15px var(--primary);
         }
 
-        /* --- SKILL TREE: NEURO-LINK --- */
-        .skill-node {
-            width: 60px; height: 60px; border: 2px solid #444; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 15px; transition: 0.3s;
+        /* --- STATS HUD --- */
+        .hud-top {
+            position: fixed; top: 30px; right: 30px; display: flex; gap: 20px;
         }
-        .skill-node.unlocked { border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); color: var(--neon-green); }
-
-        /* --- TOP BAR --- */
-        .top-hud {
-            position: fixed; top: 0; left: 0; width: 100%; height: 80px;
-            background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--neon-blue);
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 100; backdrop-filter: blur(15px);
+        .stat-badge {
+            background: var(--glass); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 30px; border-radius: 50px; backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; align-items: flex-end;
         }
+        .stat-label { font-size: 10px; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
+        .stat-value { font-family: var(--font-cyber); font-size: 20px; font-weight: 900; }
 
-        .hud-item { text-align: center; }
-        .hud-label { font-size: 10px; color: var(--neon-blue); letter-spacing: 2px; }
-        .hud-value { font-family: var(--font-cyber); font-size: 24px; font-weight: 900; }
-
-        .btn-cyber {
-            background: transparent; border: 2px solid var(--neon-blue);
-            color: white; padding: 12px 30px; border-radius: 50px;
+        /* --- BUTTONS --- */
+        .btn-deus {
+            background: transparent; border: 2px solid var(--primary);
+            color: white; padding: 12px 25px; border-radius: 10px;
             font-family: var(--font-cyber); font-size: 12px; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 2px;
         }
-        .btn-cyber:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); }
+        .btn-deus:hover { background: var(--primary); color: black; box-shadow: 0 0 30px var(--primary); }
+        .btn-deus:disabled { opacity: 0.3; border-color: #555; }
 
-        /* --- SCROLLBAR --- */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
-    <canvas id="bg-canvas"></canvas>
-    <div id="glitch-overlay"></div>
-    
-    <div id="cursor-wrapper">
-        <div class="cursor-trail"></div>
-        <div class="cursor-main">
-            <div class="cursor-dot"></div>
+    <canvas id="render-canvas"></canvas>
+    <div class="noise-filter"></div>
+
+    <div id="pointer-dron">
+        <div class="dron-wings"></div>
+        <div class="dron-chassis"><div class="dron-eye"></div></div>
+    </div>
+
+    <div class="hud-top">
+        <div class="stat-badge">
+            <span class="stat-label">Neural Credits</span>
+            <span class="stat-value" id="hud-cash" style="color: var(--success);">$0</span>
+        </div>
+        <div class="stat-badge">
+            <span class="stat-label">Core Stability</span>
+            <span class="stat-value" id="hud-xp" style="color: var(--accent);">0 XP</span>
         </div>
     </div>
 
-    <div id="view-lobby" class="view-container active">
-        <div class="header-logo">
-            <h1 class="logo-text">Requiem</h1>
-        </div>
+    <div class="nav-sidebar">
+        <div class="nav-item active" onclick="showView('view-lobby')" title="Home">🏠</div>
+        <div class="nav-item" onclick="showView('view-farm')" title="Farming Engine">🚜</div>
+        <div class="nav-item" onclick="showView('view-gears')" title="Gear Factory">⚙️</div>
+        <div class="nav-item" onclick="showView('view-settings')" title="Core Settings">🛠️</div>
+    </div>
 
-        <div class="main-grid">
-            <div class="hologram-card" onclick="changeView('view-farm')">
-                <div class="card-inner">
-                    <div style="font-size: 100px; margin-bottom: 30px;">🛰️</div>
-                    <h2 style="font-family: var(--font-cyber); font-size: 1.8rem;">NEON-FARM</h2>
-                    <p style="color: var(--neon-blue); margin-top: 15px; letter-spacing: 4px;">SYSTEM ONLINE</p>
-                    <div style="margin-top: 40px;" class="btn-cyber">BOOT INTERFACE</div>
+    <div id="view-lobby" class="view active">
+        <h1 style="font-family: var(--font-cyber); font-size: 6rem; letter-spacing: 40px; text-shadow: 0 0 30px var(--primary);">DEUS EX</h1>
+        <p style="letter-spacing: 10px; color: var(--secondary); margin-bottom: 50px;">CYBER-OMEGA PROTOCOL // ACTIVE</p>
+        <button class="btn-deus" style="font-size: 20px; padding: 20px 60px;" onclick="showView('view-farm')">Initialize Link</button>
+    </div>
+
+    <div id="view-farm" class="view">
+        <div style="display: flex; gap: 50px;">
+            <div id="farm-shop" style="width: 350px; background: var(--glass); padding: 30px; border-radius: 30px;">
+                <h2 style="font-family: var(--font-cyber); margin-bottom: 20px; font-size: 18px; color: var(--secondary);">Bio-Seeds</h2>
+                </div>
+            <div class="farm-grid" id="main-grid">
+                </div>
+        </div>
+    </div>
+
+    <div id="view-gears" class="view">
+        <h2 style="font-family: var(--font-cyber); font-size: 3rem; margin-bottom: 40px; color: var(--accent);">GEAR MODIFICATION</h2>
+        <div class="gears-matrix">
+            <div class="gear-config-card">
+                <div class="big-gear-anim">⚙️</div>
+                <h3 style="color: var(--primary);">HYPER-DRIVE GEAR</h3>
+                <p style="margin: 15px 0; color: #aaa;">Przyspiesza czas wzrostu o 25%. Zwiększa zużycie energii RGB.</p>
+                <div style="display:flex; justify-content: space-between; align-items: center;">
+                    <span style="font-family: var(--font-code); color: var(--success);">$5,000</span>
+                    <button class="btn-deus" onclick="buyGear(1, 5000)">Upgrade Core</button>
                 </div>
             </div>
 
-            <div class="hologram-card" style="opacity: 0.3; filter: grayscale(1);">
-                <div class="card-inner">
-                    <div style="font-size: 100px; margin-bottom: 30px;">⚔️</div>
-                    <h2 style="font-family: var(--font-cyber); font-size: 1.8rem;">VOID ARENA</h2>
-                    <p style="margin-top: 15px; letter-spacing: 4px;">ENCRYPTED</p>
+            <div class="gear-config-card">
+                <div class="big-gear-anim" style="animation-direction: reverse; color: var(--secondary);">⚙️</div>
+                <h3 style="color: var(--secondary);">RGB OVERCLOCK</h3>
+                <p style="margin: 15px 0; color: #aaa;">Podwaja zyski XP z każdej zebranej rośliny. Aktywuje neonowy tryb Ultra.</p>
+                <div style="display:flex; justify-content: space-between; align-items: center;">
+                    <span style="font-family: var(--font-code); color: var(--success);">$12,000</span>
+                    <button class="btn-deus" onclick="buyGear(2, 12000)">Install Module</button>
                 </div>
             </div>
-        </div>
 
-        <div class="console-settings">
-            <div class="control-unit">
-                <span class="label-cyber">Operator Identity</span>
-                <input type="text" id="input-nick" class="cyber-input" placeholder="ACCESS_ID...">
-            </div>
-            <div class="control-unit">
-                <span class="label-cyber">Neural Audio</span>
-                <button class="btn-cyber" id="btn-music">AUDIO: OFF</button>
-            </div>
-            <div class="control-unit">
-                <span class="label-cyber">Engine Core</span>
-                <div style="color: var(--neon-green); font-family: 'JetBrains Mono'; font-size: 14px;">STATUS: STABLE // 2026.5.7</div>
+            <div class="gear-config-card" style="grid-column: span 2;">
+                <h3 style="color: var(--warning);">GEAR SYNCHRONIZATION: <span id="gear-sync-val">100%</span></h3>
+                <div style="width: 100%; height: 10px; background: #111; margin-top: 20px; border-radius: 5px;">
+                    <div id="sync-bar" style="width: 100%; height: 100%; background: var(--primary); transition: 0.5s;"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="view-farm" class="view-container">
-        <div class="top-hud">
-            <div class="hud-item"><span class="hud-label">CREDITS</span><div class="hud-value" id="val-cash" style="color: var(--neon-green);">$0</div></div>
-            <div class="hud-item"><span class="hud-label">NEURO-XP</span><div class="hud-value" id="val-xp" style="color: var(--neon-pink);">0</div></div>
-            <div class="hud-item"><span class="hud-label">LEVEL</span><div class="hud-value" id="val-lvl">1</div></div>
-            <button class="btn-cyber" onclick="changeView('view-lobby')">DISCONNECT</button>
-        </div>
-
-        <div class="farm-interface">
-            <div class="sidebar" id="seed-shop">
-                <h3 style="font-family: var(--font-cyber); font-size: 14px; margin-bottom: 25px; color: var(--neon-blue);">RESOURCES SHOP</h3>
+    <div id="view-settings" class="view">
+        <div style="width: 500px; background: var(--glass); padding: 50px; border-radius: 40px; border: 1px solid var(--primary);">
+            <h2 style="font-family: var(--font-cyber); margin-bottom: 30px;">SYSTEM CONFIG</h2>
+            <div style="margin-bottom: 20px;">
+                <label class="stat-label">Operator Nick</label><br>
+                <input type="text" id="sys-nick" class="btn-deus" style="width: 100%; margin-top: 10px; text-align: left;">
             </div>
-
-            <div class="farm-grid-main" id="grid-main">
-                </div>
-
-            <div class="sidebar" id="skill-tree">
-                <h3 style="font-family: var(--font-cyber); font-size: 14px; margin-bottom: 25px; color: var(--neon-purple);">NEURO-LINK SKILLS</h3>
-                <div class="skill-node" id="skill-1" title="Szybsza Produkcja">⚡</div>
-                <div class="skill-node" id="skill-2" title="Bonusowe Kredyty">💎</div>
-                <div class="skill-node" id="skill-3" title="RGB Overdrive">🌈</div>
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+                <span class="stat-label">Audio Protocol</span>
+                <button class="btn-deus" id="sys-audio">OFF</button>
             </div>
+            <button class="btn-deus" style="width: 100%; margin-top: 40px; border-color: var(--secondary); color: var(--secondary);" onclick="factoryReset()">Wipe Database</button>
         </div>
     </div>
-
-    <audio id="audio-bg" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3" type="audio/mpeg">
-    </audio>
 
     <script>
         /* ================================================================
-           CYBER-OMEGA: REQUIEM - LOGIC CORE (JS ENGINE)
+           DEUS EX ENGINE LOGIC
            ================================================================
         */
 
-        const GlobalState = {
-            cash: parseInt(localStorage.getItem('req_cash')) || 500,
-            xp: parseInt(localStorage.getItem('req_xp')) || 0,
-            lvl: parseInt(localStorage.getItem('req_lvl')) || 1,
-            nick: localStorage.getItem('req_nick') || "PILOT_01",
-            audio: localStorage.getItem('req_audio') === 'true',
-            activeSeed: null,
-            skills: JSON.parse(localStorage.getItem('req_skills')) || [false, false, false]
+        const State = {
+            m: parseInt(localStorage.getItem('deus_m')) || 1000,
+            x: parseInt(localStorage.getItem('deus_x')) || 0,
+            nick: localStorage.getItem('deus_nick') || "PILOT_DEUS",
+            audio: localStorage.getItem('deus_audio') === 'true',
+            upgrades: JSON.parse(localStorage.getItem('deus_up')) || { speed: 1, xpMult: 1 },
+            selectedSeed: null
         };
 
-        const ResourceDatabase = [
-            { id: 0, name: "Neon Pulse", icon: "💎", cost: 50, time: 5, win: 120, xp: 50 },
-            { id: 1, name: "Plasma Core", icon: "🔋", cost: 250, time: 15, win: 700, xp: 200 },
-            { id: 2, name: "Void Matter", icon: "🌑", cost: 1200, time: 40, win: 4500, xp: 850 },
-            { id: 3, name: "Omega Crystal", icon: "💠", cost: 5000, time: 120, win: 25000, xp: 4000 }
+        const Database = [
+            { id: 0, n: "Neon Pulse", i: "💠", c: 50, t: 5, w: 150, xp: 40 },
+            { id: 1, n: "Cyber Root", i: "🌿", c: 300, t: 15, w: 1200, xp: 250 },
+            { id: 2, n: "Void Core", i: "⚛️", c: 2000, t: 60, w: 9000, xp: 1800 }
         ];
 
-        let PlotState = Array(9).fill().map(() => ({ seedId: null, timer: 0, ready: false }));
+        let Plots = Array(9).fill().map(() => ({ s: null, t: 0, r: false }));
 
-        // --- CANVAS BACKGROUND SYSTEM ---
-        const canvas = document.getElementById('bg-canvas');
+        // --- CANVAS ENGINE ---
+        const canvas = document.getElementById('render-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        class Star {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.z = Math.random() * canvas.width;
-                this.o = Math.random();
-            }
-            update() {
-                this.z -= 4;
-                if(this.z <= 0) this.reset();
-            }
-            draw() {
-                let sx = (this.x - canvas.width/2) * (canvas.width/this.z) + canvas.width/2;
-                let sy = (this.y - canvas.height/2) * (canvas.width/this.z) + canvas.height/2;
-                let r = (canvas.width / this.z) * 1.2;
-                ctx.fillStyle = `rgba(0, 242, 255, ${1 - this.z/canvas.width})`;
-                ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.fill();
-            }
-        }
+        let stars = [];
 
         function initStars() {
-            resize();
-            for(let i=0; i<300; i++) particles.push(new Star());
-            loop();
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            for(let i=0; i<400; i++) stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2 });
+            animate();
         }
 
-        function loop() {
-            ctx.fillStyle = '#010103'; ctx.fillRect(0,0,canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(loop);
+        function animate() {
+            ctx.fillStyle = '#020205'; ctx.fillRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = '#00f2ff';
+            stars.forEach(s => {
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
+                s.y += s.s * 0.5; if(s.y > canvas.height) s.y = 0;
+            });
+            requestAnimationFrame(animate);
         }
 
-        // --- CORE UI CONTROLLER ---
-        function changeView(vid) {
-            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
-            document.getElementById(vid).classList.add('active');
-            syncUI();
+        // --- VIEW CONTROLLER ---
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+            updateUI();
         }
 
-        function syncUI() {
-            document.getElementById('val-cash').innerText = `$${GlobalState.cash}`;
-            document.getElementById('val-xp').innerText = GlobalState.xp;
-            document.getElementById('val-lvl').innerText = GlobalState.lvl;
-            localStorage.setItem('req_cash', GlobalState.cash);
-            localStorage.setItem('req_xp', GlobalState.xp);
-            localStorage.setItem('req_lvl', GlobalState.lvl);
-        }
+        // --- GAMEPLAY ENGINE ---
+        function initGame() {
+            const grid = document.getElementById('main-grid');
+            const shop = document.getElementById('farm-shop');
 
-        // --- FARMING ENGINE LOGIC ---
-        function initFarm() {
-            const grid = document.getElementById('grid-main');
-            const shop = document.getElementById('seed-shop');
-
-            // Build Grid
-            PlotState.forEach((_, i) => {
-                const el = document.createElement('div');
-                el.className = 'mech-plot';
-                el.id = `p-${i}`;
-                el.innerHTML = `
-                    <div class="gear-system">⚙️</div>
-                    <div id="emoji-${i}" style="font-size: 60px; z-index: 5;"></div>
-                    <svg class="progress-circle" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" stroke="var(--neon-blue)" stroke-width="2" fill="none" 
-                                stroke-dasharray="283" stroke-dashoffset="283" id="circle-${i}"></circle>
-                    </svg>
-                    <div id="time-${i}" style="position: absolute; bottom: 20px; font-size: 12px; font-family: 'Orbitron';"></div>
+            Plots.forEach((_, i) => {
+                const d = document.createElement('div');
+                d.className = 'plot';
+                d.id = `plot-${i}`;
+                d.innerHTML = `
+                    <div style="position:absolute; font-size:150px; opacity:0.02; animation: spin 10s linear infinite;">⚙️</div>
+                    <div class="plot-core" id="e-${i}"></div>
+                    <div class="progress-hex"><div class="progress-bar" id="b-${i}"></div></div>
+                    <div id="t-${i}" style="margin-top:10px; font-family:var(--font-code); font-size:12px;"></div>
                 `;
-                el.onclick = () => handlePlotClick(i);
-                grid.appendChild(el);
+                d.onclick = () => handlePlot(i);
+                grid.appendChild(d);
             });
 
-            // Build Shop
-            ResourceDatabase.forEach(res => {
-                const el = document.createElement('div');
-                el.className = 'seed-card';
-                el.innerHTML = `
-                    <div style="font-size: 30px; margin-right: 15px;">${res.icon}</div>
-                    <div>
-                        <div style="font-weight: 700; color: var(--neon-blue);">${res.name}</div>
-                        <div style="font-size: 11px;">COST: $${res.cost} | PROFIT: $${res.win}</div>
-                    </div>
-                `;
-                el.onclick = () => {
-                    if(GlobalState.cash >= res.cost) {
-                        GlobalState.activeSeed = res;
-                        document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('active'));
-                        el.classList.add('active');
+            Database.forEach(s => {
+                const d = document.createElement('div');
+                d.style = "background: rgba(0,0,0,0.4); padding:15px; border-radius:15px; margin-bottom:10px; cursor:pointer; border: 1px solid #333;";
+                d.innerHTML = `<b>${s.i} ${s.n}</b><br><span style="color:var(--success)">$${s.c}</span>`;
+                d.onclick = () => {
+                    if(State.m >= s.c) {
+                        State.selectedSeed = s;
+                        document.querySelectorAll('#farm-shop div').forEach(x => x.style.borderColor = "#333");
+                        d.style.borderColor = "var(--primary)";
                     }
                 };
-                shop.appendChild(el);
+                shop.appendChild(d);
             });
 
             setInterval(tick, 1000);
+            updateUI();
         }
 
-        function handlePlotClick(i) {
-            const p = PlotState[i];
-            if(!p.seedId && GlobalState.activeSeed) {
-                GlobalState.cash -= GlobalState.activeSeed.cost;
-                p.seedId = GlobalState.activeSeed.id;
-                p.timer = GlobalState.activeSeed.time;
-                GlobalState.activeSeed = null;
-                document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('active'));
-                
-                document.getElementById(`p-${i}`).classList.add('growing');
-                document.getElementById(`emoji-${i}`).innerText = "🛰️";
-                syncUI();
-            } else if(p.ready) {
-                const res = ResourceDatabase[p.seedId];
-                let multiplier = GlobalState.skills[1] ? 1.5 : 1.0;
-                GlobalState.cash += Math.floor(res.win * multiplier);
-                GlobalState.xp += res.xp;
-                
-                // Reset
-                p.seedId = null; p.ready = false;
-                document.getElementById(`p-${i}`).classList.remove('growing');
-                document.getElementById(`emoji-${i}`).innerText = "";
-                document.getElementById(`time-${i}`).innerText = "";
-                document.getElementById(`circle-${i}`).style.strokeDashoffset = 283;
-                
-                checkLevel();
-                syncUI();
+        function handlePlot(i) {
+            const p = Plots[i];
+            if(!p.s && State.selectedSeed) {
+                State.m -= State.selectedSeed.c;
+                p.s = {...State.selectedSeed};
+                p.t = Math.ceil(p.s.t / State.upgrades.speed);
+                document.getElementById(`e-${i}`).innerText = "🛰️";
+                const bar = document.getElementById(`b-${i}`);
+                bar.style.transition = `width ${p.t}s linear`;
+                setTimeout(() => bar.style.width = "100%", 50);
+                State.selectedSeed = null;
+                updateUI();
+            } else if(p.r) {
+                State.m += p.s.w;
+                State.x += (p.s.xp * State.upgrades.xpMult);
+                p.s = null; p.r = false;
+                document.getElementById(`e-${i}`).innerText = "";
+                const bar = document.getElementById(`b-${i}`);
+                bar.style.transition = "none"; bar.style.width = "0%";
+                updateUI();
             }
         }
 
         function tick() {
-            PlotState.forEach((p, i) => {
-                if(p.seedId !== null && p.timer > 0) {
-                    p.timer--;
-                    const res = ResourceDatabase[p.seedId];
-                    const offset = 283 - (283 * (res.time - p.timer) / res.time);
-                    document.getElementById(`circle-${i}`).style.strokeDashoffset = offset;
-                    document.getElementById(`time-${i}`).innerText = p.timer + "s";
-                    
-                    if(p.timer === 0) {
-                        p.ready = true;
-                        document.getElementById(`emoji-${i}`).innerText = res.icon;
-                        document.getElementById(`time-${i}`).innerText = "READY";
-                        document.getElementById(`time-${i}`).style.color = "var(--neon-green)";
+            Plots.forEach((p, i) => {
+                if(p.s && p.t > 0) {
+                    p.t--;
+                    document.getElementById(`t-${i}`).innerText = p.t + "s";
+                    if(p.t === 0) {
+                        p.r = true;
+                        document.getElementById(`e-${i}`).innerText = p.s.i;
+                        document.getElementById(`t-${i}`).innerText = "READY";
                     }
                 }
             });
+            save();
         }
 
-        function checkLevel() {
-            let next = GlobalState.lvl * 3000;
-            if(GlobalState.xp >= next) {
-                GlobalState.lvl++;
-                triggerGlitch();
+        function buyGear(type, cost) {
+            if(State.m >= cost) {
+                State.m -= cost;
+                if(type === 1) State.upgrades.speed = 2.0;
+                if(type === 2) State.upgrades.xpMult = 2.5;
+                alert("GEAR MODULE INSTALLED");
+                updateUI();
             }
         }
 
-        function triggerGlitch() {
-            const o = document.getElementById('glitch-overlay');
-            o.style.opacity = "1";
-            setTimeout(() => o.style.opacity = "0.3", 500);
+        function updateUI() {
+            document.getElementById('hud-cash').innerText = `$${State.m.toLocaleString()}`;
+            document.getElementById('hud-xp').innerText = `${State.x} XP`;
+            document.getElementById('sys-nick').value = State.nick;
+            document.getElementById('sys-audio').innerText = State.audio ? "ON" : "OFF";
         }
 
-        // --- MOUSE & CURSOR ENGINE ---
-        const cursor = document.getElementById('cursor-wrapper');
+        function save() {
+            localStorage.setItem('deus_m', State.m);
+            localStorage.setItem('deus_x', State.x);
+            localStorage.setItem('deus_nick', State.nick);
+            localStorage.setItem('deus_audio', State.audio);
+            localStorage.setItem('deus_up', JSON.stringify(State.upgrades));
+        }
+
+        function factoryReset() {
+            if(confirm("DELETE ALL DATA?")) { localStorage.clear(); location.reload(); }
+        }
+
+        // --- CURSOR LOGIC ---
+        const dron = document.getElementById('pointer-dron');
         window.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            
-            // Background reaction
-            const xPct = e.clientX / window.innerWidth;
-            const yPct = e.clientY / window.innerHeight;
-            document.getElementById('bg-canvas').style.transform = `scale(1.05) translate(${(xPct-0.5)*20}px, ${(yPct-0.5)*20}px)`;
+            dron.style.left = e.clientX + 'px';
+            dron.style.top = e.clientY + 'px';
         });
 
-        // --- SETTINGS ---
-        const nickInput = document.getElementById('input-nick');
-        nickInput.value = GlobalState.nick;
-        nickInput.oninput = (e) => {
-            GlobalState.nick = e.target.value;
-            localStorage.setItem('req_nick', GlobalState.nick);
-        };
-
-        const musicBtn = document.getElementById('btn-music');
-        musicBtn.onclick = () => {
-            GlobalState.audio = !GlobalState.audio;
-            localStorage.setItem('req_audio', GlobalState.audio);
-            const audio = document.getElementById('audio-bg');
-            if(GlobalState.audio) {
-                audio.play(); musicBtn.innerText = "AUDIO: ON"; musicBtn.style.borderColor = "var(--neon-green)";
-            } else {
-                audio.pause(); musicBtn.innerText = "AUDIO: OFF"; musicBtn.style.borderColor = "var(--neon-pink)";
-            }
-        };
-
-        // --- INITIALIZATION ---
         initStars();
-        initFarm();
-        syncUI();
-        if(GlobalState.audio) {
-            document.getElementById('audio-bg').play().catch(() => {
-                GlobalState.audio = false;
-                musicBtn.innerText = "AUDIO: OFF";
-            });
-        }
-
+        initGame();
     </script>
 </body>
 </html>
