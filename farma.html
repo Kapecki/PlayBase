@@ -2,309 +2,223 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Cyber-Farma Ultra RGB</title>
+    <title>Cyber-Farm Pro | Simulation</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap');
-
-        :root {
-            --neon-pink: #ff00ff;
-            --neon-blue: #00d4ff;
-            --neon-green: #39ff14;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border-rgb: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8);
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap');
+        
         body {
-            margin: 0; background: #020205; color: white;
-            font-family: 'Rajdhani', sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; overflow-x: hidden;
-            /* Dynamiczne animowane tło */
-            background: radial-gradient(circle at 50% 50%, #0d0d2b 0%, #020205 100%);
+            margin: 0; background: #020205; color: white; font-family: 'Orbitron', sans-serif;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
 
-        /* --- ANIMOWANE GWIAZDY W TLE --- */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.2; z-index: -1; animation: drift 60s linear infinite;
-        }
-        @keyframes drift { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
-
-        /* --- NOWOCZESNY HUD --- */
-        .hud-container {
-            width: 100%; max-width: 1000px; padding: 25px;
-            display: flex; justify-content: space-around; align-items: center;
-            background: var(--glass); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-bottom: 30px; border-radius: 0 0 30px 30px;
+        /* --- HUD --- */
+        .top-bar {
+            width: 100%; max-width: 1100px; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(15px);
+            border-bottom: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0,212,255,0.2);
         }
 
-        .hud-card {
-            text-align: center; position: relative;
+        .user-tag { color: #ff00ff; font-weight: 900; text-shadow: 0 0 10px #ff00ff; }
+        .money-val { color: #39ff14; font-size: 1.5rem; text-shadow: 0 0 10px #39ff14; }
+
+        /* --- GRA --- */
+        .container { display: flex; gap: 40px; margin-top: 50px; padding: 20px; }
+
+        .shop {
+            background: rgba(10,10,20,0.8); padding: 20px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1); width: 250px;
         }
 
-        .hud-card span:first-child {
-            display: block; font-size: 10px; text-transform: uppercase;
-            letter-spacing: 3px; color: var(--neon-blue); font-weight: bold;
+        .seed-card {
+            background: #000; border: 2px solid #333; padding: 15px;
+            margin-bottom: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s;
         }
+        .seed-card:hover { border-color: #00d4ff; box-shadow: 0 0 15px #00d4ff; transform: scale(1.05); }
+        .seed-card.active { border-color: #ff00ff; box-shadow: 0 0 15px #ff00ff; }
 
-        .hud-card span:last-child {
-            font-family: 'Orbitron', sans-serif; font-size: 24px;
-            font-weight: 900; text-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        /* --- PRZYCISK RANKINGU --- */
-        .rank-trigger {
-            background: transparent; border: 2px solid var(--neon-pink);
-            color: var(--neon-pink); padding: 10px 25px; border-radius: 50px;
-            font-family: 'Orbitron', sans-serif; cursor: pointer;
-            transition: 0.4s; box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
-        }
-        .rank-trigger:hover {
-            background: var(--neon-pink); color: black;
-            box-shadow: 0 0 30px var(--neon-pink); transform: scale(1.05);
-        }
-
-        /* --- GŁÓWNY LAYOUT --- */
-        .main-game {
-            display: flex; gap: 40px; width: 100%; max-width: 1100px;
-            padding: 20px; align-items: flex-start;
-        }
-
-        /* --- SKLEP (Cyber-Lab) --- */
-        .cyber-shop {
-            flex: 1; background: var(--glass); border-radius: 30px;
-            padding: 30px; border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .seed-item {
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 15px; margin-bottom: 15px;
-            display: flex; align-items: center; gap: 15px; cursor: pointer;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .seed-item:hover {
-            border-color: var(--neon-green); transform: translateX(10px);
-            background: rgba(57, 255, 20, 0.05);
-        }
-
-        .seed-item.active {
-            border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue);
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        /* --- FARMA (Cyber-Grid) --- */
-        .farm-grid {
-            display: grid; grid-template-columns: repeat(3, 160px); gap: 25px;
-        }
+        .grid { display: grid; grid-template-columns: repeat(3, 160px); gap: 20px; }
 
         .plot {
-            width: 160px; height: 160px; border-radius: 35px;
-            background: #0a0a0f; position: relative; cursor: pointer;
+            width: 160px; height: 160px; background: #0a0a0f; border-radius: 30px;
+            border: 2px solid #111; position: relative; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 2px solid rgba(255,255,255,0.05);
             transition: 0.4s; overflow: hidden;
         }
 
-        /* RGB Border effect */
-        .plot::before {
-            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(transparent, transparent, transparent, var(--neon-blue));
-            animation: rotate 4s linear infinite; display: none;
+        .plot:hover { border-color: #00d4ff; box-shadow: 0 0 30px rgba(0, 212, 255, 0.3); }
+
+        /* Pasek Postępu RGB */
+        .progress-box {
+            position: absolute; bottom: 15px; width: 70%; height: 6px;
+            background: #222; border-radius: 10px; overflow: hidden; display: none;
         }
-        .plot.growing::before { display: block; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .plot-inner {
-            width: 152px; height: 152px; background: #0a0a0f;
-            border-radius: 33px; z-index: 1; display: flex;
-            flex-direction: column; align-items: center; justify-content: center;
+        .progress-bar {
+            height: 100%; width: 0%; 
+            background: linear-gradient(90deg, #ff00ff, #00d4ff, #39ff14);
+            background-size: 200%; animation: moveGradient 2s linear infinite;
         }
+        @keyframes moveGradient { to { background-position: 200% center; } }
 
-        .plot:hover {
-            border-color: var(--neon-blue); transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
-        }
+        .emoji { font-size: 60px; transition: 0.5s; }
+        .timer-val { font-size: 10px; margin-top: 10px; color: #00d4ff; }
 
-        .emoji { font-size: 60px; filter: drop-shadow(0 0 15px white); transition: 0.5s; }
-        .timer { font-family: 'Orbitron'; font-size: 10px; color: var(--neon-blue); margin-top: 10px; font-weight: bold; }
-
-        /* --- RANKING MODAL --- */
-        #rankModal {
+        /* MODAL RANKINGU */
+        #rankBox {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(5, 5, 10, 0.95); padding: 40px; border-radius: 40px;
-            border: 2px solid var(--neon-pink); box-shadow: 0 0 100px rgba(255, 0, 255, 0.3);
-            z-index: 1000; width: 400px; backdrop-filter: blur(30px);
+            background: #05050a; padding: 30px; border-radius: 20px; border: 2px solid #ff00ff;
+            z-index: 100; box-shadow: 0 0 50px #ff00ff;
         }
+        
+        .rank-item { display: flex; justify-content: space-between; gap: 50px; margin-bottom: 10px; }
 
-        .rank-row {
-            display: flex; justify-content: space-between; padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.05); font-family: 'Orbitron';
+        .pop-text {
+            position: absolute; color: #39ff14; font-weight: 900;
+            animation: floatUp 1s forwards; pointer-events: none;
         }
-
-        /* --- EFEKTY --- */
-        .fx-pop {
-            position: absolute; pointer-events: none; animation: floatUp 1s forwards;
-            font-family: 'Orbitron'; font-weight: 900;
-        }
-        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-100px); } }
 
     </style>
 </head>
 <body>
 
-<div class="hud-container">
-    <div class="hud-card"><span>Cyber-Kasa</span><span id="m">$0</span></div>
-    <div class="hud-card"><span>Poziom</span><span id="l" style="color:var(--neon-pink)">1</span></div>
-    <div class="hud-card"><span>Total XP</span><span id="x" style="color:var(--neon-green)">0</span></div>
-    <button class="rank-trigger" onclick="toggleRank(true)">TOP GRACZE</button>
-</div>
-
-<div class="main-game">
-    <div class="cyber-shop" id="shop">
-        <h2 style="font-family:'Orbitron'; font-size: 18px; letter-spacing: 2px; margin-bottom: 25px; color: var(--neon-blue);">LABORATORIUM</h2>
+    <div class="top-bar">
+        <div>USER: <span class="user-tag" id="ui-nick">---</span></div>
+        <div class="money-val" id="ui-cash">$0</div>
+        <button onclick="toggleRank()" style="background:transparent; border:1px solid #ff00ff; color:white; padding:5px 15px; cursor:pointer;">RANKING</button>
     </div>
 
-    <div class="farm-grid" id="grid"></div>
-</div>
+    <div class="container">
+        <div class="shop" id="shop">
+            <h3 style="color:#00d4ff">SKLEP NASION</h3>
+        </div>
+        <div class="grid" id="grid"></div>
+    </div>
 
-<div id="rankModal">
-    <h2 style="font-family:'Orbitron'; text-align: center; color: var(--neon-pink);">GALERIA SŁAW</h2>
-    <div id="rankContent"></div>
-    <button onclick="toggleRank(false)" style="width:100%; margin-top:20px; background:transparent; color:white; border:1px solid white; padding:10px; border-radius:10px; cursor:pointer;">ZAMKNIJ</button>
-</div>
+    <div id="rankBox">
+        <h2 style="color:#ff00ff">RANKING XP</h2>
+        <div id="rankList"></div>
+        <button onclick="toggleRank()" style="width:100%; margin-top:15px;">ZAMKNIJ</button>
+    </div>
 
-<script>
-    let player = {
-        name: localStorage.getItem('nick') || prompt("Podaj swój Cyber-Nick:") || "Guest",
-        m: parseInt(localStorage.getItem('m')) || 150,
-        x: parseInt(localStorage.getItem('x')) || 0,
-        l: parseInt(localStorage.getItem('l')) || 1
-    };
-    localStorage.setItem('nick', player.name);
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+    </audio>
 
-    const seeds = [
-        { name: "Neon Wheat", icon: "🌾", cost: 20, time: 5, win: 50, xp: 25 },
-        { name: "Cyber Root", icon: "🥕", cost: 100, time: 15, win: 300, xp: 90 },
-        { name: "Plasma Core", icon: "🎃", cost: 500, time: 40, win: 1800, xp: 400 }
-    ];
+    <script>
+        let p = {
+            nick: localStorage.getItem('nick') || "Pilot",
+            cash: parseInt(localStorage.getItem('m')) || 100,
+            xp: parseInt(localStorage.getItem('x')) || 0,
+            music: localStorage.getItem('musicOn') === 'true'
+        };
 
-    let selected = null;
-    let plots = Array(9).fill().map(() => ({ seed: null, ready: false, t: 0 }));
+        if(p.music) document.getElementById('bgMusic').play().catch(() => {});
 
-    function init() {
-        const sDiv = document.getElementById('shop');
-        seeds.forEach((s, idx) => {
-            const div = document.createElement('div');
-            div.className = 'seed-item';
-            div.innerHTML = `<span style="font-size:30px">${s.icon}</span> 
-                             <div style="flex:1"><b>${s.name}</b><br><small style="color:var(--neon-green)">XP +${s.xp}</small></div>
-                             <div style="font-family:'Orbitron'; color:var(--neon-blue)">$${s.cost}</div>`;
-            div.onclick = () => {
-                if(player.m >= s.cost) {
-                    selected = s;
-                    document.querySelectorAll('.seed-item').forEach(x => x.classList.remove('active'));
-                    div.classList.add('active');
-                }
-            };
-            sDiv.appendChild(div);
-        });
+        const seeds = [
+            { name: "Neon Wheat", icon: "🌾", cost: 15, time: 4, win: 40, xp: 20 },
+            { name: "Cyber Carrot", icon: "🥕", cost: 70, time: 10, win: 220, xp: 75 },
+            { name: "Mega Core", icon: "🎃", cost: 300, time: 30, win: 1200, xp: 350 }
+        ];
 
-        const gDiv = document.getElementById('grid');
-        plots.forEach((_, i) => {
-            const p = document.createElement('div');
-            p.className = 'plot';
-            p.id = `plot-${i}`;
-            p.innerHTML = `<div class="plot-inner">
-                            <div class="emoji" id="e-${i}"></div>
-                            <div class="timer" id="t-${i}"></div>
-                           </div>`;
-            p.onclick = () => clickPlot(i);
-            gDiv.appendChild(p);
-        });
-        updateUI();
-        setInterval(tick, 1000);
-    }
+        let selected = null;
+        let plots = Array(9).fill().map(() => ({ seed: null, ready: false, timer: 0 }));
 
-    function clickPlot(i) {
-        const p = plots[i];
-        if(!p.seed && selected) {
-            player.m -= selected.cost;
-            p.seed = {...selected}; p.t = p.seed.time;
-            selected = null;
-            document.querySelectorAll('.seed-item').forEach(x => x.classList.remove('active'));
-            document.getElementById(`plot-${i}`).classList.add('growing');
-            document.getElementById(`e-${i}`).innerText = "🌱";
+        function init() {
+            document.getElementById('ui-nick').innerText = p.nick;
+            
+            const shop = document.getElementById('shop');
+            seeds.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'seed-card';
+                div.innerHTML = `<b>${s.icon} ${s.name}</b><br><small>Koszt: $${s.cost} | +${s.xp}XP</small>`;
+                div.onclick = () => {
+                    if(p.cash >= s.cost) {
+                        selected = s;
+                        document.querySelectorAll('.seed-card').forEach(x => x.classList.remove('active'));
+                        div.classList.add('active');
+                    }
+                };
+                shop.appendChild(div);
+            });
+
+            const grid = document.getElementById('grid');
+            plots.forEach((_, i) => {
+                const div = document.createElement('div');
+                div.className = 'plot';
+                div.innerHTML = `<div class="emoji" id="e-${i}"></div>
+                                 <div class="timer-val" id="t-${i}"></div>
+                                 <div class="progress-box" id="pb-${i}"><div class="progress-bar" id="f-${i}"></div></div>`;
+                div.onclick = () => clickPlot(i);
+                grid.appendChild(div);
+            });
             updateUI();
-        } else if(p.ready) {
-            pop(i, `+$${p.seed.win}`, "#00d4ff");
-            player.m += p.seed.win; player.x += p.seed.xp;
-            if(player.x >= player.l * 1000) { player.l++; pop(i, "LEVEL UP!", "#ff00ff"); }
-            p.seed = null; p.ready = false;
-            document.getElementById(`plot-${i}`).classList.remove('growing');
-            document.getElementById(`e-${i}`).innerText = "";
-            document.getElementById(`t-${i}`).innerText = "";
-            updateUI();
+            setInterval(tick, 1000);
         }
-    }
 
-    function tick() {
-        plots.forEach((p, i) => {
-            if(p.seed && p.t > 0) {
-                p.t--;
-                document.getElementById(`t-${i}`).innerText = p.t + "S";
-                if(p.t === 0) {
-                    p.ready = true;
-                    document.getElementById(`e-${i}`).innerText = p.seed.icon;
-                    document.getElementById(`t-${i}`).innerText = "READY";
-                    document.getElementById(`t-${i}`).style.color = "var(--neon-green)";
-                }
+        function clickPlot(i) {
+            const plot = plots[i];
+            if(!plot.seed && selected) {
+                p.cash -= selected.cost;
+                plot.seed = {...selected}; plot.timer = plot.seed.time;
+                selected = null;
+                document.querySelectorAll('.seed-card').forEach(x => x.classList.remove('active'));
+                document.getElementById(`e-${i}`).innerText = "🌱";
+                const bar = document.getElementById(`f-${i}`);
+                document.getElementById(`pb-${i}`).style.display = 'block';
+                bar.style.transition = `width ${plot.seed.time}s linear`;
+                setTimeout(() => bar.style.width = '100%', 50);
+                updateUI();
+            } else if(plot.ready) {
+                showFX(i, `+$${plot.seed.win}`);
+                p.cash += plot.seed.win; p.xp += plot.seed.xp;
+                plot.seed = null; plot.ready = false;
+                document.getElementById(`e-${i}`).innerText = "";
+                document.getElementById(`t-${i}`).innerText = "";
+                document.getElementById(`f-${i}`).style.width = '0%';
+                document.getElementById(`f-${i}`).style.transition = 'none';
+                document.getElementById(`pb-${i}`).style.display = 'none';
+                updateUI();
             }
-        });
-        save();
-    }
-
-    function pop(i, txt, col) {
-        const p = document.createElement('div');
-        p.className = 'fx-pop'; p.innerText = txt; p.style.color = col;
-        p.style.textShadow = `0 0 10px ${col}`;
-        document.getElementById(`plot-${i}`).appendChild(p);
-        setTimeout(() => p.remove(), 1000);
-    }
-
-    function updateUI() {
-        document.getElementById('m').innerText = `$${player.m}`;
-        document.getElementById('x').innerText = player.x;
-        document.getElementById('l').innerText = player.l;
-    }
-
-    function save() {
-        localStorage.setItem('m', player.m);
-        localStorage.setItem('x', player.x);
-        localStorage.setItem('l', player.l);
-    }
-
-    function toggleRank(show) {
-        const m = document.getElementById('rankModal');
-        const c = document.getElementById('rankContent');
-        m.style.display = show ? 'block' : 'none';
-        if(show) {
-            let top = [
-                {n: "CyberPuniek", x: 25000}, {n: player.name, x: player.x, me: true}, {n: "NeonMasta", x: 12000}, {n: "Bot01", x: 500}
-            ].sort((a,b) => b.x - a.x);
-            c.innerHTML = top.map((p, idx) => `
-                <div class="rank-row" style="${p.me ? 'color:var(--neon-pink); border:1px solid var(--neon-pink); border-radius:10px;' : ''}">
-                    <span>#${idx+1} ${p.n}</span>
-                    <span>${p.x} XP</span>
-                </div>`).join('');
         }
-    }
 
-    init();
-</script>
+        function tick() {
+            plots.forEach((pl, i) => {
+                if(pl.seed && pl.timer > 0) {
+                    pl.timer--;
+                    document.getElementById(`t-${i}`).innerText = pl.timer + "S";
+                    if(pl.timer === 0) {
+                        pl.ready = true;
+                        document.getElementById(`e-${i}`).innerText = pl.seed.icon;
+                        document.getElementById(`t-${i}`).innerText = "GOTOWE";
+                    }
+                }
+            });
+            localStorage.setItem('m', p.cash);
+            localStorage.setItem('x', p.xp);
+        }
+
+        function showFX(i, txt) {
+            const el = document.createElement('div');
+            el.className = 'pop-text'; el.innerText = txt;
+            document.querySelectorAll('.plot')[i].appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        function updateUI() {
+            document.getElementById('ui-cash').innerText = `$${p.cash}`;
+        }
+
+        function toggleRank() {
+            const box = document.getElementById('rankBox');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+            if(box.style.display === 'block') {
+                const list = [{n: "Cyberpuniek", x: 9999}, {n: "NeonGirl", x: 5500}, {n: p.nick, x: p.xp}].sort((a,b) => b.x - a.x);
+                document.getElementById('rankList').innerHTML = list.map(i => `<div class="rank-item"><span>${i.n}</span><span>${i.x} XP</span></div>`).join('');
+            }
+        }
+
+        init();
+    </script>
 </body>
 </html>
