@@ -2,12 +2,12 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>RGB HYPER FARMER PRO | PlayBase</title>
+    <title>RGB HYPER FARMER CLOUD | PlayBase</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@900&display=swap');
 
         :root {
-            --bg: #000000;
+            --bg: #000;
             --neon-rgb: linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
         }
 
@@ -19,87 +19,64 @@
             background-image: radial-gradient(circle at center, #110022 0%, #000 100%);
         }
 
-        .top-glow {
-            width: 100%; height: 5px; background: var(--neon-rgb);
-            background-size: 400%; animation: rgb-move 5s linear infinite;
-        }
-
+        .top-glow { width: 100%; height: 5px; background: var(--neon-rgb); background-size: 400%; animation: rgb-move 5s linear infinite; }
         @keyframes rgb-move { 0% { background-position: 0%; } 100% { background-position: 400%; } }
 
         /* --- HUD --- */
-        .hud { display: flex; gap: 20px; padding: 25px; }
+        .hud { display: flex; gap: 15px; padding: 20px; flex-wrap: wrap; justify-content: center; }
         .hud-box {
-            background: #111; border: 3px solid #0ff;
-            padding: 12px 25px; border-radius: 10px;
-            box-shadow: 0 0 20px #0ff;
-            text-align: center;
+            background: #111; border: 2px solid #0ff;
+            padding: 10px 20px; border-radius: 8px;
+            box-shadow: 0 0 15px #0ff; text-align: center;
         }
-        .hud-val { font-family: 'Press Start 2P', cursive; font-size: 12px; display: block; margin-top: 5px; }
+        .hud-val { font-family: 'Press Start 2P', cursive; font-size: 10px; display: block; margin-top: 5px; color: #fff; }
 
-        /* --- LAYOUT --- */
-        .wrapper { display: flex; gap: 40px; margin-top: 10px; padding: 20px; align-items: flex-start; }
-
-        /* --- SKLEP --- */
-        .shop {
-            background: rgba(10, 10, 10, 0.95); padding: 20px;
-            border-radius: 20px; border: 2px solid #333; width: 280px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+        /* PRZYCISK RANKINGU */
+        .rank-btn {
+            background: #000; border: 2px solid #f0f; color: #f0f;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-family: 'Press Start 2P'; font-size: 10px;
+            box-shadow: 0 0 15px #f0f; transition: 0.3s;
         }
-        .seed {
-            background: #000; border: 2px solid #444; padding: 12px;
-            margin-bottom: 12px; cursor: pointer; border-radius: 15px;
-            transition: 0.2s;
-        }
-        .seed:hover { transform: scale(1.03); border-color: #0f0; box-shadow: 0 0 20px #0f0; }
-        .seed.active { border-color: #f0f; box-shadow: 0 0 20px #f0f; }
-        .seed b { color: #0ff; font-size: 14px; }
-        .seed-stats { font-size: 10px; color: #aaa; margin-top: 5px; line-height: 1.4; }
-        .xp-text { color: #39ff14; font-weight: bold; }
+        .rank-btn:hover { background: #f0f; color: #000; transform: scale(1.1); }
 
-        /* --- GRID --- */
-        .grid { display: grid; grid-template-columns: repeat(3, 150px); gap: 20px; }
+        /* --- MODAL RANKINGU --- */
+        #leaderboard-modal {
+            display: none; position: fixed; z-index: 2000;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #0a0a0a; border: 4px solid #f0f;
+            padding: 30px; border-radius: 20px; box-shadow: 0 0 50px #f0f;
+            width: 350px; text-align: center;
+        }
+        .rank-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        .rank-table th { color: #0ff; font-size: 10px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        .rank-table td { padding: 10px; font-size: 12px; font-family: 'Press Start 2P'; border-bottom: 1px solid #111; }
+        .my-rank { color: #39ff14; }
+
+        /* --- GRID I SKLEP --- */
+        .wrapper { display: flex; gap: 30px; margin-top: 10px; padding: 20px; }
+        .shop { background: rgba(10,10,10,0.9); padding: 20px; border-radius: 20px; border: 1px solid #333; width: 250px; }
+        .seed { background: #000; border: 2px solid #444; padding: 10px; margin-bottom: 10px; cursor: pointer; border-radius: 12px; }
+        .seed.active { border-color: #f0f; box-shadow: 0 0 15px #f0f; }
+        .grid { display: grid; grid-template-columns: repeat(3, 140px); gap: 15px; }
         .plot {
-            width: 150px; height: 150px; background: #050505;
-            border-radius: 25px; position: relative; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 3px solid transparent;
+            width: 140px; height: 140px; background: #050505; border-radius: 20px;
+            position: relative; cursor: pointer; border: 3px solid transparent;
             background-image: linear-gradient(#050505, #050505), var(--neon-rgb);
             background-origin: border-box; background-clip: content-box, border-box;
             background-size: 100% 100%, 400% 400%; animation: rgb-move 5s linear infinite;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .plot-icon { font-size: 60px; filter: drop-shadow(0 0 10px #fff); }
-        
-        /* TIMER NA NASIONIE */
-        .timer-text {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px; color: #fff; margin-top: 10px;
-            text-shadow: 0 0 5px #0ff;
-        }
-
-        .bar-wrap {
-            position: absolute; bottom: 15px; width: 70%; height: 8px;
-            background: #222; border-radius: 5px; overflow: hidden; display: none;
-        }
+        .plot-icon { font-size: 55px; }
+        .timer-text { font-family: 'Press Start 2P'; font-size: 8px; margin-top: 8px; }
+        .bar-wrap { position: absolute; bottom: 12px; width: 70%; height: 6px; background: #222; border-radius: 5px; display: none; overflow: hidden; }
         .bar-fill { height: 100%; width: 0%; background: var(--neon-rgb); background-size: 400%; }
 
-        /* FX */
-        .pop {
-            position: absolute; font-family: 'Press Start 2P';
-            font-size: 16px; animation: explode 0.8s forwards; pointer-events: none;
-        }
+        .pop { position: absolute; font-family: 'Press Start 2P'; font-size: 14px; animation: explode 0.8s forwards; pointer-events: none; }
+        @keyframes explode { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2) translateY(-70px); opacity: 0; } }
 
-        @keyframes explode {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(2) translateY(-80px); opacity: 0; }
-        }
-
-        .btn-back {
-            margin: 30px; text-decoration: none; color: #ff007a;
-            border: 2px solid #ff007a; padding: 10px 20px; border-radius: 8px;
-            font-size: 10px; transition: 0.3s;
-        }
-        .btn-back:hover { background: #ff007a; color: #000; box-shadow: 0 0 20px #ff007a; }
+        .close-btn { margin-top: 20px; background: #ff0000; color: #fff; border: none; padding: 10px; cursor: pointer; font-family: 'Press Start 2P'; font-size: 8px; }
     </style>
 </head>
 <body>
@@ -107,57 +84,61 @@
     <div class="top-glow"></div>
 
     <div class="hud">
-        <div class="hud-box"><span>CASH</span> <span id="m" class="hud-val">$100</span></div>
+        <div class="hud-box"><span>CASH</span> <span id="m" class="hud-val">$0</span></div>
         <div class="hud-box"><span>XP</span> <span id="x" class="hud-val">0</span></div>
         <div class="hud-box"><span>LVL</span> <span id="l" class="hud-val">1</span></div>
+        <button class="rank-btn" onclick="showRank()">RANKING</button>
     </div>
 
     <div class="wrapper">
         <div class="shop" id="shop">
-            <h2 style="color:#0ff; text-align:center; font-size: 18px;">RGB LAB</h2>
+            <h2 style="color:#0ff; text-align:center; font-size: 14px;">RGB SHOP</h2>
         </div>
-
         <div class="grid" id="grid"></div>
     </div>
 
-    <a href="index.html" class="btn-back">BACK TO TERMINAL</a>
+    <div id="leaderboard-modal">
+        <h2 style="font-family: 'Press Start 2P'; font-size: 14px; color: #f0f;">CYBER RANK</h2>
+        <table class="rank-table">
+            <thead><tr><th>PLAYER</th><th>XP</th></tr></thead>
+            <tbody id="rank-body"></tbody>
+        </table>
+        <button class="close-btn" onclick="document.getElementById('leaderboard-modal').style.display='none'">CLOSE</button>
+    </div>
 
     <script>
-        let state = {
+        // System zapisu i gracza
+        let player = {
+            name: localStorage.getItem('rgb_name') || "",
             money: parseInt(localStorage.getItem('rgb_m')) || 100,
             xp: parseInt(localStorage.getItem('rgb_x')) || 0,
-            lvl: parseInt(localStorage.getItem('rgb_l')) || 1,
-            selected: null
+            lvl: parseInt(localStorage.getItem('rgb_l')) || 1
         };
 
+        if(!player.name) {
+            player.name = prompt("Enter your Cyber-Nick:", "Player1") || "Guest";
+            localStorage.setItem('rgb_name', player.name);
+        }
+
         const seeds = [
-            { id: 1, name: "NEON WHEAT", icon: "🌾", cost: 10, time: 5, win: 35, xp: 20 },
-            { id: 2, name: "CYBER ROOT", icon: "🥕", cost: 60, time: 15, win: 210, xp: 80 },
-            { id: 3, name: "GIGA CORE", icon: "🎃", cost: 250, time: 45, win: 950, xp: 300 }
+            { id: 1, name: "WHEAT", icon: "🌾", cost: 10, time: 5, win: 35, xp: 20 },
+            { id: 2, name: "ROOT", icon: "🥕", cost: 60, time: 15, win: 210, xp: 80 },
+            { id: 3, name: "CORE", icon: "🎃", cost: 250, time: 45, win: 950, xp: 300 }
         ];
 
+        let selected = null;
         let plots = Array(9).fill().map(() => ({ seed: null, ready: false, timeLeft: 0 }));
 
         function init() {
             const sDiv = document.getElementById('shop');
             seeds.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'seed';
-                div.innerHTML = `
-                    <b>${s.icon} ${s.name}</b>
-                    <div class="seed-stats">
-                        Koszt: $${s.cost} | Zysk: $${s.win}<br>
-                        Bonus: <span class="xp-text">+${s.xp} XP</span>
-                    </div>
-                `;
-                div.onclick = () => {
-                    if(state.money >= s.cost) {
-                        state.selected = s;
-                        document.querySelectorAll('.seed').forEach(x => x.classList.remove('active'));
-                        div.classList.add('active');
-                    }
-                };
-                sDiv.appendChild(div);
+                const d = document.createElement('div');
+                d.className = 'seed';
+                d.innerHTML = `<b>${s.icon} ${s.name}</b><br><small>$${s.cost} | +${s.xp}XP</small>`;
+                d.onclick = () => { if(player.money >= s.cost) { selected = s; 
+                    document.querySelectorAll('.seed').forEach(x => x.classList.remove('active'));
+                    d.classList.add('active'); } };
+                sDiv.appendChild(d);
             });
 
             const gDiv = document.getElementById('grid');
@@ -171,45 +152,34 @@
                 gDiv.appendChild(p);
             });
             updateUI();
-            
-            // Timer Engine
-            setInterval(tick, 1000);
+            setInterval(() => { tick(); save(); }, 1000);
         }
 
         function clickPlot(i) {
             const p = plots[i];
-            if(!p.seed && state.selected) {
-                state.money -= state.selected.cost;
-                p.seed = {...state.selected};
-                p.timeLeft = p.seed.time;
-                state.selected = null;
+            if(!p.seed && selected) {
+                player.money -= selected.cost;
+                p.seed = {...selected}; p.timeLeft = p.seed.time;
+                selected = null;
                 document.querySelectorAll('.seed').forEach(x => x.classList.remove('active'));
-
                 document.getElementById(`i-${i}`).innerText = "🌱";
                 const fill = document.getElementById(`f-${i}`);
                 document.getElementById(`w-${i}`).style.display = 'block';
                 fill.style.transition = `width ${p.seed.time}s linear`;
                 setTimeout(() => fill.style.width = '100%', 50);
-                updateUI();
             } else if(p.ready) {
                 pop(i, `+$${p.seed.win}`, "#0f0");
                 pop(i, `+${p.seed.xp}XP`, "#39ff14");
-                
-                state.money += p.seed.win;
-                state.xp += p.seed.xp;
-
-                if(state.xp >= state.lvl * 1000) {
-                    state.lvl++;
-                    pop(i, "LVL UP!", "#f0f");
-                }
-
+                player.money += p.seed.win;
+                player.xp += p.seed.xp;
+                if(player.xp >= player.lvl * 1000) { player.lvl++; pop(i, "LVL UP!", "#f0f"); }
                 p.seed = null; p.ready = false;
                 document.getElementById(`i-${i}`).innerText = "";
                 document.getElementById(`t-${i}`).innerText = "";
                 document.getElementById(`f-${i}`).style.width = '0%';
                 document.getElementById(`f-${i}`).style.transition = 'none';
-                updateUI();
             }
+            updateUI();
         }
 
         function tick() {
@@ -227,22 +197,46 @@
             });
         }
 
-        function pop(i, txt, col) {
-            const plotEl = document.querySelectorAll('.plot')[i];
-            const p = document.createElement('div');
-            p.className = 'pop'; p.innerText = txt; p.style.color = col;
-            p.style.textShadow = `0 0 10px ${col}`;
-            plotEl.appendChild(p);
-            setTimeout(() => p.remove(), 800);
+        function save() {
+            localStorage.setItem('rgb_m', player.money);
+            localStorage.setItem('rgb_x', player.xp);
+            localStorage.setItem('rgb_l', player.lvl);
         }
 
         function updateUI() {
-            document.getElementById('m').innerText = `$${state.money}`;
-            document.getElementById('x').innerText = state.xp;
-            document.getElementById('l').innerText = state.lvl;
-            localStorage.setItem('rgb_m', state.money);
-            localStorage.setItem('rgb_x', state.xp);
-            localStorage.setItem('rgb_l', state.lvl);
+            document.getElementById('m').innerText = `$${player.money}`;
+            document.getElementById('x').innerText = player.xp;
+            document.getElementById('l').innerText = player.lvl;
+        }
+
+        function pop(i, txt, col) {
+            const el = document.querySelectorAll('.plot')[i];
+            const p = document.createElement('div');
+            p.className = 'pop'; p.innerText = txt; p.style.color = col;
+            el.appendChild(p); setTimeout(() => p.remove(), 800);
+        }
+
+        // --- RANKING LOGIC ---
+        function showRank() {
+            const modal = document.getElementById('leaderboard-modal');
+            const body = document.getElementById('rank-body');
+            modal.style.display = 'block';
+            
+            // Symulacja danych innych graczy + Twoje dane
+            let players = [
+                { name: "CyberKing", xp: 15000 },
+                { name: "NeonQueen", xp: 8500 },
+                { name: "Slayer66", xp: 4200 },
+                { name: player.name, xp: player.xp, me: true }
+            ].sort((a, b) => b.xp - a.xp);
+
+            body.innerHTML = "";
+            players.forEach(p => {
+                body.innerHTML += `<tr class="${p.me ? 'my-rank' : ''}">
+                    <td>${p.name}</td>
+                    <td>${p.xp}</td>
+                </tr>`;
+            });
         }
 
         init();
