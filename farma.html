@@ -2,127 +2,292 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>PlayBase | Gra Farma</title>
+    <title>Cyber Farmer Ultra | RGB Edition</title>
     <style>
-        :root { --bg: #05070a; --card: #0f1218; --neon-blue: #00d4ff; --neon-green: #00ff99; --neon-pink: #ff00ff; --gold: #ffcc00; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
-        /* PANEL GÓRNY */
-        .top-bar { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; padding: 30px; }
-        .btn-back { padding: 10px 20px; background: transparent; border: 1px solid #333; color: #555; text-decoration: none; border-radius: 12px; transition: 0.3s; }
-        .btn-back:hover { color: var(--neon-pink); border-color: var(--neon-pink); box-shadow: 0 0 15px var(--neon-pink); }
-        .money { background: var(--card); border: 2px solid var(--neon-blue); padding: 12px 30px; border-radius: 50px; font-size: 22px; color: var(--gold); font-weight: bold; }
+        :root {
+            --bg: #05070a;
+            --panel: #0f1218;
+            --neon-blue: #00d4ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --gold: #ffcc00;
+        }
 
-        .game-area { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; padding: 20px; }
-        
-        /* SKLEP */
-        .shop { background: var(--card); padding: 25px; border-radius: 30px; width: 260px; border: 1px solid #222; }
-        .item { background: #161b22; padding: 15px; border-radius: 20px; margin-bottom: 12px; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
-        .item:hover { border-color: var(--neon-green); transform: scale(1.05); }
-        .item.selected { border-color: var(--neon-pink); background: #1e242c; }
+        body {
+            margin: 0; background: var(--bg); color: white;
+            font-family: 'Orbitron', sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+        }
 
-        /* GRUPOWANIE PÓL */
-        .grid { display: grid; grid-template-columns: repeat(3, 140px); gap: 15px; }
-        .plot { width: 140px; height: 140px; background: #1a1614; border: 3px solid #333; border-radius: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; transition: 0.3s; }
-        .plot:hover { border-color: var(--neon-blue); }
+        /* HEADER RGB */
+        .top-bar {
+            width: 100%; max-width: 1200px; padding: 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+        }
+
+        .stats-group { display: flex; gap: 20px; }
+
+        .stat-card {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue);
+            padding: 10px 25px; border-radius: 15px;
+            display: flex; flex-direction: column; align-items: center;
+            min-width: 120px; box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+        }
+
+        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-value { font-size: 20px; font-weight: bold; color: var(--gold); }
+
+        /* GAME AREA */
+        .game-layout {
+            display: grid; grid-template-columns: 350px 1fr;
+            gap: 40px; width: 100%; max-width: 1200px; margin-top: 40px; padding: 0 20px;
+        }
+
+        /* SHOP */
+        .shop-container {
+            background: var(--panel); border-radius: 30px; padding: 30px;
+            border: 1px solid rgba(255,255,255,0.05); height: fit-content;
+        }
+
+        .shop-title { color: var(--neon-blue); margin-bottom: 25px; font-size: 22px; text-align: center; }
+
+        .seed-card {
+            background: #05070a; border: 2px solid #222; border-radius: 20px;
+            padding: 20px; margin-bottom: 15px; cursor: pointer;
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+
+        .seed-card:hover { border-color: var(--neon-green); transform: scale(1.02); }
+        .seed-card.selected { border-color: var(--neon-pink); background: rgba(255, 0, 255, 0.05); }
+
+        .seed-info h4 { margin: 0; font-size: 18px; color: white; }
+        .seed-details { font-size: 11px; color: #666; margin-top: 5px; line-height: 1.4; }
+        .seed-cost { color: var(--gold); font-weight: bold; margin-top: 10px; }
+
+        /* FARM GRID */
+        .farm-wrapper {
+            display: grid; grid-template-columns: repeat(3, 180px); gap: 25px;
+            justify-content: center; align-content: start;
+        }
+
+        .plot {
+            width: 180px; height: 180px; background: #0a0c10;
+            border: 2px solid #1a1e26; border-radius: 35px;
+            position: relative; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer;
+            transition: 0.4s; overflow: hidden;
+        }
+
+        .plot:hover { border-color: var(--neon-blue); background: #0f141d; }
+
+        .plot-icon { font-size: 70px; z-index: 5; transition: 0.3s; }
         
-        .progress-box { position: absolute; bottom: 0; width: 100%; height: 8px; background: rgba(0,0,0,0.5); }
-        .progress-bar { height: 100%; width: 0%; background: linear-gradient(to right, var(--neon-blue), var(--neon-green)); transition: linear; }
-        
-        .ready { animation: pulse 1s infinite alternate; }
-        @keyframes pulse { from { border-color: var(--neon-pink); box-shadow: 0 0 5px var(--neon-pink); } to { border-color: white; box-shadow: 0 0 20px var(--neon-pink); } }
+        .plot.growing .plot-icon { filter: grayscale(1) opacity(0.5); transform: scale(0.8); }
+        .plot.ready .plot-icon { animation: pulseReady 1s infinite alternate; }
+
+        @keyframes pulseReady {
+            from { transform: scale(1); filter: drop-shadow(0 0 10px var(--neon-pink)); }
+            to { transform: scale(1.15); filter: drop-shadow(0 0 25px var(--neon-pink)); }
+        }
+
+        /* PROGRESS RGB BAR */
+        .progress-track {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 12px;
+            background: rgba(0,0,0,0.8);
+        }
+
+        .progress-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green), var(--neon-blue));
+            background-size: 200% 100%;
+            animation: moveGradient 2s linear infinite;
+            box-shadow: 0 -5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        @keyframes moveGradient { to { background-position: 200% center; } }
+
+        .floating-xp {
+            position: absolute; color: var(--neon-green); font-weight: bold;
+            animation: floatXP 1s forwards; pointer-events: none;
+        }
+
+        @keyframes floatXP {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-80px); }
+        }
+
+        .btn-lobby {
+            padding: 10px 25px; background: transparent; border: 1px solid #333;
+            color: #666; border-radius: 10px; cursor: pointer; font-family: inherit;
+            transition: 0.3s; text-decoration: none; font-size: 12px;
+        }
+
+        .btn-lobby:hover { border-color: var(--secondary); color: white; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <a href="index.html" class="btn-back">← LOBBY</a>
-        <div class="money">💰 $<span id="bal">50</span></div>
+        <a href="index.html" class="btn-lobby">← POWRÓT DO LOBBY</a>
+        <div class="stats-group">
+            <div class="stat-card">
+                <span class="stat-label">Poziom</span>
+                <span class="stat-value" id="lvl-display" style="color: var(--neon-blue);">1</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Cyber-Kasa</span>
+                <span class="stat-value" id="money-display">$50</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">EXP</span>
+                <span class="stat-value" id="xp-display" style="color: var(--neon-green);">0</span>
+            </div>
+        </div>
     </div>
 
-    <div class="game-area">
-        <div class="shop" id="shop-items">
-            <h3 style="margin-top:0; color:var(--neon-blue)">BIO-SKLEP</h3>
+    <div class="game-layout">
+        <div class="shop-container">
+            <h2 class="shop-title">LABORATORIUM NASION</h2>
+            <div id="shop-list"></div>
         </div>
-        <div class="grid" id="farm-grid"></div>
+
+        <div class="farm-wrapper" id="farm-grid">
+            </div>
     </div>
 
     <script>
-        let money = parseInt(localStorage.getItem('rgb_money')) || 50;
-        let selected = null;
-        const catalog = [
-            { id: 0, name: "Wheat", icon: "🌾", cost: 10, time: 5, win: 25 },
-            { id: 1, name: "Carrot", icon: "🥕", cost: 50, time: 15, win: 150 },
-            { id: 2, name: "Pumpkin", icon: "🎃", cost: 200, time: 40, win: 700 }
+        // System Danych
+        let gameData = {
+            money: parseInt(localStorage.getItem('cf_money')) || 100,
+            xp: parseInt(localStorage.getItem('cf_xp')) || 0,
+            lvl: parseInt(localStorage.getItem('cf_lvl')) || 1
+        };
+
+        let selectedSeed = null;
+
+        const seedsCatalog = [
+            { id: 1, name: "Neon Wheat", icon: "🌾", cost: 15, time: 5, profit: 40, xp: 10 },
+            { id: 2, name: "Cyber Carrot", icon: "🥕", cost: 80, time: 15, profit: 220, xp: 45 },
+            { id: 3, name: "Plasma Pumpkin", icon: "🎃", cost: 350, time: 40, profit: 1100, xp: 150 },
+            { id: 4, name: "Binary Flower", icon: "🌸", cost: 1200, time: 90, profit: 4500, xp: 600 }
         ];
 
-        let state = Array(9).fill().map(() => ({ plant: null, ready: false }));
+        let plotsData = Array(9).fill().map(() => ({ crop: null, isReady: false }));
 
-        function setup() {
-            const shopDiv = document.getElementById('shop-items');
-            catalog.forEach(item => {
+        function init() {
+            // Sklep
+            const shop = document.getElementById('shop-list');
+            seedsCatalog.forEach(seed => {
                 const div = document.createElement('div');
-                div.className = 'item';
-                div.innerHTML = `<b>${item.icon} ${item.name}</b><br><small>$${item.cost} -> $${item.win}</small>`;
+                div.className = 'seed-card';
+                div.innerHTML = `
+                    <div class="seed-info">
+                        <h4>${seed.icon} ${seed.name}</h4>
+                        <div class="seed-details">Wzrost: ${seed.time}s | Doświadczenie: +${seed.xp} XP</div>
+                        <div class="seed-cost">KOSZT: $${seed.cost} | ZYSK: $${seed.profit}</div>
+                    </div>
+                `;
                 div.onclick = () => {
-                    if(money >= item.cost) {
-                        selected = item;
-                        document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+                    if(gameData.money >= seed.cost) {
+                        selectedSeed = seed;
+                        document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('selected'));
                         div.classList.add('selected');
                     }
                 };
-                shopDiv.appendChild(div);
+                shop.appendChild(div);
             });
 
-            const gridDiv = document.getElementById('farm-grid');
-            state.forEach((_, i) => {
-                const p = document.createElement('div');
-                p.className = 'plot';
-                p.id = `p-${i}`;
-                p.innerHTML = `<span style="font-size:50px" id="i-${i}"></span><div class="progress-box"><div class="progress-bar" id="b-${i}"></div></div>`;
-                p.onclick = () => clickPlot(i);
-                gridDiv.appendChild(p);
+            // Grid
+            const grid = document.getElementById('farm-grid');
+            plotsData.forEach((_, i) => {
+                const div = document.createElement('div');
+                div.className = 'plot';
+                div.id = `plot-${i}`;
+                div.innerHTML = `
+                    <span class="plot-icon" id="icon-${i}"></span>
+                    <div class="progress-track"><div class="progress-bar" id="bar-${i}"></div></div>
+                `;
+                div.onclick = () => handlePlot(i);
+                grid.appendChild(div);
             });
-            refresh();
+            updateStats();
         }
 
-        function clickPlot(i) {
-            const plot = state[i];
-            const el = document.getElementById(`p-${i}`);
-            if(!plot.plant && selected) {
-                money -= selected.cost;
-                plot.plant = {...selected};
-                selected = null;
-                document.querySelectorAll('.item').forEach(btn => btn.classList.remove('selected'));
+        function handlePlot(i) {
+            const plot = plotsData[i];
+            const el = document.getElementById(`plot-${i}`);
+            const icon = document.getElementById(`icon-${i}`);
+
+            // Sadzenie
+            if(!plot.crop && selectedSeed) {
+                gameData.money -= selectedSeed.cost;
+                plot.crop = {...selectedSeed};
+                selectedSeed = null;
+                document.querySelectorAll('.seed-card').forEach(c => c.classList.remove('selected'));
                 
-                document.getElementById(`i-${i}`).innerText = "🌱";
-                const bar = document.getElementById(`b-${i}`);
-                bar.style.transition = `width ${plot.plant.time}s linear`;
+                el.classList.add('growing');
+                icon.innerText = "🌱";
+                
+                const bar = document.getElementById(`bar-${i}`);
+                bar.style.transition = `width ${plot.crop.time}s linear`;
                 setTimeout(() => bar.style.width = "100%", 50);
 
                 setTimeout(() => {
-                    plot.ready = true;
+                    plot.isReady = true;
+                    el.classList.remove('growing');
                     el.classList.add('ready');
-                    document.getElementById(`i-${i}`).innerText = plot.plant.icon;
-                }, plot.plant.time * 1000);
-            } else if(plot.ready) {
-                money += plot.plant.win;
-                plot.plant = null;
-                plot.ready = false;
+                    icon.innerText = plot.crop.icon;
+                }, plot.crop.time * 1000);
+                
+                updateStats();
+            } 
+            // Zbieranie
+            else if(plot.isReady) {
+                const p = plot.crop;
+                gameData.money += p.profit;
+                gameData.xp += p.xp;
+                
+                // Efekt XP
+                const fx = document.createElement('div');
+                fx.className = 'floating-xp';
+                fx.innerText = `+$${p.profit} \n +${p.xp} XP`;
+                el.appendChild(fx);
+                setTimeout(() => fx.remove(), 1000);
+
+                // Level up?
+                if(gameData.xp >= gameData.lvl * 500) {
+                    gameData.lvl++;
+                    alert("LEVEL UP! Nowy poziom: " + gameData.lvl);
+                }
+
+                plot.crop = null;
+                plot.isReady = false;
                 el.classList.remove('ready');
-                document.getElementById(`i-${i}`).innerText = "";
-                document.getElementById(`b-${i}`).style.transition = "none";
-                document.getElementById(`b-${i}`).style.width = "0%";
+                icon.innerText = "";
+                const bar = document.getElementById(`bar-${i}`);
+                bar.style.transition = "none";
+                bar.style.width = "0%";
+                
+                updateStats();
             }
-            refresh();
         }
 
-        function refresh() {
-            document.getElementById('bal').innerText = money;
-            localStorage.setItem('rgb_money', money);
+        function updateStats() {
+            document.getElementById('money-display').innerText = "$" + gameData.money;
+            document.getElementById('xp-display').innerText = gameData.xp;
+            document.getElementById('lvl-display').innerText = gameData.lvl;
+            
+            localStorage.setItem('cf_money', gameData.money);
+            localStorage.setItem('cf_xp', gameData.xp);
+            localStorage.setItem('cf_lvl', gameData.lvl);
         }
 
-        setup();
+        init();
     </script>
 </body>
 </html>
