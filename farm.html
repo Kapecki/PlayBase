@@ -4,158 +4,146 @@
     <meta charset="UTF-8">
     <title>PlayBase | Cyber Farmer</title>
     <style>
-        :root { --bg: #0b0e14; --panel: #161b22; --accent: #00ff99; --gold: #ffcc00; --primary: #00d4ff; }
+        :root { --bg: #0b0e14; --panel: #161b22; --accent: #00ff99; --gold: #ffcc00; }
         body { 
             margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif;
-            display: flex; flex-direction: column; align-items: center; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
         
-        .top-nav { width: 100%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .money-box { background: var(--panel); padding: 15px 30px; border-radius: 50px; border: 2px solid var(--gold); color: var(--gold); font-size: 24px; font-weight: bold; box-shadow: 0 0 15px rgba(255, 204, 0, 0.2); }
+        .header { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; padding: 40px 20px; }
+        .balance-card { background: var(--panel); padding: 15px 35px; border-radius: 100px; border: 2px solid var(--gold); font-size: 24px; font-weight: bold; color: var(--gold); box-shadow: 0 0 20px rgba(255,204,0,0.1); }
 
-        .game-area { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+        .main-layout { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; padding: 20px; }
         
-        /* SKLEP */
-        .shop { background: var(--panel); padding: 25px; border-radius: 25px; width: 280px; border: 1px solid #333; }
-        .seed-item { 
-            background: #0b0e14; padding: 15px; border-radius: 15px; margin-bottom: 12px; 
+        .shop-box { background: var(--panel); padding: 30px; border-radius: 30px; width: 280px; border: 1px solid #333; }
+        .seed-btn { 
+            background: #0b0e14; padding: 15px; border-radius: 20px; margin-bottom: 15px; 
             border: 2px solid #222; cursor: pointer; transition: 0.3s;
         }
-        .seed-item:hover { border-color: var(--accent); transform: scale(1.03); }
-        .seed-item.selected { border-color: var(--primary); background: #1a2430; }
+        .seed-btn:hover { border-color: var(--accent); }
+        .seed-btn.selected { border-color: #00d4ff; background: #1a2430; }
 
-        /* POLA */
-        .farm-grid { display: grid; grid-template-columns: repeat(3, 130px); gap: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 130px); gap: 20px; }
         .plot { 
-            width: 130px; height: 130px; background: #2a1d15; border: 4px solid #3d2b1f; 
-            border-radius: 20px; display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; cursor: pointer; position: relative; transition: 0.2s;
+            width: 130px; height: 130px; background: #1a1614; border: 4px solid #2d241e; 
+            border-radius: 25px; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; position: relative; overflow: hidden; transition: 0.2s;
         }
         .plot:hover { border-color: var(--accent); }
-        .plot-icon { font-size: 50px; transition: 0.3s; }
+        .plant-icon { font-size: 50px; z-index: 2; }
         
-        .progress-container { position: absolute; bottom: 10px; width: 80%; height: 6px; background: #000; border-radius: 10px; overflow: hidden; display: none; }
-        .progress-fill { height: 100%; background: var(--accent); width: 0%; }
+        .progress-container { position: absolute; bottom: 0; width: 100%; height: 6px; background: rgba(0,0,0,0.5); }
+        .progress-bar { height: 100%; background: var(--accent); width: 0%; }
 
-        .btn-back { margin-top: 50px; padding: 12px 25px; background: transparent; border: 1px solid #444; color: white; border-radius: 15px; cursor: pointer; transition: 0.3s; }
-        .btn-back:hover { background: #444; }
+        .back-btn { padding: 12px 25px; background: transparent; border: 1px solid #333; color: #555; border-radius: 15px; cursor: pointer; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        .back-btn:hover { color: white; border-color: white; }
 
-        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        .ready-anim { animation: bounce 0.6s infinite; }
+        @keyframes readyGrow { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        .ready { animation: readyGrow 0.8s infinite; }
     </style>
 </head>
 <body>
 
-    <div class="top-nav">
-        <button class="btn-back" style="margin-top:0" onclick="location.href='index.html'">← WYJDŹ</button>
-        <div class="money-box">💰 $<span id="money">50</span></div>
+    <div class="header">
+        <a href="index.html" class="back-btn">← POWRÓT DO LOBBY</a>
+        <div class="balance-card">💰 $<span id="money">50</span></div>
     </div>
 
-    <div class="game-area">
-        <div class="shop">
-            <h2 style="color: var(--accent); margin-top:0">NASIONA</h2>
-            <div id="shop-list"></div>
+    <div class="main-layout">
+        <div class="shop-box">
+            <h2 style="color: var(--accent); margin-top: 0;">SKLEP</h2>
+            <div id="seeds-container"></div>
         </div>
 
-        <div class="farm-grid" id="farm-grid"></div>
+        <div class="grid" id="farm-grid"></div>
     </div>
 
     <script>
-        let money = parseInt(localStorage.getItem('farm_money')) || 50;
-        let selectedSeed = null;
+        let money = parseInt(localStorage.getItem('farmer_cash')) || 50;
+        let activeSeed = null;
 
-        const seedTypes = [
-            { name: 'Pszenica', icon: '🌾', cost: 10, time: 5, profit: 25 },
-            { name: 'Marchew', icon: '🥕', cost: 40, time: 12, profit: 100 },
-            { name: 'Dynia', icon: '🎃', cost: 150, time: 30, profit: 400 }
+        const catalog = [
+            { id: 0, name: 'Pszenica', icon: '🌾', cost: 10, time: 5, win: 25 },
+            { id: 1, name: 'Marchew', icon: '🥕', cost: 50, time: 15, win: 150 },
+            { id: 2, name: 'Dynia', icon: '🎃', cost: 200, time: 45, win: 700 }
         ];
 
-        let plots = Array(9).fill().map(() => ({ plant: null, ready: false }));
+        let farmState = Array(9).fill().map(() => ({ crop: null, isReady: false }));
 
-        function initShop() {
-            const list = document.getElementById('shop-list');
-            seedTypes.forEach((seed, idx) => {
-                const div = document.createElement('div');
-                div.className = 'seed-item';
-                div.innerHTML = `<strong>${seed.icon} ${seed.name}</strong><br><small>Koszt: $${seed.cost} | Zysk: $${seed.profit}</small>`;
-                div.onclick = () => {
-                    if(money >= seed.cost) {
-                        selectedSeed = seed;
-                        document.querySelectorAll('.seed-item').forEach(i => i.classList.remove('selected'));
-                        div.classList.add('selected');
+        function init() {
+            // Renderuj sklep
+            const shop = document.getElementById('seeds-container');
+            catalog.forEach(item => {
+                const btn = document.createElement('div');
+                btn.className = 'seed-btn';
+                btn.innerHTML = `<strong>${item.icon} ${item.name}</strong><br><small>Koszt: $${item.cost} | Zysk: $${item.win}</small>`;
+                btn.onclick = () => {
+                    if(money >= item.cost) {
+                        activeSeed = item;
+                        document.querySelectorAll('.seed-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
                     }
                 };
-                list.appendChild(div);
+                shop.appendChild(btn);
             });
-        }
 
-        function initGrid() {
+            // Renderuj pola
             const grid = document.getElementById('farm-grid');
-            grid.innerHTML = '';
-            plots.forEach((p, i) => {
-                const div = document.createElement('div');
-                div.className = 'plot';
-                div.innerHTML = `
-                    <span class="plot-icon" id="icon-${i}"></span>
-                    <div class="progress-container" id="prog-cont-${i}">
-                        <div class="progress-fill" id="prog-fill-${i}"></div>
-                    </div>
-                `;
-                div.onclick = () => handlePlot(i);
-                grid.appendChild(div);
+            farmState.forEach((_, i) => {
+                const plot = document.createElement('div');
+                plot.className = 'plot';
+                plot.innerHTML = `<span class="plant-icon" id="icon-${i}"></span><div class="progress-container"><div class="progress-bar" id="bar-${i}"></div></div>`;
+                plot.onclick = () => clickPlot(i);
+                grid.appendChild(plot);
             });
+            updateUI();
         }
 
-        function handlePlot(i) {
-            const p = plots[i];
-            const icon = document.getElementById(`icon-${i}`);
-            
-            if (!p.plant && selectedSeed) {
-                money -= selectedSeed.cost;
-                p.plant = {...selectedSeed};
-                updateUI();
-                
-                icon.innerText = '🌱';
-                const cont = document.getElementById(`prog-cont-${i}`);
-                const fill = document.getElementById(`prog-fill-${i}`);
-                cont.style.display = 'block';
-                
-                let start = Date.now();
-                let timer = setInterval(() => {
-                    let elapsed = Date.now() - start;
-                    let percent = (elapsed / (p.plant.time * 1000)) * 100;
-                    fill.style.width = percent + '%';
-                    
-                    if (percent >= 100) {
-                        clearInterval(timer);
-                        p.ready = true;
-                        cont.style.display = 'none';
-                        icon.innerText = p.plant.icon;
-                        icon.classList.add('ready-anim');
-                    }
-                }, 100);
-                
-                selectedSeed = null;
-                document.querySelectorAll('.seed-item').forEach(i => i.classList.remove('selected'));
-            } 
-            else if (p.ready) {
-                money += p.plant.profit;
-                p.plant = null;
-                p.ready = false;
-                icon.innerText = '';
-                icon.classList.remove('ready-anim');
-                updateUI();
+        function clickPlot(i) {
+            let p = farmState[i];
+            if(!p.crop && activeSeed) {
+                money -= activeSeed.cost;
+                p.crop = {...activeSeed};
+                activeSeed = null;
+                document.querySelectorAll('.seed-btn').forEach(b => b.classList.remove('selected'));
+                grow(i);
+            } else if(p.isReady) {
+                money += p.crop.win;
+                p.crop = null;
+                p.isReady = false;
+                document.getElementById(`icon-${i}`).innerText = '';
+                document.getElementById(`icon-${i}`).classList.remove('ready');
             }
+            updateUI();
+        }
+
+        function grow(i) {
+            const bar = document.getElementById(`bar-${i}`);
+            const icon = document.getElementById(`icon-${i}`);
+            icon.innerText = '🌱';
+            let start = Date.now();
+            let duration = farmState[i].crop.time * 1000;
+
+            let interval = setInterval(() => {
+                let passed = Date.now() - start;
+                let progress = (passed / duration) * 100;
+                bar.style.width = progress + '%';
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    farmState[i].isReady = true;
+                    icon.innerText = farmState[i].crop.icon;
+                    icon.classList.add('ready');
+                    bar.style.width = '0%';
+                }
+            }, 50);
         }
 
         function updateUI() {
             document.getElementById('money').innerText = money;
-            localStorage.setItem('farm_money', money);
+            localStorage.setItem('farmer_cash', money);
         }
 
-        initShop();
-        initGrid();
-        updateUI();
+        init();
     </script>
 </body>
 </html>
