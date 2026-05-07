@@ -2,195 +2,103 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayBase | Cosmic RGB Hub</title>
+    <title>Cyber-Terminal | Lobby</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-        :root {
-            --primary: #00d4ff;
-            --secondary: #ff00ff;
-            --bg: #02050a;
-            --card-bg: rgba(15, 20, 30, 0.8);
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap');
+        
         body {
-            margin: 0;
-            padding: 0;
-            background: var(--bg);
-            color: white;
+            margin: 0; background: #05050a; color: white;
             font-family: 'Orbitron', sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            perspective: 1000px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
+            background: radial-gradient(circle, #0a0a2e 0%, #05050a 100%);
         }
 
-        /* Dynamiczne tło RGB */
-        .bg-animate {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #16213e 0%, #02050a 100%);
-            z-index: -1;
+        .main-panel {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px);
+            padding: 50px; border-radius: 40px; border: 1px solid rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.1); text-align: center;
         }
 
-        .stars {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.3;
-            animation: moveStars 100s linear infinite;
+        h1 { font-size: 3rem; text-shadow: 0 0 20px #00d4ff; margin-bottom: 30px; }
+
+        .settings-box { margin: 20px 0; display: flex; flex-direction: column; gap: 15px; }
+
+        input {
+            background: #000; border: 2px solid #00d4ff; color: #0ff;
+            padding: 10px; border-radius: 10px; text-align: center; font-family: 'Orbitron';
         }
 
-        @keyframes moveStars {
-            from { background-position: 0 0; }
-            to { background-position: 1000px 1000px; }
+        .btn {
+            background: #00d4ff; color: #000; border: none; padding: 15px 40px;
+            border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s;
+            text-decoration: none; display: inline-block; font-size: 1.2rem;
         }
+        .btn:hover { box-shadow: 0 0 30px #00d4ff; transform: scale(1.1); }
 
-        .container {
-            text-align: center;
-            z-index: 10;
+        .audio-controls { margin-top: 20px; }
+        .audio-btn {
+            background: transparent; border: 1px solid white; color: white;
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; opacity: 0.6;
         }
-
-        .logo {
-            font-size: 85px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 15px;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite;
-            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
-        }
-
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
-
-        .tagline {
-            font-size: 14px;
-            letter-spacing: 8px;
-            color: var(--secondary);
-            margin-bottom: 60px;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-
-        .grid {
-            display: flex;
-            gap: 40px;
-            padding: 20px;
-        }
-
-        .card {
-            position: relative;
-            width: 320px;
-            height: 450px;
-            background: var(--card-bg);
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: white;
-            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            overflow: hidden;
-            backdrop-filter: blur(15px);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(0, 212, 255, 0.1), transparent);
-            transition: 0.5s;
-        }
-
-        .card:hover {
-            transform: translateY(-20px) scale(1.02);
-            border-color: var(--primary);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 212, 255, 0.3);
-        }
-
-        .card:hover::before {
-            left: 100%;
-        }
-
-        .card .icon-box {
-            font-size: 100px;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 0 15px var(--primary));
-            transition: 0.5s;
-        }
-
-        .card:hover .icon-box {
-            transform: scale(1.2) rotate(10deg);
-        }
-
-        .card h2 {
-            margin: 0;
-            font-size: 26px;
-            letter-spacing: 2px;
-            color: var(--primary);
-        }
-
-        .card p {
-            color: #888;
-            font-size: 12px;
-            margin-top: 15px;
-            padding: 0 30px;
-            line-height: 1.6;
-        }
-
-        .card .enter-btn {
-            margin-top: 30px;
-            padding: 10px 30px;
-            border: 1px solid var(--primary);
-            border-radius: 50px;
-            font-size: 12px;
-            transition: 0.3s;
-        }
-
-        .card:hover .enter-btn {
-            background: var(--primary);
-            color: black;
-            box-shadow: 0 0 20px var(--primary);
-        }
+        .audio-btn:hover { opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div class="bg-animate"></div>
-    <div class="stars"></div>
-
-    <div class="container">
-        <div class="logo">PlayBase</div>
-        <div class="tagline">The Future of Gaming</div>
-
-        <div class="grid">
-            <a href="farma.html" class="card">
-                <div class="icon-box">🌿</div>
-                <h2>CYBER FARMER</h2>
-                <p>Eksploruj neonowe pola, zbieraj rzadkie rośliny i buduj swoją cybernetyczną potęgę.</p>
-                <div class="enter-btn">URUCHOM GRĘ</div>
-            </a>
-            
-            <div class="card" style="opacity: 0.5; cursor: not-allowed;">
-                <div class="icon-box" style="filter: grayscale(1);">🔒</div>
-                <h2>COMING SOON</h2>
-                <p>Nowy projekt w przygotowaniu. Wkrótce kolejne wyzwania RGB.</p>
-                <div class="enter-btn">ZABLOKOWANE</div>
-            </div>
+    <div class="main-panel">
+        <h1>CYBER-BASE</h1>
+        
+        <div class="settings-box">
+            <label>TWÓJ CYBER-NICK:</label>
+            <input type="text" id="nickInput" placeholder="Wpisz nick...">
         </div>
+
+        <div class="audio-controls">
+            <button class="audio-btn" id="musicToggle">MUZYKA: OFF</button>
+        </div>
+
+        <br><br>
+        <a href="farma.html" class="btn" onclick="saveSettings()">START SIMULATION</a>
     </div>
 
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const music = document.getElementById('bgMusic');
+        const btn = document.getElementById('musicToggle');
+        const input = document.getElementById('nickInput');
+
+        // Wczytaj ustawienia
+        input.value = localStorage.getItem('nick') || "Player1";
+        let isPlaying = localStorage.getItem('musicOn') === 'true';
+
+        function updateMusic() {
+            if(isPlaying) {
+                music.play().catch(() => console.log("Czekam na interakcję..."));
+                btn.innerText = "MUZYKA: ON";
+                btn.style.borderColor = "#39ff14";
+            } else {
+                music.pause();
+                btn.innerText = "MUZYKA: OFF";
+                btn.style.borderColor = "red";
+            }
+        }
+
+        btn.onclick = () => {
+            isPlaying = !isPlaying;
+            localStorage.setItem('musicOn', isPlaying);
+            updateMusic();
+        };
+
+        function saveSettings() {
+            localStorage.setItem('nick', input.value);
+        }
+
+        // Próba auto-startu muzyki przy kliknięciu gdziekolwiek
+        window.onclick = () => { if(isPlaying) music.play(); };
+    </script>
 </body>
 </html>
