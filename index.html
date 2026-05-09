@@ -2,120 +2,146 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>KAPECKI AI - MYŚLĄCY CZAT</title>
+    <title>KAPECKI CLICKER - PETS & RGB</title>
     <style>
-        :root { --red: #ff0000; --dark: #0d0d0d; }
-        body { background: var(--dark); color: white; font-family: 'Arial', sans-serif; margin: 0; display: flex; height: 100vh; }
-        
-        /* SIDEBAR */
-        .sidebar { width: 250px; background: #000; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; }
-        .logo { color: var(--red); font-size: 22px; font-weight: bold; margin-bottom: 30px; text-shadow: 0 0 10px red; }
-        .stat-box { background: #111; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; border: 1px solid #333; }
-
-        /* CHAT */
-        .chat-area { flex-grow: 1; display: flex; flex-direction: column; }
-        #messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        
-        .msg { padding: 12px 18px; border-radius: 15px; max-width: 80%; line-height: 1.4; font-size: 15px; }
-        .user { align-self: flex-end; background: #333; border-bottom-right-radius: 2px; }
-        .ai { align-self: flex-start; background: #1a1a1a; border-left: 4px solid var(--red); border-bottom-left-radius: 2px; }
-
-        /* INPUT */
-        .input-zone { padding: 20px; background: #050505; border-top: 1px solid #222; }
-        input { width: 100%; background: #111; border: 1px solid #444; padding: 15px; border-radius: 10px; color: white; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--red); box-shadow: 0 0 15px rgba(255,0,0,0.3); }
-
-        /* MODAL PREMIUM */
-        #premium-modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
-            flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
+        :root { --red: #ff0000; --gold: #ffd700; }
+        body { 
+            background: #0a0a0a; color: white; font-family: 'Arial Black', sans-serif; 
+            margin: 0; display: flex; flex-direction: column; align-items: center; 
+            user-select: none; overflow-x: hidden;
         }
-        .p-card { background: #111; padding: 40px; border: 2px solid red; border-radius: 20px; text-align: center; box-shadow: 0 0 50px red; }
-        .btn { background: red; color: white; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+
+        /* NAGŁÓWEK */
+        .stats-bar { 
+            width: 100%; background: #111; padding: 20px; text-align: center; 
+            border-bottom: 3px solid var(--red); box-shadow: 0 0 20px red;
+        }
+        .points { font-size: 40px; color: var(--red); text-shadow: 0 0 10px red; }
+
+        /* GŁÓWNY PRZYCISK */
+        #main-clicker {
+            width: 200px; height: 200px; background: var(--red); border-radius: 50px;
+            margin: 50px; display: flex; align-items: center; justify-content: center;
+            font-size: 80px; cursor: pointer; transition: 0.1s;
+            box-shadow: 0 0 30px rgba(255,0,0,0.5); border: 5px solid white;
+        }
+        #main-clicker:active { transform: scale(0.9); }
+
+        /* SKLEP I JAJA */
+        .container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding: 20px; }
+        .card { 
+            background: #1a1a1a; padding: 20px; border-radius: 15px; border: 2px solid #333;
+            width: 250px; text-align: center; transition: 0.3s;
+        }
+        .card:hover { border-color: var(--red); }
+        .btn { 
+            background: var(--red); color: white; border: none; padding: 10px 20px; 
+            border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px;
+        }
+        .btn:disabled { background: #444; cursor: not-allowed; }
+
+        /* INWENTARZ PETÓW */
+        #pets-list { margin-top: 20px; color: var(--gold); font-size: 14px; }
+        .ultra-pet { border: 2px solid var(--gold) !important; box-shadow: 0 0 20px var(--gold); }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo">KAPECKI BRAIN AI</div>
-        <div class="stat-box">Wiadomości: <span id="count-ui">0</span> / 10</div>
-        <button class="btn" style="background: #222; font-size: 12px;" onclick="document.getElementById('premium-modal').style.display='flex'">💎 KUP PREMIUM</button>
+    <div class="stats-bar">
+        <div>TWOJE PUNKTY:</div>
+        <div id="points-display" class="points">0</div>
+        <div id="strength-display" style="font-size: 14px; color: #888;">Siła kliknięcia: 1</div>
     </div>
 
-    <div class="chat-area">
-        <div id="messages">
-            <div class="msg ai">Siema! Jestem Kapecki AI. Mam własne myślenie i 10 darmowych prób. Co tam u Ciebie?</div>
-        </div>
-        <div class="input-zone">
-            <input type="text" id="user-in" placeholder="Napisz do mnie (np. 'hej' lub 'podaj kraje')...">
-        </div>
-    </div>
+    <div id="main-clicker" onclick="clickMain()">K</div>
 
-    <div id="premium-modal">
-        <div class="p-card">
-            <h1 style="color:red">LIMIT OSIĄGNIĘTY!</h1>
-            <p>Poczekaj 10 minut lub kup wersję bez limitu.</p>
-            <button class="btn">ODBLOKUJ PREMIUM - 19.99 PLN</button>
-            <p style="margin-top:20px; font-size: 12px; cursor:pointer" onclick="location.reload()">Odśwież (Resetuj)</p>
+    <div class="container">
+        <div class="card">
+            <h3>UPGRADE</h3>
+            <p>Większa siła kliku</p>
+            <button class="btn" onclick="buyUpgrade()" id="up-btn">KUP (100 pkt)</button>
+        </div>
+
+        <div class="card">
+            <h3>JAJKO RGB</h3>
+            <p>Wylosuj zwierzaka</p>
+            <button class="btn" onclick="buyEgg()" id="egg-btn">OTWÓRZ (500 pkt)</button>
+            <div id="pets-list">Pety: brak</div>
+        </div>
+
+        <div class="card ultra-pet">
+            <h3 style="color:var(--gold)">ULTRA PET</h3>
+            <p>+150% mocy najlepszego peta i x2 baza!</p>
+            <button class="btn" style="background:var(--gold); color:black" onclick="buyUltraPet()" id="ultra-btn">ODBLOKUJ (5000 pkt)</button>
         </div>
     </div>
 
     <script>
-        let msgCount = 0;
-        const input = document.getElementById('user-in');
-        const box = document.getElementById('messages');
+        let points = 0;
+        let basePower = 1;
+        let petPower = 0;
+        let upgradeCost = 100;
+        let eggCost = 500;
+        let ultraCost = 5000;
+        let myPets = [];
 
-        function addMsg(txt, type) {
-            const d = document.createElement('div');
-            d.className = `msg ${type}`;
-            d.innerText = txt;
-            box.appendChild(d);
-            box.scrollTop = box.scrollHeight;
-        }
-
-        // --- LOGIKA "MÓZGU" AI ---
-        function getAiResponse(userText) {
-            const text = userText.toLowerCase();
-
-            if (text.includes("hej") || text.includes("siema") || text.includes("cześć")) {
-                return "No siema! Co tam słychać w świecie RGB? Ja właśnie analizuję kod Twojego kanału!";
-            }
+        function updateUI() {
+            document.getElementById('points-display').innerText = Math.floor(points);
+            document.getElementById('strength-display').innerText = `Siła kliknięcia: ${basePower + petPower}`;
+            document.getElementById('up-btn').innerText = `KUP (${upgradeCost} pkt)`;
+            document.getElementById('pets-list').innerText = "Pety: " + (myPets.length > 0 ? myPets.join(", ") : "brak");
             
-            if (text.includes("kraj") || text.includes("państw")) {
-                return "Oto 10 krajów, które wybrałem dla Ciebie (moje ulubione):\n1. Polska (Najlepszy vibe)\n2. Japonia (Elektronika 10/10)\n3. USA (Gaming)\n4. Niemcy\n5. Islandia (Zimno, ale ładnie)\n6. Brazylia\n7. Włochy (Dobra pizza)\n8. Hiszpania\n9. Egipt\n10. Norwegia.\nCo o nich sądzisz?";
-            }
-
-            if (text.includes("kapecki")) {
-                return "Kapecki to mój stwórca. Gość ma najlepsze pomysły na skrypty, serio!";
-            }
-
-            return "Ciekawe... Moje obwody przetwarzają to pytanie o '" + userText + "'. Brzmi to sensownie, ale jako AI muszę przyznać, że to głęboki temat. Chcesz pogadać o tym więcej?";
+            // Sprawdzanie dostępności
+            document.getElementById('up-btn').disabled = points < upgradeCost;
+            document.getElementById('egg-btn').disabled = points < eggCost;
+            document.getElementById('ultra-btn').disabled = points < ultraCost;
         }
 
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && input.value.trim() !== "") {
-                if (msgCount >= 10) {
-                    document.getElementById('premium-modal').style.display = 'flex';
-                    return;
-                }
+        function clickMain() {
+            points += (basePower + petPower);
+            updateUI();
+        }
 
-                const userVal = input.value;
-                addMsg(userVal, 'user');
-                input.value = "";
-
-                // Myślenie AI
-                setTimeout(() => {
-                    const response = getAiResponse(userVal);
-                    addMsg(response, 'ai');
-                    msgCount++;
-                    document.getElementById('count-ui').innerText = msgCount;
-                    
-                    if (msgCount >= 10) {
-                        setTimeout(() => { document.getElementById('premium-modal').style.display = 'flex'; }, 1000);
-                    }
-                }, 800);
+        function buyUpgrade() {
+            if (points >= upgradeCost) {
+                points -= upgradeCost;
+                basePower += 2;
+                upgradeCost = Math.floor(upgradeCost * 1.5);
+                updateUI();
             }
-        });
+        }
+
+        function buyEgg() {
+            if (points >= eggCost) {
+                points -= eggCost;
+                const power = Math.floor(Math.random() * 10) + 5;
+                myPets.push(`Pet(+${power})`);
+                petPower += power;
+                updateUI();
+            }
+        }
+
+        function buyUltraPet() {
+            if (points >= ultraCost) {
+                points -= ultraCost;
+                
+                // Logika: 150% najlepszego peta + baza x2
+                let bestPetValue = myPets.length > 0 ? Math.max(...myPets.map(p => parseInt(p.match(/\d+/)))) : 0;
+                
+                // Twój wymóg: Lepszy o 150% od najlepszego i baza x2
+                let boost = (bestPetValue * 1.5) + (basePower * 2);
+                if (boost === 0) boost = 50; // Jeśli nie masz petów, daje bazowe 50
+
+                petPower += boost;
+                myPets.push(`ULTRA-K(+${Math.floor(boost)})`);
+                
+                ultraCost *= 2; // Następny jest droższy
+                updateUI();
+                alert("ZDOBYŁEŚ ULTRA PETA! Twoja siła wystrzeliła!");
+            }
+        }
+
+        updateUI();
     </script>
 </body>
 </html>
