@@ -3,270 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAPECKI - DISCORD HUB</title>
+    <title>KAPECKI - LIVE DISCORD</title>
     <style>
         :root {
             --bg-main: #313338;
             --bg-sidebar: #1e1f22;
             --bg-channels: #2b2d31;
-            --accent-rgb: #ff0000;
+            --accent-red: #ff0000;
             --text-primary: #f2f3f5;
             --text-muted: #949ba4;
         }
 
-        /* TĘCZOWA ANIMACJA RGB DLA ELEMENTÓW */
-        @keyframes rgb-glow {
-            0% { border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
-            33% { border-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
-            66% { border-color: #0000ff; box-shadow: 0 0 10px #0000ff; }
-            100% { border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
-        }
-
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'gg sans', 'Noto Sans', sans-serif;
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-main);
             color: var(--text-primary);
-            display: flex;
-            overflow: hidden;
+            display: flex; overflow: hidden;
         }
 
-        /* 1. PASEK SERWERÓW (LEWA) */
-        .server-bar {
-            width: 72px;
-            background-color: var(--bg-sidebar);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 12px;
-            gap: 8px;
+        /* RGB ANIMACJA DLA LOGO */
+        @keyframes rgb-border {
+            0% { box-shadow: 0 0 15px red; }
+            50% { box-shadow: 0 0 15px #ff00ff; }
+            100% { box-shadow: 0 0 15px red; }
         }
 
-        .server-icon {
-            width: 48px;
-            height: 48px;
-            background-color: var(--accent-rgb);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 2px solid transparent;
+        /* BOCZNY PASEK SERWERÓW */
+        .server-sidebar {
+            width: 72px; background-color: var(--bg-sidebar);
+            display: flex; flex-direction: column; align-items: center; padding-top: 12px; gap: 10px;
         }
 
-        .server-icon:hover {
-            border-radius: 15px;
-            animation: rgb-glow 3s linear infinite;
+        .server-btn {
+            width: 48px; height: 48px; background-color: var(--accent-red);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 20px; cursor: pointer; transition: 0.2s;
+            color: white; text-decoration: none;
+            animation: rgb-border 3s infinite;
         }
 
-        /* 2. LISTA KANAŁÓW */
-        .channels-bar {
-            width: 240px;
-            background-color: var(--bg-channels);
-            display: flex;
-            flex-direction: column;
+        .server-btn:hover { border-radius: 15px; background-color: #cc0000; }
+
+        /* LISTA KANAŁÓW */
+        .channel-sidebar {
+            width: 240px; background-color: var(--bg-channels);
+            display: flex; flex-direction: column;
         }
 
         .header {
-            height: 48px;
-            padding: 0 16px;
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            border-bottom: 1px solid #232428;
+            height: 48px; padding: 0 16px; display: flex; align-items: center;
+            font-weight: bold; border-bottom: 1px solid #232428;
         }
 
-        .channel-list {
-            padding: 12px 8px;
-            flex-grow: 1;
+        .channel-list { padding: 10px; flex-grow: 1; }
+        .channel {
+            padding: 8px; border-radius: 4px; color: var(--text-muted);
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+        }
+        .channel:hover, .channel.active { background-color: #3f4147; color: white; }
+
+        /* GŁÓWNY CZAT */
+        .chat-container { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        
+        #messages-flow {
+            flex-grow: 1; padding: 20px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 15px;
         }
 
-        .category {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 8px;
-            margin-top: 16px;
-        }
+        .msg-card { display: flex; gap: 15px; position: relative; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .channel-item {
-            padding: 6px 8px;
-            border-radius: 4px;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .avatar { width: 40px; height: 40px; background: red; border-radius: 50%; flex-shrink: 0; }
+        
+        .msg-body b { color: #fff; font-size: 14px; }
+        .msg-text { color: #dcdee1; margin-top: 4px; word-break: break-all; }
 
-        .channel-item:hover {
-            background-color: #3f4147;
-            color: white;
+        .delete-btn {
+            position: absolute; right: 10px; top: 0;
+            color: #ed4245; cursor: pointer; font-size: 12px;
+            display: none; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px;
         }
+        .msg-card:hover .delete-btn { display: block; }
 
-        .channel-item.active {
-            background-color: #3f4147;
-            color: white;
-            border-left: 3px solid red;
-        }
-
-        /* 3. OKNO CZATU (ŚRODEK) */
-        .chat-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .message {
-            display: flex;
-            gap: 16px;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #5865f2;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .msg-content b {
-            color: #ffffff;
-            margin-right: 8px;
-        }
-
-        .msg-text {
-            color: #dbdee1;
-            margin-top: 4px;
-        }
-
-        .input-area {
-            padding: 0 16px 24px;
-        }
-
-        .chat-input {
-            width: 100%;
-            background-color: #383a40;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            color: white;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        /* 4. LISTA OSÓB (PRAWA) */
-        .members-bar {
-            width: 240px;
-            background-color: var(--bg-channels);
-            padding: 12px 8px;
-        }
-
-        .member {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 6px 8px;
-            border-radius: 4px;
-            color: var(--text-muted);
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #23a55a;
-            border-radius: 50%;
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            border: 2px solid var(--bg-channels);
-        }
-
-        .avatar-container {
-            position: relative;
+        /* POLE WPISYWANIA */
+        .input-box { padding: 0 20px 24px; }
+        #chat-input {
+            width: 100%; background: #383a40; border: none; padding: 15px;
+            border-radius: 8px; color: white; outline: none; font-size: 15px;
         }
     </style>
 </head>
 <body>
 
-    <div class="server-bar">
-        <a href="https://www.youtube.com/@Kapecki" target="_blank" style="text-decoration: none; color: white;">
-            <div class="server-icon" style="background-color: #ff0000;">K</div>
-        </a>
-        <div style="width: 32px; height: 2px; background: #35363c; margin: 4px 0;"></div>
-        <div class="server-icon" style="background-color: #313338;">+</div>
+    <div class="server-sidebar">
+        <a href="https://www.youtube.com/@Kapecki" target="_blank" class="server-btn">K</a>
     </div>
 
-    <div class="channels-bar">
-        <div class="header">KAPECKI OFFICIAL</div>
+    <div class="channel-sidebar">
+        <div class="header">KAPECKI HUB</div>
         <div class="channel-list">
-            <div class="category">Kanały tekstowe</div>
-            <div class="channel-item active"># ogólny</div>
-            <div class="channel-item"># pomoc-it</div>
-            <div class="channel-item"># setup-rgb</div>
-            <div class="category">Linki</div>
-            <a href="https://www.youtube.com/@Kapecki" style="text-decoration:none">
-                <div class="channel-item"># mój-youtube</div>
-            </a>
+            <div class="channel active"># ogólny</div>
+            <div class="channel"># projekty-rgb</div>
+            <div class="channel"># pomoc</div>
         </div>
     </div>
 
-    <div class="chat-area">
+    <div class="chat-container">
         <div class="header"># ogólny</div>
-        <div class="chat-messages">
-            <div class="message">
-                <div class="avatar" style="background-color: red;"></div>
-                <div class="msg-content">
-                    <b>Kapecki (Właściciel)</b> <span style="font-size: 12px; color: grey;">Dzisiaj o 12:00</span>
-                    <div class="msg-text">Witaj na moim nowym hubie RGB! Kliknij logo po lewej, żeby wejść na YT.</div>
-                </div>
-            </div>
-            <div class="message">
-                <div class="avatar" style="background-color: #5865f2;"></div>
-                <div class="msg-content">
-                    <b>System Bot</b> <span style="font-size: 12px; color: grey;">Dzisiaj o 12:01</span>
-                    <div class="msg-text">Wykryto ultra wysoki poziom RGB! Strona działa poprawnie. 🚀</div>
+        <div id="messages-flow">
+            <div class="msg-card">
+                <div class="avatar" style="background: #5865f2;"></div>
+                <div class="msg-body">
+                    <b>System Bot</b> <span style="color:gray; font-size:10px;">TERAZ</span>
+                    <div class="msg-text">Witaj na pokładzie! Możesz tu pisać i usuwać wiadomości. 🔥</div>
                 </div>
             </div>
         </div>
-        <div class="input-area">
-            <input type="text" class="chat-input" placeholder="Napisz na #ogólny">
+
+        <div class="input-box">
+            <input type="text" id="chat-input" placeholder="Napisz coś i kliknij Enter...">
         </div>
     </div>
 
-    <div class="members-bar">
-        <div class="category">Dostępni — 1</div>
-        <div class="member">
-            <div class="avatar-container">
-                <div class="avatar" style="width: 32px; height: 32px; background-color: red;"></div>
-                <div class="status-dot"></div>
-            </div>
-            <span>Kapecki</span>
-        </div>
-        <div class="category">Boty — 1</div>
-        <div class="member">
-            <div class="avatar-container">
-                <div class="avatar" style="width: 32px; height: 32px; background-color: #5865f2;"></div>
-            </div>
-            <span>RGB-Bot</span>
-        </div>
-    </div>
+    <script>
+        const input = document.getElementById('chat-input');
+        const flow = document.getElementById('messages-flow');
+
+        // Funkcja dodawania wiadomości
+        function addMessage(text) {
+            const now = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg-card';
+            msgDiv.innerHTML = `
+                <div class="avatar"></div>
+                <div class="msg-body">
+                    <b>Ty (Kapecki)</b> <span style="color:gray; font-size:10px;">Dziś o ${now}</span>
+                    <div class="msg-text">${text}</div>
+                </div>
+                <div class="delete-btn" onclick="this.parentElement.remove()">USUŃ</div>
+            `;
+            flow.appendChild(msgDiv);
+            flow.scrollTop = flow.scrollHeight; // Przewiń na dół
+        }
+
+        // Obsługa klawisza Enter
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                addMessage(input.value);
+                input.value = ""; // Wyczyść pole
+            }
+        });
+    </script>
 
 </body>
 </html>
