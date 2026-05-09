@@ -3,100 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAPECKI - OFFICIAL RGB HUB</title>
+    <title>KAPECKI - DISCORD HUB</title>
     <style>
-        /* Animacja tęczowego tła */
-        @keyframes rainbowBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        :root {
+            --bg-main: #313338;
+            --bg-sidebar: #1e1f22;
+            --bg-channels: #2b2d31;
+            --accent-rgb: #ff0000;
+            --text-primary: #f2f3f5;
+            --text-muted: #949ba4;
         }
 
-        body {
+        /* TĘCZOWA ANIMACJA RGB DLA ELEMENTÓW */
+        @keyframes rgb-glow {
+            0% { border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+            33% { border-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
+            66% { border-color: #0000ff; box-shadow: 0 0 10px #0000ff; }
+            100% { border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        }
+
+        body, html {
             margin: 0;
             padding: 0;
+            height: 100%;
+            font-family: 'gg sans', 'Noto Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            /* Gradient RGB */
-            background: linear-gradient(-45deg, #ff0000, #ff00ff, #0000ff, #00ff00);
-            background-size: 400% 400%;
-            animation: rainbowBG 10s ease infinite;
-            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
         }
 
-        /* Kontener na logo */
-        .hub-container {
-            text-align: center;
-            z-index: 10;
+        /* 1. PASEK SERWERÓW (LEWA) */
+        .server-bar {
+            width: 72px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 12px;
+            gap: 8px;
         }
 
-        /* Twoje Logo z YT */
-        .logo-circle {
-            width: 200px;
-            height: 200px;
+        .server-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--accent-rgb);
             border-radius: 50%;
-            background: url('https://yt3.googleusercontent.com/ytc/AIdro_n8ePZ89A083jZ8q9O49S9O49S9O49S9O49S9O4=s176-c-k-c0x00ffffff-no-rj') no-repeat center;
-            background-size: cover;
-            border: 8px solid white;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 0, 0, 0.6);
-            display: inline-block;
-            cursor: pointer;
-            transition: 0.4s;
-            animation: pulseLogo 2s infinite alternate;
-        }
-
-        .logo-circle:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 100px rgba(255, 255, 255, 1);
-        }
-
-        @keyframes pulseLogo {
-            from { transform: scale(1); box-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
-            to { transform: scale(1.05); box-shadow: 0 0 70px rgba(255, 0, 0, 1); }
-        }
-
-        h1 {
-            color: white;
-            font-size: 3.5rem;
-            text-shadow: 0 0 20px black, 0 0 10px rgba(255,255,255,0.5);
-            margin-top: 20px;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-        }
-
-        .btn-visit {
-            margin-top: 20px;
-            padding: 15px 40px;
-            background: white;
-            color: black;
-            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            transition: 0.3s;
-            display: inline-block;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
         }
 
-        .btn-visit:hover {
-            background: #ff0000;
+        .server-icon:hover {
+            border-radius: 15px;
+            animation: rgb-glow 3s linear infinite;
+        }
+
+        /* 2. LISTA KANAŁÓW */
+        .channels-bar {
+            width: 240px;
+            background-color: var(--bg-channels);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 48px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            border-bottom: 1px solid #232428;
+        }
+
+        .channel-list {
+            padding: 12px 8px;
+            flex-grow: 1;
+        }
+
+        .category {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+
+        .channel-item {
+            padding: 6px 8px;
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .channel-item:hover {
+            background-color: #3f4147;
             color: white;
-            transform: translateY(-5px);
+        }
+
+        .channel-item.active {
+            background-color: #3f4147;
+            color: white;
+            border-left: 3px solid red;
+        }
+
+        /* 3. OKNO CZATU (ŚRODEK) */
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 16px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #5865f2;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .msg-content b {
+            color: #ffffff;
+            margin-right: 8px;
+        }
+
+        .msg-text {
+            color: #dbdee1;
+            margin-top: 4px;
+        }
+
+        .input-area {
+            padding: 0 16px 24px;
+        }
+
+        .chat-input {
+            width: 100%;
+            background-color: #383a40;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* 4. LISTA OSÓB (PRAWA) */
+        .members-bar {
+            width: 240px;
+            background-color: var(--bg-channels);
+            padding: 12px 8px;
+        }
+
+        .member {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 8px;
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #23a55a;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 2px solid var(--bg-channels);
+        }
+
+        .avatar-container {
+            position: relative;
         }
     </style>
 </head>
 <body>
 
-    <div class="hub-container">
-        <a href="https://www.youtube.com/@Kapecki" target="_blank">
-            <div class="logo-circle"></div>
+    <div class="server-bar">
+        <a href="https://www.youtube.com/@Kapecki" target="_blank" style="text-decoration: none; color: white;">
+            <div class="server-icon" style="background-color: #ff0000;">K</div>
         </a>
-        <h1>KAPECKI</h1>
-        <p style="color: white; font-weight: bold;">EXPLORE THE RGB JOURNEY</p>
-        <a href="https://www.youtube.com/@Kapecki" target="_blank" class="btn-visit">SUBSKRYBUJ</a>
+        <div style="width: 32px; height: 2px; background: #35363c; margin: 4px 0;"></div>
+        <div class="server-icon" style="background-color: #313338;">+</div>
+    </div>
+
+    <div class="channels-bar">
+        <div class="header">KAPECKI OFFICIAL</div>
+        <div class="channel-list">
+            <div class="category">Kanały tekstowe</div>
+            <div class="channel-item active"># ogólny</div>
+            <div class="channel-item"># pomoc-it</div>
+            <div class="channel-item"># setup-rgb</div>
+            <div class="category">Linki</div>
+            <a href="https://www.youtube.com/@Kapecki" style="text-decoration:none">
+                <div class="channel-item"># mój-youtube</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="chat-area">
+        <div class="header"># ogólny</div>
+        <div class="chat-messages">
+            <div class="message">
+                <div class="avatar" style="background-color: red;"></div>
+                <div class="msg-content">
+                    <b>Kapecki (Właściciel)</b> <span style="font-size: 12px; color: grey;">Dzisiaj o 12:00</span>
+                    <div class="msg-text">Witaj na moim nowym hubie RGB! Kliknij logo po lewej, żeby wejść na YT.</div>
+                </div>
+            </div>
+            <div class="message">
+                <div class="avatar" style="background-color: #5865f2;"></div>
+                <div class="msg-content">
+                    <b>System Bot</b> <span style="font-size: 12px; color: grey;">Dzisiaj o 12:01</span>
+                    <div class="msg-text">Wykryto ultra wysoki poziom RGB! Strona działa poprawnie. 🚀</div>
+                </div>
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" class="chat-input" placeholder="Napisz na #ogólny">
+        </div>
+    </div>
+
+    <div class="members-bar">
+        <div class="category">Dostępni — 1</div>
+        <div class="member">
+            <div class="avatar-container">
+                <div class="avatar" style="width: 32px; height: 32px; background-color: red;"></div>
+                <div class="status-dot"></div>
+            </div>
+            <span>Kapecki</span>
+        </div>
+        <div class="category">Boty — 1</div>
+        <div class="member">
+            <div class="avatar-container">
+                <div class="avatar" style="width: 32px; height: 32px; background-color: #5865f2;"></div>
+            </div>
+            <span>RGB-Bot</span>
+        </div>
     </div>
 
 </body>
