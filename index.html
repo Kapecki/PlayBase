@@ -2,180 +2,156 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAPECKI MULTIVERSUM</title>
+    <title>KAPECKI AI - LIMITLESS</title>
     <style>
         :root {
-            --primary: #ff0000;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --rgb-red: #ff0000;
+            --bg-dark: #0f0f0f;
+            --glass: rgba(255, 255, 255, 0.07);
         }
 
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            background: #050505; color: white;
-            font-family: 'Orbitron', sans-serif; /* Futurystyczna czcionka */
-            display: flex; overflow: hidden;
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0; display: flex; height: 100vh;
         }
 
-        /* ANIMOWANE TŁO RGB MESH */
-        .bg-animate {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #200000 0%, #000 100%);
-            z-index: -1;
+        /* BOCZNE MENU */
+        .sidebar {
+            width: 260px; background: #000; border-right: 1px solid #333;
+            display: flex; flex-direction: column; padding: 15px;
         }
 
-        /* GŁÓWNY PULPIT */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 80px 300px 1fr 300px;
-            width: 100%; height: 100vh;
-            padding: 10px; gap: 10px; box-sizing: border-box;
+        .nav-item {
+            padding: 12px; margin-bottom: 5px; border-radius: 8px;
+            cursor: pointer; transition: 0.3s; color: #ccc;
         }
 
-        .panel {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            display: flex; flex-direction: column;
-            transition: 0.3s;
-        }
-
-        .panel:hover { border-color: var(--primary); box-shadow: 0 0 20px rgba(255,0,0,0.2); }
-
-        /* LOGO K - PULSUJĄCE */
-        .logo-k {
-            width: 60px; height: 60px; background: var(--primary);
-            margin: 10px auto; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px; font-weight: bold; cursor: pointer;
-            animation: pulse 2s infinite; text-decoration: none; color: white;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 10px red; }
-            50% { transform: scale(1.1); box-shadow: 0 0 30px red; }
-            100% { transform: scale(1); box-shadow: 0 0 10px red; }
-        }
-
-        /* CZAT MODUŁOWY */
-        #chat-flow {
-            flex-grow: 1; padding: 20px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 15px;
-        }
-
-        .msg {
-            background: rgba(255,255,255,0.03);
-            padding: 12px; border-radius: 12px;
-            border-left: 4px solid var(--primary);
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } }
-
-        /* INPUT W STYLU CYBERPUNK */
-        .input-wrapper { padding: 20px; }
-        #user-input {
-            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
-            padding: 15px; border-radius: 10px; color: #ff0000;
-            outline: none; font-weight: bold; text-transform: uppercase;
-        }
-
-        /* WIDGETY */
-        .widget { padding: 20px; border-bottom: 1px solid var(--border); }
-        .stat { font-size: 24px; color: var(--primary); font-weight: bold; }
+        .nav-item:hover { background: var(--glass); color: white; }
         
+        .premium-btn {
+            background: linear-gradient(45deg, #ff0000, #ff8800);
+            color: white; font-weight: bold; border: none; margin-top: auto;
+            padding: 15px; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+        }
+
+        /* GŁÓWNY CZAT */
+        .chat-main { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        
+        #chat-window {
+            flex-grow: 1; padding: 30px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .msg { padding: 15px; border-radius: 10px; max-width: 80%; line-height: 1.5; }
+        .user-msg { background: #2f2f2f; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai-msg { background: var(--glass); align-self: flex-start; border-left: 4px solid red; }
+
+        /* STOPKA Z INPUTEM */
+        .input-area { padding: 20px 100px; background: var(--bg-dark); }
+        .input-container { position: relative; display: flex; align-items: center; }
+
+        input {
+            width: 100%; background: #222; border: 1px solid #444; padding: 15px;
+            border-radius: 12px; color: white; outline: none; font-size: 16px;
+        }
+
+        input:disabled { opacity: 0.5; cursor: not-allowed; border-color: red; }
+
+        /* EKRAN BLOKADY / PREMIUM */
+        #lock-screen {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            z-index: 100; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+
+        .limit-text { color: red; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="bg-animate" id="bg"></div>
+    <div class="sidebar">
+        <h2 style="color:red; letter-spacing: 2px;">KAPECKI AI</h2>
+        <div class="nav-item" onclick="location.reload()">+ Nowy czat</div>
+        <div class="nav-item">Historia</div>
+        <div class="nav-item" onclick="showPremium()">⭐ Moje konto</div>
+        
+        <button class="premium-btn" onclick="showPremium()">KUP PREMIUM</button>
+    </div>
 
-    <div class="dashboard">
-        <div class="panel">
-            <a href="https://www.youtube.com/@Kapecki" target="_blank" class="logo-k">K</a>
+    <div class="chat-main">
+        <div id="lock-screen">
+            <div class="limit-text">LIMIT WIADOMOŚCI OSIĄGNIĘTY!</div>
+            <p>Wykorzystałeś darmowe 10 wiadomości.</p>
+            <p style="color: #888;">Poczekaj 10 minut lub odblokuj teraz:</p>
+            <button class="premium-btn" style="width: 250px;">ODBLOKUJ PREMIUM - 19,99 PLN</button>
+            <br>
+            <a href="#" onclick="hidePremium()" style="color:white; font-size: 12px;">Wróć do czatu</a>
         </div>
 
-        <div class="panel">
-            <div class="widget">
-                <div style="font-size: 12px; opacity: 0.5;">STATUS SYSTEMU</div>
-                <div class="stat">ONLINE</div>
-            </div>
-            <div style="padding: 20px;">
-                <p># MULTIVERSUM</p>
-                <p># RGB-CORE</p>
-                <p># YT-LIVE</p>
-            </div>
+        <div id="chat-window">
+            <div class="msg ai-msg">Cześć! Jestem Twoim AI. Mam dla Ciebie 10 darmowych wiadomości. O czym chcesz pogadać?</div>
         </div>
 
-        <div class="panel">
-            <div id="chat-flow">
-                <div class="msg"><b>SYSTEM:</b> Witaj w Multiversum Kapeckiego. Wpisz polecenie...</div>
-            </div>
-            <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="WPISZ WIADOMOŚĆ LUB 'RGB'...">
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="widget">
-                <div style="font-size: 12px; opacity: 0.5;">CZAS SESJI</div>
-                <div id="clock" class="stat">00:00:00</div>
-            </div>
-            <div class="widget">
-                <div style="font-size: 12px; opacity: 0.5;">MOC RGB</div>
-                <div class="stat">100%</div>
+        <div class="input-area">
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="Napisz coś...">
+                <div id="counter" style="position:absolute; right: -80px; color: #555;">0/10</div>
             </div>
         </div>
     </div>
 
     <script>
+        let msgCount = 0;
+        const maxMsgs = 10;
         const input = document.getElementById('user-input');
-        const chat = document.getElementById('chat-flow');
-        const bg = document.getElementById('bg');
+        const chatWindow = document.getElementById('chat-window');
+        const lockScreen = document.getElementById('lock-screen');
+        const counter = document.getElementById('counter');
 
-        // Zegar
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
+        function showPremium() { lockScreen.style.display = 'flex'; }
+        function hidePremium() { lockScreen.style.display = 'none'; }
 
         input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && input.value !== "") {
-                const val = input.value.toUpperCase();
-                
-                // Dodaj wiadomość
-                const m = document.createElement('div');
-                m.className = 'msg';
-                m.innerHTML = `<b>TY:</b> ${input.value}`;
-                chat.appendChild(m);
-                chat.scrollTop = chat.scrollHeight;
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                if (msgCount >= maxMsgs) {
+                    showPremium();
+                    return;
+                }
 
-                // Specjalna komenda RGB
-                if (val === 'RGB') {
-                    bg.style.background = "linear-gradient(45deg, red, blue, green, yellow)";
-                    bg.style.backgroundSize = "400% 400%";
-                    bg.style.animation = "rainbow 2s infinite linear";
-                    
-                    const botMsg = document.createElement('div');
-                    botMsg.className = 'msg';
-                    botMsg.style.borderColor = 'lime';
-                    botMsg.innerHTML = `<b>SYSTEM:</b> TRYB RGB AKTYWOWANY! 🌈`;
-                    chat.appendChild(botMsg);
+                // Dodaj wiadomość użytkownika
+                const userMsg = document.createElement('div');
+                userMsg.className = 'msg user-msg';
+                userMsg.innerText = input.value;
+                chatWindow.appendChild(userMsg);
+
+                // Symuluj odpowiedź AI
+                setTimeout(() => {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'msg ai-msg';
+                    aiMsg.innerText = "To ciekawe! Jako Twoje AI mogę Ci powiedzieć, że " + input.value + " to świetny temat. Co jeszcze?";
+                    chatWindow.appendChild(aiMsg);
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                }, 600);
+
+                msgCount++;
+                counter.innerText = `${msgCount}/${maxMsgs}`;
+                
+                if (msgCount >= maxMsgs) {
+                    counter.style.color = 'red';
+                    input.disabled = true;
+                    input.placeholder = "LIMIT OSIĄGNIĘTY!";
+                    setTimeout(showPremium, 1500);
                 }
 
                 input.value = "";
+                chatWindow.scrollTop = chatWindow.scrollHeight;
             }
         });
     </script>
-
-    <style>
-        @keyframes rainbow {
-            0% {background-position: 0% 50%}
-            50% {background-position: 100% 50%}
-            100% {background-position: 0% 50%}
-        }
-    </style>
 
 </body>
 </html>
