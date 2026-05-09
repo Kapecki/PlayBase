@@ -2,62 +2,91 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Kapecki - Logo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kapecki - YouTube</title>
     <style>
+        /* Styl tła - czarny i elegancki */
         body {
-            background-color: #000; /* Czarne tło, żeby czerwony "bił" po oczach */
+            background-color: #0b0b0b;
             margin: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            font-family: 'Arial', sans-serif;
+            color: white;
             overflow: hidden;
         }
 
-        .logo-link {
-            text-decoration: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* Kontener na logo */
+        .container {
+            text-align: center;
         }
 
-        /* To jest Twoje czerwone logo "K" */
-        .red-logo {
-            width: 150px;
-            height: 150px;
+        /* Styl czerwonego logo "K" */
+        .logo {
+            width: 140px;
+            height: 140px;
             background-color: #ff0000;
-            color: white;
-            font-family: 'Arial Black', sans-serif;
-            font-size: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 30px; /* Zaokrąglone rogi jak w ikonie */
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.7);
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 35px; /* Zaokrąglone rogi jak w ikonie */
+            font-size: 90px;
+            font-weight: 900;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.6);
+            transition: all 0.3s ease;
             cursor: pointer;
             user-select: none;
-            animation: glow 2s infinite alternate;
+            animation: float 3s ease-in-out infinite; /* Logo będzie "pływać" */
         }
 
-        /* Efekt najechania myszką */
-        .red-logo:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 80px rgba(255, 0, 0, 1);
+        /* Efekt po najechaniu myszką */
+        .logo:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 70px rgba(255, 0, 0, 0.9);
+            background-color: #ff2222;
         }
 
-        /* Animacja świecenia */
-        @keyframes glow {
-            from { box-shadow: 0 0 30px rgba(255, 0, 0, 0.5); }
-            to { box-shadow: 0 0 60px rgba(255, 0, 0, 0.9); }
+        /* Napis pod spodem */
+        .sub-text {
+            margin-top: 30px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        /* Animacja pływania logo */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Dodatkowy efekt RGB w tle (bardzo delikatny) */
+        .bg-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,0,0,0.2) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
         }
     </style>
 </head>
 <body>
 
-    <a href="https://www.youtube.com/@Kapecki" target="_blank" class="logo-link">
-        <div class="red-logo">K</div>
-    </a>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <a href="https://www.youtube.com/@Kapecki" target="_blank" class="logo">
+            K
+        </a>
+        <div class="sub-text">Kliknij logo, aby wejść</div>
+    </div>
 
 </body>
 </html>
