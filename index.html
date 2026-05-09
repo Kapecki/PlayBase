@@ -2,156 +2,120 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>KAPECKI AI - LIMITLESS</title>
+    <title>KAPECKI AI - MYŚLĄCY CZAT</title>
     <style>
-        :root {
-            --rgb-red: #ff0000;
-            --bg-dark: #0f0f0f;
-            --glass: rgba(255, 255, 255, 0.07);
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0; display: flex; height: 100vh;
-        }
-
-        /* BOCZNE MENU */
-        .sidebar {
-            width: 260px; background: #000; border-right: 1px solid #333;
-            display: flex; flex-direction: column; padding: 15px;
-        }
-
-        .nav-item {
-            padding: 12px; margin-bottom: 5px; border-radius: 8px;
-            cursor: pointer; transition: 0.3s; color: #ccc;
-        }
-
-        .nav-item:hover { background: var(--glass); color: white; }
+        :root { --red: #ff0000; --dark: #0d0d0d; }
+        body { background: var(--dark); color: white; font-family: 'Arial', sans-serif; margin: 0; display: flex; height: 100vh; }
         
-        .premium-btn {
-            background: linear-gradient(45deg, #ff0000, #ff8800);
-            color: white; font-weight: bold; border: none; margin-top: auto;
-            padding: 15px; border-radius: 10px; cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
-        }
+        /* SIDEBAR */
+        .sidebar { width: 250px; background: #000; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; }
+        .logo { color: var(--red); font-size: 22px; font-weight: bold; margin-bottom: 30px; text-shadow: 0 0 10px red; }
+        .stat-box { background: #111; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; border: 1px solid #333; }
 
-        /* GŁÓWNY CZAT */
-        .chat-main { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        /* CHAT */
+        .chat-area { flex-grow: 1; display: flex; flex-direction: column; }
+        #messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        #chat-window {
-            flex-grow: 1; padding: 30px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 20px;
+        .msg { padding: 12px 18px; border-radius: 15px; max-width: 80%; line-height: 1.4; font-size: 15px; }
+        .user { align-self: flex-end; background: #333; border-bottom-right-radius: 2px; }
+        .ai { align-self: flex-start; background: #1a1a1a; border-left: 4px solid var(--red); border-bottom-left-radius: 2px; }
+
+        /* INPUT */
+        .input-zone { padding: 20px; background: #050505; border-top: 1px solid #222; }
+        input { width: 100%; background: #111; border: 1px solid #444; padding: 15px; border-radius: 10px; color: white; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--red); box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+
+        /* MODAL PREMIUM */
+        #premium-modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
+            flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
         }
-
-        .msg { padding: 15px; border-radius: 10px; max-width: 80%; line-height: 1.5; }
-        .user-msg { background: #2f2f2f; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .ai-msg { background: var(--glass); align-self: flex-start; border-left: 4px solid red; }
-
-        /* STOPKA Z INPUTEM */
-        .input-area { padding: 20px 100px; background: var(--bg-dark); }
-        .input-container { position: relative; display: flex; align-items: center; }
-
-        input {
-            width: 100%; background: #222; border: 1px solid #444; padding: 15px;
-            border-radius: 12px; color: white; outline: none; font-size: 16px;
-        }
-
-        input:disabled { opacity: 0.5; cursor: not-allowed; border-color: red; }
-
-        /* EKRAN BLOKADY / PREMIUM */
-        #lock-screen {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
-            z-index: 100; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center;
-        }
-
-        .limit-text { color: red; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .p-card { background: #111; padding: 40px; border: 2px solid red; border-radius: 20px; text-align: center; box-shadow: 0 0 50px red; }
+        .btn { background: red; color: white; border: none; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2 style="color:red; letter-spacing: 2px;">KAPECKI AI</h2>
-        <div class="nav-item" onclick="location.reload()">+ Nowy czat</div>
-        <div class="nav-item">Historia</div>
-        <div class="nav-item" onclick="showPremium()">⭐ Moje konto</div>
-        
-        <button class="premium-btn" onclick="showPremium()">KUP PREMIUM</button>
+        <div class="logo">KAPECKI BRAIN AI</div>
+        <div class="stat-box">Wiadomości: <span id="count-ui">0</span> / 10</div>
+        <button class="btn" style="background: #222; font-size: 12px;" onclick="document.getElementById('premium-modal').style.display='flex'">💎 KUP PREMIUM</button>
     </div>
 
-    <div class="chat-main">
-        <div id="lock-screen">
-            <div class="limit-text">LIMIT WIADOMOŚCI OSIĄGNIĘTY!</div>
-            <p>Wykorzystałeś darmowe 10 wiadomości.</p>
-            <p style="color: #888;">Poczekaj 10 minut lub odblokuj teraz:</p>
-            <button class="premium-btn" style="width: 250px;">ODBLOKUJ PREMIUM - 19,99 PLN</button>
-            <br>
-            <a href="#" onclick="hidePremium()" style="color:white; font-size: 12px;">Wróć do czatu</a>
+    <div class="chat-area">
+        <div id="messages">
+            <div class="msg ai">Siema! Jestem Kapecki AI. Mam własne myślenie i 10 darmowych prób. Co tam u Ciebie?</div>
         </div>
-
-        <div id="chat-window">
-            <div class="msg ai-msg">Cześć! Jestem Twoim AI. Mam dla Ciebie 10 darmowych wiadomości. O czym chcesz pogadać?</div>
+        <div class="input-zone">
+            <input type="text" id="user-in" placeholder="Napisz do mnie (np. 'hej' lub 'podaj kraje')...">
         </div>
+    </div>
 
-        <div class="input-area">
-            <div class="input-container">
-                <input type="text" id="user-input" placeholder="Napisz coś...">
-                <div id="counter" style="position:absolute; right: -80px; color: #555;">0/10</div>
-            </div>
+    <div id="premium-modal">
+        <div class="p-card">
+            <h1 style="color:red">LIMIT OSIĄGNIĘTY!</h1>
+            <p>Poczekaj 10 minut lub kup wersję bez limitu.</p>
+            <button class="btn">ODBLOKUJ PREMIUM - 19.99 PLN</button>
+            <p style="margin-top:20px; font-size: 12px; cursor:pointer" onclick="location.reload()">Odśwież (Resetuj)</p>
         </div>
     </div>
 
     <script>
         let msgCount = 0;
-        const maxMsgs = 10;
-        const input = document.getElementById('user-input');
-        const chatWindow = document.getElementById('chat-window');
-        const lockScreen = document.getElementById('lock-screen');
-        const counter = document.getElementById('counter');
+        const input = document.getElementById('user-in');
+        const box = document.getElementById('messages');
 
-        function showPremium() { lockScreen.style.display = 'flex'; }
-        function hidePremium() { lockScreen.style.display = 'none'; }
+        function addMsg(txt, type) {
+            const d = document.createElement('div');
+            d.className = `msg ${type}`;
+            d.innerText = txt;
+            box.appendChild(d);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // --- LOGIKA "MÓZGU" AI ---
+        function getAiResponse(userText) {
+            const text = userText.toLowerCase();
+
+            if (text.includes("hej") || text.includes("siema") || text.includes("cześć")) {
+                return "No siema! Co tam słychać w świecie RGB? Ja właśnie analizuję kod Twojego kanału!";
+            }
+            
+            if (text.includes("kraj") || text.includes("państw")) {
+                return "Oto 10 krajów, które wybrałem dla Ciebie (moje ulubione):\n1. Polska (Najlepszy vibe)\n2. Japonia (Elektronika 10/10)\n3. USA (Gaming)\n4. Niemcy\n5. Islandia (Zimno, ale ładnie)\n6. Brazylia\n7. Włochy (Dobra pizza)\n8. Hiszpania\n9. Egipt\n10. Norwegia.\nCo o nich sądzisz?";
+            }
+
+            if (text.includes("kapecki")) {
+                return "Kapecki to mój stwórca. Gość ma najlepsze pomysły na skrypty, serio!";
+            }
+
+            return "Ciekawe... Moje obwody przetwarzają to pytanie o '" + userText + "'. Brzmi to sensownie, ale jako AI muszę przyznać, że to głęboki temat. Chcesz pogadać o tym więcej?";
+        }
 
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && input.value.trim() !== "") {
-                if (msgCount >= maxMsgs) {
-                    showPremium();
+                if (msgCount >= 10) {
+                    document.getElementById('premium-modal').style.display = 'flex';
                     return;
                 }
 
-                // Dodaj wiadomość użytkownika
-                const userMsg = document.createElement('div');
-                userMsg.className = 'msg user-msg';
-                userMsg.innerText = input.value;
-                chatWindow.appendChild(userMsg);
-
-                // Symuluj odpowiedź AI
-                setTimeout(() => {
-                    const aiMsg = document.createElement('div');
-                    aiMsg.className = 'msg ai-msg';
-                    aiMsg.innerText = "To ciekawe! Jako Twoje AI mogę Ci powiedzieć, że " + input.value + " to świetny temat. Co jeszcze?";
-                    chatWindow.appendChild(aiMsg);
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                }, 600);
-
-                msgCount++;
-                counter.innerText = `${msgCount}/${maxMsgs}`;
-                
-                if (msgCount >= maxMsgs) {
-                    counter.style.color = 'red';
-                    input.disabled = true;
-                    input.placeholder = "LIMIT OSIĄGNIĘTY!";
-                    setTimeout(showPremium, 1500);
-                }
-
+                const userVal = input.value;
+                addMsg(userVal, 'user');
                 input.value = "";
-                chatWindow.scrollTop = chatWindow.scrollHeight;
+
+                // Myślenie AI
+                setTimeout(() => {
+                    const response = getAiResponse(userVal);
+                    addMsg(response, 'ai');
+                    msgCount++;
+                    document.getElementById('count-ui').innerText = msgCount;
+                    
+                    if (msgCount >= 10) {
+                        setTimeout(() => { document.getElementById('premium-modal').style.display = 'flex'; }, 1000);
+                    }
+                }, 800);
             }
         });
     </script>
-
 </body>
 </html>
