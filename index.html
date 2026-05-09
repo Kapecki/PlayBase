@@ -2,66 +2,62 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Kapecki - Moja Strona</title>
+    <title>Kapecki - Logo</title>
     <style>
         body {
-            /* Intensywne czerwone tło RGB */
-            background-color: rgb(255, 0, 0);
-            color: white;
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            background-color: #000; /* Czarne tło, żeby czerwony "bił" po oczach */
             margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             overflow: hidden;
-            animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0% { background-color: rgb(200, 0, 0); }
-            50% { background-color: rgb(255, 0, 0); }
-            100% { background-color: rgb(200, 0, 0); }
+        .logo-link {
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .container {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid white;
-        }
-
-        h1 { font-size: 3rem; margin-bottom: 10px; }
-
-        .yt-button {
-            display: inline-block;
+        /* To jest Twoje czerwone logo "K" */
+        .red-logo {
+            width: 150px;
+            height: 150px;
             background-color: #ff0000;
             color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 50px;
-            border: 2px solid white;
-            transition: transform 0.3s;
-            font-size: 1.2rem;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 30px; /* Zaokrąglone rogi jak w ikonie */
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.7);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            user-select: none;
+            animation: glow 2s infinite alternate;
         }
 
-        .yt-button:hover {
+        /* Efekt najechania myszką */
+        .red-logo:hover {
             transform: scale(1.1);
-            background-color: white;
-            color: red;
+            box-shadow: 0 0 80px rgba(255, 0, 0, 1);
+        }
+
+        /* Animacja świecenia */
+        @keyframes glow {
+            from { box-shadow: 0 0 30px rgba(255, 0, 0, 0.5); }
+            to { box-shadow: 0 0 60px rgba(255, 0, 0, 0.9); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>KAPECKI</h1>
-        <p>Witaj na mojej oficjalnej stronie!</p>
-        <a href="https://www.youtube.com/@Kapecki" target="_blank" class="yt-button">
-            SUBSKRYBUJ MÓJ KANAŁ
-        </a>
-    </div>
+
+    <a href="https://www.youtube.com/@Kapecki" target="_blank" class="logo-link">
+        <div class="red-logo">K</div>
+    </a>
+
 </body>
 </html>
