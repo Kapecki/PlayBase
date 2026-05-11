@@ -2,146 +2,156 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>KAPECKI CLICKER - PETS & RGB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAPECKI - MULTIVERSE GENERATOR</title>
     <style>
-        :root { --red: #ff0000; --gold: #ffd700; }
-        body { 
-            background: #0a0a0a; color: white; font-family: 'Arial Black', sans-serif; 
-            margin: 0; display: flex; flex-direction: column; align-items: center; 
-            user-select: none; overflow-x: hidden;
+        :root {
+            --primary: #ff0000;
+            --secondary: #00ff00;
+            --bg: #050505;
         }
 
-        /* NAGŁÓWEK */
-        .stats-bar { 
-            width: 100%; background: #111; padding: 20px; text-align: center; 
-            border-bottom: 3px solid var(--red); box-shadow: 0 0 20px red;
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            transition: 0.5s;
         }
-        .points { font-size: 40px; color: var(--red); text-shadow: 0 0 10px red; }
 
-        /* GŁÓWNY PRZYCISK */
-        #main-clicker {
-            width: 200px; height: 200px; background: var(--red); border-radius: 50px;
-            margin: 50px; display: flex; align-items: center; justify-content: center;
-            font-size: 80px; cursor: pointer; transition: 0.1s;
-            box-shadow: 0 0 30px rgba(255,0,0,0.5); border: 5px solid white;
+        /* EFEKT ULTRA RGB */
+        .ultra-mode {
+            animation: rainbowBG 2s infinite linear;
         }
-        #main-clicker:active { transform: scale(0.9); }
 
-        /* SKLEP I JAJA */
-        .container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding: 20px; }
-        .card { 
-            background: #1a1a1a; padding: 20px; border-radius: 15px; border: 2px solid #333;
-            width: 250px; text-align: center; transition: 0.3s;
+        @keyframes rainbowBG {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
         }
-        .card:hover { border-color: var(--red); }
-        .btn { 
-            background: var(--red); color: white; border: none; padding: 10px 20px; 
-            border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px;
-        }
-        .btn:disabled { background: #444; cursor: not-allowed; }
 
-        /* INWENTARZ PETÓW */
-        #pets-list { margin-top: 20px; color: var(--gold); font-size: 14px; }
-        .ultra-pet { border: 2px solid var(--gold) !important; box-shadow: 0 0 20px var(--gold); }
+        .main-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 30px;
+            border: 2px solid var(--primary);
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            max-width: 500px;
+            z-index: 10;
+        }
+
+        h1 { font-size: 3rem; margin: 0; color: var(--primary); text-shadow: 0 0 10px red; }
+
+        #project-display {
+            font-size: 1.5rem;
+            margin: 30px 0;
+            min-height: 80px;
+            color: #ddd;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.4);
+        }
+
+        .btn:hover { transform: scale(1.1); box-shadow: 0 0 30px red; }
+
+        .xp-bar {
+            width: 100%;
+            height: 10px;
+            background: #222;
+            margin-top: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #xp-progress {
+            width: 0%;
+            height: 100%;
+            background: var(--secondary);
+            transition: 0.5s;
+        }
+
+        .stats { margin-top: 10px; font-size: 0.8rem; color: #888; }
     </style>
 </head>
 <body>
 
-    <div class="stats-bar">
-        <div>TWOJE PUNKTY:</div>
-        <div id="points-display" class="points">0</div>
-        <div id="strength-display" style="font-size: 14px; color: #888;">Siła kliknięcia: 1</div>
-    </div>
+    <div class="main-card">
+        <div id="lvl-display" style="color: var(--secondary); font-weight: bold;">LEVEL 1</div>
+        <h1>KAPECKI HUB</h1>
+        <p>Wylosuj swój następny projekt:</p>
+        
+        <div id="project-display">Kliknij przycisk, aby zacząć...</div>
 
-    <div id="main-clicker" onclick="clickMain()">K</div>
+        <button class="btn" onclick="generateProject()">LOSUJ PROJEKT</button>
 
-    <div class="container">
-        <div class="card">
-            <h3>UPGRADE</h3>
-            <p>Większa siła kliku</p>
-            <button class="btn" onclick="buyUpgrade()" id="up-btn">KUP (100 pkt)</button>
+        <div class="xp-bar">
+            <div id="xp-progress"></div>
         </div>
-
-        <div class="card">
-            <h3>JAJKO RGB</h3>
-            <p>Wylosuj zwierzaka</p>
-            <button class="btn" onclick="buyEgg()" id="egg-btn">OTWÓRZ (500 pkt)</button>
-            <div id="pets-list">Pety: brak</div>
-        </div>
-
-        <div class="card ultra-pet">
-            <h3 style="color:var(--gold)">ULTRA PET</h3>
-            <p>+150% mocy najlepszego peta i x2 baza!</p>
-            <button class="btn" style="background:var(--gold); color:black" onclick="buyUltraPet()" id="ultra-btn">ODBLOKUJ (5000 pkt)</button>
-        </div>
+        <div class="stats">XP: <span id="xp-val">0</span>/100</div>
+        
+        <button id="ultra-btn" class="btn" style="display:none; margin-top:20px; background: gold; color: black;" onclick="activateUltra()">AKTYWUJ TRYB ULTRA</button>
     </div>
 
     <script>
-        let points = 0;
-        let basePower = 1;
-        let petPower = 0;
-        let upgradeCost = 100;
-        let eggCost = 500;
-        let ultraCost = 5000;
-        let myPets = [];
+        const projects = [
+            "Symulator Clickera w kosmosie 🚀",
+            "Horror o złym RGB w pokoju 🕯️",
+            "Strona, która sama pisze piosenki o Kapeckim 🎵",
+            "Gra: Ucieczka przed lagami 🎮",
+            "Generator ultra-szybkich skryptów AI 🤖",
+            "Portal do wymiany petów w Clickerze 🐾",
+            "Symulator YouTubera z 1 miliardem subów 📹",
+            "Aplikacja: Detektor czystego RGB w pokoju 🌈"
+        ];
 
-        function updateUI() {
-            document.getElementById('points-display').innerText = Math.floor(points);
-            document.getElementById('strength-display').innerText = `Siła kliknięcia: ${basePower + petPower}`;
-            document.getElementById('up-btn').innerText = `KUP (${upgradeCost} pkt)`;
-            document.getElementById('pets-list').innerText = "Pety: " + (myPets.length > 0 ? myPets.join(", ") : "brak");
-            
-            // Sprawdzanie dostępności
-            document.getElementById('up-btn').disabled = points < upgradeCost;
-            document.getElementById('egg-btn').disabled = points < eggCost;
-            document.getElementById('ultra-btn').disabled = points < ultraCost;
-        }
+        let xp = 0;
+        let lvl = 1;
 
-        function clickMain() {
-            points += (basePower + petPower);
-            updateUI();
-        }
+        function generateProject() {
+            // Losowanie
+            const randomProject = projects[Math.floor(Math.random() * projects.length)];
+            document.getElementById('project-display').innerText = randomProject;
 
-        function buyUpgrade() {
-            if (points >= upgradeCost) {
-                points -= upgradeCost;
-                basePower += 2;
-                upgradeCost = Math.floor(upgradeCost * 1.5);
-                updateUI();
+            // Dodawanie XP
+            xp += 25;
+            if (xp >= 100) {
+                xp = 0;
+                lvl++;
+                document.getElementById('lvl-display').innerText = "LEVEL " + lvl;
+                if(lvl === 3) {
+                    document.getElementById('ultra-btn').style.display = 'inline-block';
+                }
             }
+
+            document.getElementById('xp-progress').style.width = xp + "%";
+            document.getElementById('xp-val').innerText = xp;
         }
 
-        function buyEgg() {
-            if (points >= eggCost) {
-                points -= eggCost;
-                const power = Math.floor(Math.random() * 10) + 5;
-                myPets.push(`Pet(+${power})`);
-                petPower += power;
-                updateUI();
-            }
+        function activateUltra() {
+            document.body.classList.add('ultra-mode');
+            document.querySelector('.main-card').style.borderColor = 'gold';
+            document.querySelector('h1').innerText = "ULTRA K-HUB";
+            document.querySelector('h1').style.color = "gold";
+            alert("TRYB ULTRA AKTYWOWANY! Widzisz te kolory?!");
         }
-
-        function buyUltraPet() {
-            if (points >= ultraCost) {
-                points -= ultraCost;
-                
-                // Logika: 150% najlepszego peta + baza x2
-                let bestPetValue = myPets.length > 0 ? Math.max(...myPets.map(p => parseInt(p.match(/\d+/)))) : 0;
-                
-                // Twój wymóg: Lepszy o 150% od najlepszego i baza x2
-                let boost = (bestPetValue * 1.5) + (basePower * 2);
-                if (boost === 0) boost = 50; // Jeśli nie masz petów, daje bazowe 50
-
-                petPower += boost;
-                myPets.push(`ULTRA-K(+${Math.floor(boost)})`);
-                
-                ultraCost *= 2; // Następny jest droższy
-                updateUI();
-                alert("ZDOBYŁEŚ ULTRA PETA! Twoja siła wystrzeliła!");
-            }
-        }
-
-        updateUI();
     </script>
 </body>
 </html>
