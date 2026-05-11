@@ -2,156 +2,195 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAPECKI - MULTIVERSE GENERATOR</title>
+    <title>KAPECKI OS v1.0 - OVERDRIVE EDITION</title>
     <style>
         :root {
-            --primary: #ff0000;
-            --secondary: #00ff00;
+            --red: #ff0000;
             --bg: #050505;
+            --glass: rgba(20, 0, 0, 0.8);
+            --border: rgba(255, 0, 0, 0.3);
         }
 
-        body {
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+        body, html {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            background: var(--bg); color: white;
+            font-family: 'Consolas', 'Courier New', monospace;
             overflow: hidden;
-            transition: 0.5s;
+            background-image: radial-gradient(circle at 50% 50%, #1a0000 0%, #050505 100%);
         }
 
-        /* EFEKT ULTRA RGB */
-        .ultra-mode {
-            animation: rainbowBG 2s infinite linear;
+        /* PULPIT */
+        #desktop {
+            width: 100%; height: calc(100% - 50px);
+            position: relative; padding: 20px; box-sizing: border-box;
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
         }
 
-        @keyframes rainbowBG {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
+        .icon {
+            width: 80px; text-align: center; cursor: pointer;
+            margin-bottom: 30px; transition: 0.3s;
+        }
+        .icon img, .icon-box {
+            width: 60px; height: 60px; background: var(--red);
+            margin: 0 auto 5px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; border: 2px solid white;
+            box-shadow: 0 0 15px rgba(255,0,0,0.5);
+        }
+        .icon:hover { transform: scale(1.1); filter: drop-shadow(0 0 10px red); }
+
+        /* SYSTEM OKIEN */
+        .window {
+            position: absolute; width: 400px; height: 300px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: none; flex-direction: column;
+            resize: both; overflow: auto;
+            animation: bootUp 0.3s ease-out;
+        }
+        @keyframes bootUp { from { opacity: 0; transform: scale(0.8); } }
+
+        .win-header {
+            padding: 10px; background: rgba(255,0,0,0.2);
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: move;
+        }
+        .close-btn { color: red; cursor: pointer; font-weight: bold; }
+
+        .win-content { padding: 15px; flex-grow: 1; overflow-y: auto; }
+
+        /* PASEK ZADAŃ */
+        #taskbar {
+            width: 100%; height: 50px; background: rgba(0,0,0,0.9);
+            border-top: 2px solid var(--red);
+            display: flex; align-items: center; padding: 0 20px; box-sizing: border-box;
+            position: fixed; bottom: 0; z-index: 9999;
+        }
+        .start-btn {
+            background: var(--red); color: white; border: none;
+            padding: 5px 15px; border-radius: 5px; font-weight: bold;
+            cursor: pointer; margin-right: 20px; box-shadow: 0 0 10px red;
         }
 
-        .main-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 30px;
-            border: 2px solid var(--primary);
-            text-align: center;
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
-            max-width: 500px;
-            z-index: 10;
+        /* SPECJALNE ELEMENTY */
+        .terminal-text { color: #00ff00; font-size: 13px; }
+        .input-line { background: transparent; border: none; color: white; width: 100%; outline: none; border-bottom: 1px solid #333; }
+        
+        #clock { margin-left: auto; color: var(--red); font-weight: bold; }
+
+        /* TRYB OVERDRIVE */
+        .overdrive-active {
+            animation: shake 0.1s infinite;
+            filter: hue-rotate(360deg);
+            transition: filter 5s linear;
         }
-
-        h1 { font-size: 3rem; margin: 0; color: var(--primary); text-shadow: 0 0 10px red; }
-
-        #project-display {
-            font-size: 1.5rem;
-            margin: 30px 0;
-            min-height: 80px;
-            color: #ddd;
-            font-weight: bold;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(255,0,0,0.4);
-        }
-
-        .btn:hover { transform: scale(1.1); box-shadow: 0 0 30px red; }
-
-        .xp-bar {
-            width: 100%;
-            height: 10px;
-            background: #222;
-            margin-top: 20px;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        #xp-progress {
-            width: 0%;
-            height: 100%;
-            background: var(--secondary);
-            transition: 0.5s;
-        }
-
-        .stats { margin-top: 10px; font-size: 0.8rem; color: #888; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } }
     </style>
 </head>
-<body>
+<body id="main-body">
 
-    <div class="main-card">
-        <div id="lvl-display" style="color: var(--secondary); font-weight: bold;">LEVEL 1</div>
-        <h1>KAPECKI HUB</h1>
-        <p>Wylosuj swój następny projekt:</p>
-        
-        <div id="project-display">Kliknij przycisk, aby zacząć...</div>
-
-        <button class="btn" onclick="generateProject()">LOSUJ PROJEKT</button>
-
-        <div class="xp-bar">
-            <div id="xp-progress"></div>
+    <div id="desktop">
+        <div class="icon" onclick="openWindow('win-chat')">
+            <div class="icon-box">💬</div>
+            <span>K-CHAT</span>
         </div>
-        <div class="stats">XP: <span id="xp-val">0</span>/100</div>
-        
-        <button id="ultra-btn" class="btn" style="display:none; margin-top:20px; background: gold; color: black;" onclick="activateUltra()">AKTYWUJ TRYB ULTRA</button>
+        <div class="icon" onclick="openWindow('win-clicker')">
+            <div class="icon-box">🖱️</div>
+            <span>CLICKER</span>
+        </div>
+        <div class="icon" onclick="openWindow('win-term')">
+            <div class="icon-box">⌨️</div>
+            <span>TERMINAL</span>
+        </div>
+    </div>
+
+    <div id="win-chat" class="window" style="top: 50px; left: 150px;">
+        <div class="win-header"><span>KAPECKI-AI.exe</span><span class="close-btn" onclick="closeWindow('win-chat')">X</span></div>
+        <div class="win-content">
+            <div id="chat-output" class="terminal-text">> System Ready...</div>
+            <input type="text" id="chat-input" class="input-line" placeholder="Zapytaj AI...">
+        </div>
+    </div>
+
+    <div id="win-clicker" class="window" style="top: 100px; left: 200px;">
+        <div class="win-header"><span>CLICKER_V2.sys</span><span class="close-btn" onclick="closeWindow('win-clicker')">X</span></div>
+        <div class="win-content" style="text-align: center;">
+            <h2 id="pts">0</h2>
+            <button onclick="addPoint()" style="background:red; color:white; padding: 20px; border:none; border-radius: 10px; cursor:pointer;">KLIKAJ!</button>
+        </div>
+    </div>
+
+    <div id="win-term" class="window" style="top: 200px; left: 300px; width: 500px; background: black;">
+        <div class="win-header"><span>ROOT_TERMINAL</span><span class="close-btn" onclick="closeWindow('win-term')">X</span></div>
+        <div class="win-content">
+            <div class="terminal-text">KAPECKI OS [Version 1.0.442]</div>
+            <div class="terminal-text">Wpisz 'overdrive', aby podkręcić system.</div>
+            <div id="term-out" class="terminal-text"></div>
+            <input type="text" id="term-input" class="input-line" style="color: lime;" placeholder="command_">
+        </div>
+    </div>
+
+    <div id="taskbar">
+        <button class="start-btn" onclick="alert('KAPECKI OS v1.0\nStatus: Ultra RGB\nCPU: 99% Red Power')">K-START</button>
+        <div id="clock">00:00:00</div>
     </div>
 
     <script>
-        const projects = [
-            "Symulator Clickera w kosmosie 🚀",
-            "Horror o złym RGB w pokoju 🕯️",
-            "Strona, która sama pisze piosenki o Kapeckim 🎵",
-            "Gra: Ucieczka przed lagami 🎮",
-            "Generator ultra-szybkich skryptów AI 🤖",
-            "Portal do wymiany petów w Clickerze 🐾",
-            "Symulator YouTubera z 1 miliardem subów 📹",
-            "Aplikacja: Detektor czystego RGB w pokoju 🌈"
-        ];
+        // SYSTEMOWE FUNKCJE
+        function openWindow(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeWindow(id) { document.getElementById(id).style.display = 'none'; }
 
-        let xp = 0;
-        let lvl = 1;
+        // ZEGAR
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
 
-        function generateProject() {
-            // Losowanie
-            const randomProject = projects[Math.floor(Math.random() * projects.length)];
-            document.getElementById('project-display').innerText = randomProject;
+        // CLICKER LOGIC
+        let p = 0;
+        function addPoint() { p++; document.getElementById('pts').innerText = p; }
 
-            // Dodawanie XP
-            xp += 25;
-            if (xp >= 100) {
-                xp = 0;
-                lvl++;
-                document.getElementById('lvl-display').innerText = "LEVEL " + lvl;
-                if(lvl === 3) {
-                    document.getElementById('ultra-btn').style.display = 'inline-block';
+        // TERMINAL LOGIC
+        const termInput = document.getElementById('term-input');
+        termInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = termInput.value.toLowerCase();
+                const out = document.getElementById('term-out');
+                
+                if (cmd === 'overdrive') {
+                    document.getElementById('main-body').classList.toggle('overdrive-active');
+                    out.innerHTML += "<br>> TRYB OVERDRIVE AKTYWOWANY!";
+                } else if (cmd === 'clear') {
+                    out.innerHTML = "";
+                } else {
+                    out.innerHTML += `<br>> Nieznana komenda: ${cmd}`;
                 }
+                termInput.value = "";
             }
+        });
 
-            document.getElementById('xp-progress').style.width = xp + "%";
-            document.getElementById('xp-val').innerText = xp;
-        }
+        // DRAGGING LOGIC (Uproszczony)
+        document.querySelectorAll('.win-header').forEach(header => {
+            header.onmousedown = function(e) {
+                let win = header.parentElement;
+                let shiftX = e.clientX - win.getBoundingClientRect().left;
+                let shiftY = e.clientY - win.getBoundingClientRect().top;
+                
+                function moveAt(pageX, pageY) {
+                    win.style.left = pageX - shiftX + 'px';
+                    win.style.top = pageY - shiftY + 'px';
+                }
 
-        function activateUltra() {
-            document.body.classList.add('ultra-mode');
-            document.querySelector('.main-card').style.borderColor = 'gold';
-            document.querySelector('h1').innerText = "ULTRA K-HUB";
-            document.querySelector('h1').style.color = "gold";
-            alert("TRYB ULTRA AKTYWOWANY! Widzisz te kolory?!");
-        }
+                function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
+                document.addEventListener('mousemove', onMouseMove);
+                header.onmouseup = function() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    header.onmouseup = null;
+                };
+            };
+            header.ondragstart = function() { return false; };
+        });
     </script>
 </body>
 </html>
