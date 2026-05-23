@@ -3,803 +3,689 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QUANTUM OS // MATRIX TERMINAL v9.0</title>
+    <title>Intergalactic Trade Tycoon 3D // System OS v12</title>
     <style>
         /* ==========================================================================
-           ULTRA CHROMA RGB & CYBERPUNK CORE INTERFACE
+           CYBERPUNK CHROMA GLOW & FULLSCREEN LAYOUT
            ========================================================================== */
         :root {
-            --neon-cyan: #00ffcc;
-            --neon-pink: #ff0055;
-            --neon-purple: #9b59b6;
-            --neon-gold: #f1c40f;
-            --terminal-bg: rgba(10, 10, 18, 0.95);
-            --panel-border: #222;
+            --neon-blue: #00f0ff;
+            --neon-magenta: #ff0077;
+            --neon-green: #00ff66;
+            --neon-gold: #ffcc00;
+            --panel-bg: rgba(6, 6, 14, 0.9);
         }
 
-        @keyframes chroma-glow {
-            0% { border-color: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink), inset 0 0 8px var(--neon-pink); }
-            25% { border-color: var(--neon-cyan); box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 8px var(--neon-cyan); }
-            50% { border-color: var(--neon-purple); box-shadow: 0 0 20px var(--neon-purple), inset 0 0 8px var(--neon-purple); }
-            75% { border-color: var(--neon-gold); box-shadow: 0 0 20px var(--neon-gold), inset 0 0 8px var(--neon-gold); }
-            100% { border-color: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink), inset 0 0 8px var(--neon-pink); }
-        }
-
-        @keyframes text-chroma {
-            0% { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
-            33% { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
-            66% { color: var(--neon-gold); text-shadow: 0 0 10px var(--neon-gold); }
-            100% { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
-        }
-
-        @keyframes grid-pulse {
-            0% { opacity: 0.3; }
-            50% { opacity: 0.5; }
-            100% { opacity: 0.3; }
+        @keyframes border-chroma {
+            0% { border-color: var(--neon-magenta); box-shadow: 0 0 15px var(--neon-magenta); }
+            33% { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+            66% { border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
+            100% { border-color: var(--neon-magenta); box-shadow: 0 0 15px var(--neon-magenta); }
         }
 
         body {
-            background-color: #030307;
+            background-color: #020205;
             color: #ffffff;
-            font-family: 'Consolas', 'Courier New', monospace;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
+            padding: 0;
+            overflow: hidden;
             user-select: none;
+            width: 100vw;
+            height: 100vh;
         }
 
-        /* Tło siatki skanującej */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            background-size: 100% 4px, 6px 100%;
-            z-index: 9999;
+        /* Canvas dla silnika 3D */
+        #canvas-3d {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* Warstwa Interfejsu 2D (HUD) */
+        #hud-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2;
             pointer-events: none;
-        }
-
-        header {
-            width: 100%;
-            max-width: 1400px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        header h1 {
-            animation: text-chroma 6s infinite linear;
-            margin: 0;
-            font-size: 26px;
-            letter-spacing: 3px;
-        }
-
-        /* UKŁAD PANELU GŁÓWNEGO APP */
-        .app-container {
             display: grid;
-            grid-template-columns: 350px 1fr 380px;
+            grid-template-columns: 360px 1fr 380px;
+            padding: 20px;
+            box-sizing: border-box;
             gap: 20px;
-            width: 100%;
-            max-width: 1400px;
         }
 
-        @media (max-width: 1200px) {
-            .app-container { grid-template-columns: 1fr; }
+        @media (max-width: 1100px) {
+            #hud-layer {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+                pointer-events: auto;
+            }
+            .interactive-panel { pointer-events: auto !important; }
         }
 
-        .matrix-panel {
-            background: var(--terminal-bg);
-            border: 2px solid var(--panel-border);
-            border-radius: 12px;
-            padding: 18px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+        .interactive-panel {
+            background: var(--panel-bg);
+            border: 2px solid #222;
+            border-radius: 14px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            position: relative;
+            pointer-events: auto;
+            backdrop-filter: blur(8px);
+            animation: border-chroma 20s infinite linear;
+            max-height: 92vh;
+            overflow-y: auto;
         }
 
         .panel-header {
-            font-size: 13px;
-            color: var(--neon-cyan);
-            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--neon-blue);
             letter-spacing: 2px;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #222;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* KONSOLA INTERAKTYWNEGO TERMINALU */
-        #terminal-log {
-            height: 280px;
-            overflow-y: auto;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid #222;
-            border-radius: 6px;
-            padding: 10px;
-            font-size: 12px;
-            color: #00ff55;
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .terminal-input-row {
-            display: flex;
-            align-items: center;
-            background: #0d0d15;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 8px;
-        }
-
-        .terminal-input-row span {
-            color: var(--neon-pink);
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        #terminal-cmd {
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-family: inherit;
-            font-size: 12px;
-            outline: none;
-            width: 100%;
-        }
-
-        /* GLOBALNE STRUKTURY STATYSTYK */
-        .data-stream {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            padding: 8px 0;
-            border-bottom: 1px dashed #222;
-        }
-        .data-stream span { color: var(--neon-cyan); font-weight: bold; }
-
-        .big-crypto-counter {
-            font-size: 32px;
-            text-align: center;
-            padding: 20px 0;
-            background: rgba(0,0,0,0.5);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #222;
-            animation: text-chroma 8s infinite linear;
-            font-weight: bold;
-        }
-
-        /* FUTURYSTYCZNE PRZYCISKI */
-        .cyber-trigger {
-            background: #08080f;
-            color: #fff;
-            border: 1px solid #444;
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-            margin-bottom: 10px;
-        }
-        .cyber-trigger:hover:not(:disabled) {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0,255,204,0.3);
-            background: #111122;
-            transform: translateY(-1px);
-        }
-        .cyber-trigger:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* MODUŁ SYNTEZY MATRYCOWEJ (MERGE LAB) */
-        #lab-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            background: rgba(0,0,0,0.4);
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #222;
-        }
-
-        .lab-slot {
-            height: 75px;
-            background: #07070f;
-            border: 1px dashed #334;
-            border-radius: 8px;
-            position: relative;
-        }
-        .lab-slot.active-hover {
-            border-color: var(--neon-cyan);
-            background: rgba(0, 255, 204, 0.05);
-        }
-
-        .data-node {
-            position: absolute;
-            top: 2px; left: 2px; right: 2px; bottom: 2px;
-            background: linear-gradient(145deg, #10101f, #1a1a35);
-            border: 1px solid #444;
-            border-radius: 6px;
-            cursor: grab;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            animation: chroma-glow 12s infinite linear;
-        }
-        .data-node:active { cursor: grabbing; }
-        .node-icon { font-size: 20px; }
-        .node-level { font-size: 8px; color: #aaa; margin-top: 3px; background: rgba(0,0,0,0.5); padding: 1px 4px; border-radius: 3px; }
-
-        /* LIVE NET SNIFFER WIDGET */
-        #network-streamer {
-            height: 180px;
-            overflow: hidden;
-            background: #040408;
-            border: 1px solid #1c1c28;
-            border-radius: 6px;
-            padding: 8px;
-            font-size: 11px;
-            color: #00aeff;
-        }
-        .net-packet {
-            padding: 3px 0;
-            border-bottom: 1px solid #0d0d1a;
-            white-space: nowrap;
         }
 
-        /* PANEL KONTROLI SKLEPU PREMIUM */
-        .premium-hub {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            width: 100%;
-            max-width: 1400px;
-            margin-top: 20px;
-        }
-        @media (max-width: 750px) { .premium-hub { grid-template-columns: 1fr; } }
-
-        .booster-box {
-            background: rgba(12, 12, 20, 0.9);
+        /* STATYSTYKI FINANSOWE */
+        .wallet-container {
+            background: rgba(0,0,0,0.4);
             border: 1px solid #222;
             border-radius: 8px;
             padding: 15px;
             text-align: center;
-        }
-        .booster-box h5 { margin: 0 0 5px 0; color: var(--neon-gold); font-size: 12px; letter-spacing: 1px; }
-        .booster-box p { margin: 0 0 10px 0; font-size: 10px; color: #777; }
-
-        /* PROFILE SPOŁECZNOŚCIOWE HUB */
-        footer {
-            margin-top: 35px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            width: 100%;
-            max-width: 1400px;
-            justify-content: center;
-        }
-        .social-node {
-            background: #09090f;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 25px;
-            border: 1px solid #333;
-            border-radius: 6px;
-            font-size: 12px;
+            font-size: 28px;
             font-weight: bold;
-            letter-spacing: 1px;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0,255,102,0.3);
+            margin-bottom: 15px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+        .stat-row span { color: #fff; font-weight: bold; }
+
+        /* SKLEP / HANDELKI */
+        .trade-item-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             transition: all 0.2s;
         }
-        .social-node:hover {
-            animation: chroma-glow 4s infinite linear;
-            transform: translateY(-2px);
+        .trade-item-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: var(--neon-blue);
         }
 
-        #matrix-canvas {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.12;
+        .btn-action {
+            background: #090912;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 11px;
+            transition: all 0.2s;
         }
+        .btn-action:hover:not(:disabled) {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(0,255,102,0.4);
+            transform: translateY(-1px);
+        }
+        .btn-action:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* TOPKA / LEADERBOARD */
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .leader-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: 1px solid transparent;
+        }
+        .leader-row.player {
+            border-color: var(--neon-magenta);
+            background: rgba(255,0,119,0.1);
+            font-weight: bold;
+        }
+        .rank-badge {
+            width: 24px;
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+
+        /* TIMER SEZONU */
+        #season-timer-bar {
+            width: 100%;
+            height: 4px;
+            background: #222;
+            margin-top: 5px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        #season-progress {
+            width: 100%;
+            height: 100%;
+            background: var(--neon-magenta);
+            transition: width 1s linear;
+        }
+
+        /* SKLEP DOPOALACZY */
+        .booster-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-boost {
+            font-size: 9px;
+            padding: 8px 4px;
+            text-align: center;
+        }
+
+        /* HISTORIA NAGRÓD */
+        #rewards-log {
+            font-size: 11px;
+            color: var(--neon-gold);
+            background: rgba(0,0,0,0.5);
+            padding: 8px;
+            border-radius: 6px;
+            height: 70px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border: 1px solid #222;
+        }
+
+        /* SCROLLBARS */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <canvas id="matrix-canvas"></canvas>
+    <canvas id="canvas-3d"></canvas>
 
-    <header>
-        <h1>QUANTUM CORE // OS INTERACTIVE v9.0</h1>
-        <div style="font-size: 11px; color: #666;" id="clock-display">STACJA SYNC: ONLINE</div>
-    </header>
-
-    <div class="app-container">
+    <div id="hud-layer">
         
-        <div class="matrix-panel" style="animation: chroma-glow 15s infinite ease-in-out;">
-            <div class="panel-header"><div>[01] CENTRAL REAKTOR</div></div>
-            <div class="big-crypto-counter"><span id="crypto-val">0</span> Qubit</div>
+        <div class="interactive-panel">
+            <div class="panel-header"><div>[01] Licencje Handlowe</div></div>
+            <div class="wallet-container"><span id="player-cash">0</span> 🪙</div>
             
-            <div class="data-stream">MOC OBLICZENIOWA: <span id="power-val">0 MFlops</span></div>
-            <div class="data-stream">DOPALACZ KWANTOWY: <span id="boost-val">NIEAKTYWNY</span></div>
-            <div class="data-stream">PRZEPUSTOWOŚĆ Linii: <span id="net-speed-val">120 KB/s</span></div>
-            <div class="data-stream">TEMPERATURA RDZENIA: <span id="temp-val">36.4°C</span></div>
+            <div class="stat-row">CAŁKOWITY PRZYCHÓD: <span id="total-ips">0 🪙/s</span></div>
+            <div class="stat-row">NAJLEPSZY HANDELEK: <span id="best-item-txt">Brak</span></div>
             
-            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-                <button class="cyber-trigger" id="btn-manual">Wymuś Impuls Kwantowy</button>
-                <button class="cyber-trigger" id="btn-buy-node">Inicjuj Rdzeń Danych [<span id="node-cost-txt">50</span> Q]</button>
-            </div>
+            <button class="btn-action" id="btn-manual-click" style="width:100%; margin-bottom:15px; background:#111125; border-color:var(--neon-blue);">
+                Wymuś Transakcję Ręczną (+10 🪙)
+            </button>
+
+            <div style="flex:1; overflow-y:auto;" id="shop-items-container">
+                </div>
         </div>
 
-        <div class="matrix-panel" style="animation: chroma-glow 15s infinite ease-in-out; animation-delay: 2s;">
-            <div class="panel-header"><div>[02] INTERACTIVE COMMAND TERMINAL</div><div style="color:#00ff55;">ROOT@QUANTUM_OS</div></div>
-            <div id="terminal-log"></div>
-            <div class="terminal-input-row">
-                <span>$</span>
-                <input type="text" id="terminal-cmd" placeholder="Wpisz komendę (np. help, matrix, crypto, clear)..." autofocus autocomplete="off">
-            </div>
-        </div>
+        <div></div>
 
-        <div class="matrix-panel" style="animation: chroma-glow 15s infinite ease-in-out; animation-delay: 4s;">
-            <div class="panel-header"><div>[03] DATA SYNTHESIZER & PACKETS</div></div>
+        <div class="interactive-panel">
+            <div class="panel-header">
+                <div>[02] Globalna Topka Handlowa</div>
+                <div style="font-size:10px; color:#666;">SEZON #1</div>
+            </div>
             
-            <div id="lab-grid" style="margin-bottom: 15px;"></div>
-            
-            <div class="panel-header" style="margin-bottom: 8px;"><div>LIVE NETWORK SNIFFER</div></div>
-            <div id="network-streamer"></div>
+            <div class="stat-row">KONIEC SEZONU ZA: <span id="timer-txt">60s</span></div>
+            <div id="season-timer-bar"><div id="season-progress"></div></div>
+
+            <div style="margin: 15px 0;" class="leaderboard-list" id="leaderboard-dom">
+                </div>
+
+            <div class="panel-header" style="margin-top:10px;"><div>[03] Dopalacze Matrycy</div></div>
+            <div class="booster-grid">
+                <button class="btn-action btn-boost" onclick="triggerFreeBoost(30)">Impuls 30s (x2)</button>
+                <button class="btn-action btn-boost" onclick="triggerFreeBoost(300)">Błysk 5m (x2)</button>
+                <button class="btn-action btn-boost" onclick="triggerFreeBoost(3600)">Hiper 1H (x2)</button>
+            </div>
+
+            <div class="panel-header" style="margin-top:20px; margin-bottom:5px;"><div>Dziennik Przyznanych Nagród</div></div>
+            <div id="rewards-log">Oczekiwanie na zakończenie pierwszego sezonu handlowego...</div>
         </div>
 
     </div>
-
-    <div class="premium-hub">
-        <div class="booster-box">
-            <h5>IMPULS KWANTOWY 1M</h5>
-            <p>Mnożnik generacji Qubitów x5 na okres 1 minuty.</p>
-            <button class="cyber-trigger" style="width:100%; margin:0;" onclick="injectPremiumBooster(60)">ZASILAJ BEZPŁATNIE</button>
-        </div>
-        <div class="booster-box">
-            <h5>PRZEŁADOWANIE REAKTORA 1H</h5>
-            <p>Mnożnik generacji Qubitów x5 na okres 1 godziny.</p>
-            <button class="cyber-trigger" style="width:100%; margin:0;" onclick="injectPremiumBooster(3600)">ZASILAJ BEZPŁATNIE</button>
-        </div>
-        <div class="booster-box">
-            <h5>KOSMICZNY PRZEŁOM 1D</h5>
-            <p>Mnożnik generacji Qubitów x5 na okres 1 dnia.</p>
-            <button class="cyber-trigger" style="width:100%; margin:0;" onclick="injectPremiumBooster(86400)">ZASILAJ BEZPŁATNIE</button>
-        </div>
-    </div>
-
-    <footer>
-        <a href="https://github.com" target="_blank" class="social-node">POŁĄCZENIE GITHUB 🚀</a>
-        <a href="https://tiktok.com" target="_blank" class="social-node">STREFA TIKTOK 🎬</a>
-        <a href="https://youtube.com" target="_blank" class="social-node">PROFIL YOUTUBE 📺</a>
-    </footer>
 
 <script>
     /* ==========================================================================
-       ZAAWANSOWANY SILNIK INTERAKTYWNEJ APLIKACJI DOŚWIADCZALNEJ
+       ZAAWANSOWANY SILNIK INTERGALAKTYCZNEGO TYCOONA 3D
        ========================================================================== */
 
-    // Rejestr struktur rdzeni danych dla modułu syntezy
-    const nodeRegistry = {
-        1: { name: "Rdzeń Sygnału", icon: "🛰️", power: 2 },
-        2: { name: "Procesor Strumieniowy", icon: "⚡", power: 8 },
-        3: { name: "Kwantowy Szyfrator", icon: "🔐", power: 30 },
-        4: { name: "Baza Neuromorficzna", icon: "🧠", power: 120 },
-        5: { name: "Hiper-Klaster", icon: "🌌", power: 500 },
-        6: { name: "Osobliwość Systemowa", icon: "🌀", power: 2500 }
-    };
+    // Definicje domyślnych typów handlowych (Sklep)
+    const baseShopConfig = [
+        { id: "h1", name: "Dron Kurierski", cost: 50, income: 2, count: 0 },
+        { id: "h2", name: "Kuter Handlowy", cost: 250, income: 12, count: 0 },
+        { id: "h3", name: "Fregata Transportowa", cost: 1200, income: 65, count: 0 },
+        { id: "h4", name: "Gwiezdny Transporter", cost: 7500, income: 380, count: 0 },
+        { id: "h5", name: "Mega-Galeon Korporacji", cost: 45000, income: 2100, count: 0 }
+    ];
+
+    // Nazwy botów do symulacji rankingu (Topki)
+    const corporateCompetitors = [
+        { name: "Apex Corp", cash: 3000, incomeRate: 15 },
+        { name: "Vortex Logistics", cash: 1500, incomeRate: 35 },
+        { name: "Nexus Freight", cash: 8000, incomeRate: 90 },
+        { name: "Quantum Cargo", cash: 25000, incomeRate: 400 },
+        { name: "Nebula Trade", cash: 90000, incomeRate: 1800 },
+        { name: "Hyperion Inc", cash: 200, incomeRate: 2 },
+        { name: "Chroma Shipping", cash: 400, incomeRate: 8 },
+        { name: "Core Systems", cash: 12000, incomeRate: 150 },
+        { name: "Solar Wind Ltd", cash: 60000, incomeRate: 1100 }
+    ];
 
     // Globalny stan aplikacji
-    let appState = {
-        qubits: 100,
-        nodeCost: 50,
-        premiumTime: 0,
-        totalPower: 0,
-        coreTemp: 36.4,
-        commandsExecuted: 0
+    let state = {
+        cash: 100,
+        shopItems: JSON.parse(JSON.stringify(baseShopConfig)),
+        competitors: JSON.parse(JSON.stringify(corporateCompetitors)),
+        rewardHandelki: [], // Tu trafiają wygrane super-handelki z topki
+        seasonTimeLeft: 60,
+        globalBoosterTime: 0
     };
 
-    let activeDragNode = null;
-
-    // Przechwycenie węzłów DOM
-    const cryptoDisplay = document.getElementById('crypto-val');
-    const powerDisplay = document.getElementById('power-val');
-    const boostDisplay = document.getElementById('boost-val');
-    const tempDisplay = document.getElementById('temp-val');
-    const nodeCostDisplay = document.getElementById('node-cost-txt');
-    const labGridDOM = document.getElementById('lab-grid');
-    const terminalLogDOM = document.getElementById('terminal-log');
-    const terminalInputDOM = document.getElementById('terminal-cmd');
-    const netStreamerDOM = document.getElementById('network-streamer');
-
-    /* ==========================================================================
-       AUDIO SYNTHESIZER (WEB AUDIO API - DŹWIĘKI BEZ PLIKÓW EXTERNAL)
-       ========================================================================== */
+    // Inicjalizacja Audio Synthesizera
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function playCyberSound(type) {
+    function playBeep(freq, type="sine", duration=0.1) {
         try {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
-            if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            } else if (type === 'merge') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-            } else if (type === 'cmd') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.05);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-            }
-        } catch(e) {}
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        } catch(e){}
     }
 
     /* ==========================================================================
-       SYSTEM OPERACYJNY TERMINALU BASH (CMD INTERPRETER)
+       SILNIK 3D (THREE.JS GRAPHICS ENGINE)
        ========================================================================== */
-    function logTerminal(text, color = '#00ff55') {
-        const line = document.createElement('div');
-        line.style.color = color;
-        line.innerHTML = `> ${text}`;
-        terminalLogDOM.appendChild(line);
-        terminalLogDOM.scrollTop = terminalLogDOM.scrollHeight;
+    let scene, camera, renderer, stationGroup, particles;
+
+    function init3DEngine() {
+        const container = document.getElementById('canvas-3d');
+        
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x020206);
+        scene.fog = new THREE.FogExp2(0x020206, 0.015);
+
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 45;
+
+        renderer = new THREE.WebGLRenderer({ canvas: container, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // Tworzenie stacji kosmicznej 3D
+        stationGroup = new THREE.Group();
+        
+        // Pierścień główny stacji
+        const ringGeo = new THREE.TorusGeometry(12, 0.6, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
+        const mainRing = new THREE.Mesh(ringGeo, ringMat);
+        stationGroup.add(mainRing);
+
+        // Drugi pierścień (krzyżowy)
+        const ringGeo2 = new THREE.TorusGeometry(9, 0.3, 12, 80);
+        const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xff0077, wireframe: true });
+        const crossRing = new THREE.Mesh(ringGeo2, ringMat2);
+        crossRing.rotation.x = Math.PI / 2;
+        stationGroup.add(crossRing);
+
+        // Rdzeń energetyczny stacji
+        const coreGeo = new THREE.IcosahedronGeometry(3, 1);
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0x00ff66, wireframe: true });
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        stationGroup.add(coreMesh);
+
+        scene.add(stationGroup);
+
+        // System cząsteczek gwiazd w tle
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 800;
+        const starPositions = new Float32Array(starsCount * 3);
+
+        for(let i=0; i<starsCount*3; i++) {
+            starPositions[i] = (Math.random() - 0.5) * 200;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.4, transparent: true });
+        particles = new THREE.Points(starsGeo, starsMat);
+        scene.add(particles);
+
+        // Obsługa ruchu myszką
+        window.addEventListener('mousemove', (e) => {
+            const mouseX = (e.clientX / window.innerWidth) - 0.5;
+            const mouseY = (e.clientY / window.innerHeight) - 0.5;
+            stationGroup.rotation.y = mouseX * 2;
+            stationGroup.rotation.x = mouseY * 2;
+        });
+
+        window.addEventListener('resize', onWindowResize);
+        animate3D();
     }
 
-    // Ekran powitalny terminala
-    logTerminal("Inicjalizacja Quantum_OS Kernel v9.0...", "#00ffcc");
-    logTerminal("Wszystkie systemy zsynchronizowane. Reaktor stabilny.", "#00ffcc");
-    logTerminal("Wpisz 'help' aby uzyskać dostęp do ukrytych komend systemowych.", var(--neon-gold));
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
 
-    terminalInputDOM.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const rawCmd = terminalInputDOM.value.trim();
-            terminalInputDOM.value = '';
-            if (rawCmd === '') return;
+    function animate3D() {
+        requestAnimationFrame(animate3D);
+        
+        // Autonomiczny obrót obiektów 3D
+        stationGroup.children[0].rotation.z += 0.005;
+        stationGroup.children[1].rotation.z -= 0.008;
+        stationGroup.children[2].rotation.y += 0.01;
 
-            playCyberSound('cmd');
-            logTerminal(rawCmd, '#ffffff');
-            executeCommand(rawCmd.toLowerCase());
-            appState.commandsExecuted++;
-            saveSystemState();
-        }
-    });
+        particles.rotation.y += 0.0005;
 
-    function executeCommand(cmd) {
-        const args = cmd.split(' ');
-        switch(args[0]) {
-            case 'help':
-                logTerminal("Dostępne dyrektywy systemowe:");
-                logTerminal(" - clear  : Czyszczenie bufora konsoli logów");
-                logTerminal(" - system : Pobiera aktualne specyfikacje rdzeni");
-                logTerminal(" - matrix : Przełącza intensywność skanera Chroma");
-                logTerminal(" - crypto : Próba wykonania brute-force na darmowe Qubity");
-                logTerminal(" - wifi   : Skanuje pobliskie wirtualne sieci pakietowe");
-                break;
-            case 'clear':
-                terminalLogDOM.innerHTML = '';
-                break;
-            case 'system':
-                logTerminal(`ARCHITEKTURA: Quantum Core-X9`);
-                logTerminal(`TEMPERATURA REAKTORA: ${appState.coreTemp}°C`);
-                logTerminal(`PRZETWORZONE WYDANIA: ${appState.commandsExecuted}`);
-                break;
-            case 'matrix':
-                logTerminal("Przeładowanie wizualne matrycy tła...", "#ff0055");
-                document.getElementById('matrix-canvas').style.opacity = "0.3";
-                break;
-            case 'crypto':
-                logTerminal("Uruchamianie procedury łamania bloków kwantowych...");
-                if (Math.random() > 0.5) {
-                    const prize = Math.floor(Math.random() * 50) + 10;
-                    appState.qubits += prize;
-                    logTerminal(`SUKCES! Wstrzyknięto dodatkowe +${prize} Qubitów do pamięci reaktora.`, "#00ffcc");
-                } else {
-                    logTerminal("BŁĄD: Blokada zapory sieciowej wykryła skanowanie.", "#ff0055");
-                }
-                updateSystemUI();
-                break;
-            case 'wifi':
-                logTerminal("Skanowanie sieci w częstotliwości 6G...");
-                setTimeout(() => { logTerminal("Wykryto sieć: CYBER_NET_SECURE [Zabezpieczona]", "#00aeff"); }, 200);
-                setTimeout(() => { logTerminal("Wykryto sieć: NET_DARK_GATE_666 [Słaby Sygnał]", "#ff0055"); }, 400);
-                break;
-            default:
-                logTerminal(`Nieznana komenda systemowa: '${cmd}'. Wpisz 'help'.`, "#ff0055");
-        }
+        renderer.render(scene, camera);
     }
 
     /* ==========================================================================
-       BUDOWANIE INTEGRALNEJ MATRYCY SYNTEZY (16 SLOTÓW)
+       LOGIKA BIZNESOWA, SKLEP I STRUKTURA EKONOMII
        ========================================================================== */
-    function initializeMatrixGrid() {
-        labGridDOM.innerHTML = '';
-        for (let i = 0; i < 16; i++) {
-            const slot = document.createElement('div');
-            slot.classList.add('lab-slot');
-            slot.dataset.id = i;
+    function renderShop() {
+        const container = document.getElementById('shop-items-container');
+        container.innerHTML = '';
 
-            slot.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                slot.classList.add('active-hover');
+        // Najpierw renderujemy standardowe kupne licencje
+        state.shopItems.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.classList.add('trade-item-card');
+            card.innerHTML = `
+                <div>
+                    <div style="font-weight:bold; font-size:13px;">${item.name} (x${item.count})</div>
+                    <div style="font-size:11px; color:var(--neon-green);">+${item.income} 🪙/s</div>
+                </div>
+                <button class="btn-action" onclick="buyStandardItem(${index})" ${state.cash < item.cost ? 'disabled' : ''}>
+                    Kup [${Math.floor(item.cost)} 🪙]
+                </button>
+            `;
+            container.appendChild(card);
+        });
+
+        // Jeśli posiadamy specjalne statki zdobyte z nagród TOP 1/2/3, wyświetlamy je niżej
+        if(state.rewardHandelki.length > 0) {
+            const separator = document.createElement('div');
+            separator.style.cssText = "margin:15px 0 10px 0; font-size:11px; color:var(--neon-gold); text-transform:uppercase; font-weight:bold; border-top:1px dashed #444; padding-top:10px;";
+            separator.innerText = "Flota Nagród Specjalnych (Topka)";
+            container.appendChild(separator);
+
+            state.rewardHandelki.forEach(bonus => {
+                const card = document.createElement('div');
+                card.classList.add('trade-item-card');
+                card.style.borderColor = "var(--neon-gold)";
+                card.innerHTML = `
+                    <div>
+                        <div style="font-weight:bold; font-size:13px; color:var(--neon-gold);">${bonus.name}</div>
+                        <div style="font-size:11px; color:#fff;">Mnożnik Pozycji: +${bonus.bonusPercent}%</div>
+                    </div>
+                    <div style="font-weight:bold; color:var(--neon-green); font-size:13px;">+${Math.floor(bonus.finalIncome)} 🪙/s</div>
+                `;
+                container.appendChild(card);
             });
-            slot.addEventListener('dragleave', () => slot.classList.remove('active-hover'));
-            slot.addEventListener('drop', handleNodeDrop);
-
-            labGridDOM.appendChild(slot);
         }
     }
 
-    function spawnNodeInSlot(targetSlot, level) {
-        if (level > 6) level = 6;
-        const config = nodeRegistry[level];
+    window.buyStandardItem = function(index) {
+        const item = state.shopItems[index];
+        if(state.cash >= item.cost) {
+            state.cash -= item.cost;
+            item.count++;
+            item.cost = Math.floor(item.cost * 1.25); // Skalowanie ceny o 25%
+            playBeep(600, "triangle");
+            recalculateTotalIncome();
+            updateInterface();
+            saveGameData();
+        }
+    };
 
-        const node = document.createElement('div');
-        node.classList.add('data-node');
-        node.draggable = true;
-        node.dataset.level = level;
-
-        node.innerHTML = `
-            <div class="node-icon">${config.icon}</div>
-            <div class="node-level">LVL ${level}</div>
-        `;
-
-        node.addEventListener('dragstart', () => {
-            activeDragNode = node;
-            playCyberSound('click');
-        });
-        node.addEventListener('dragend', () => activeDragNode = null);
-
-        targetSlot.appendChild(node);
-    }
-
-    function handleNodeDrop(e) {
-        e.preventDefault();
-        this.classList.remove('active-hover');
-        if (!activeDragNode) return;
-
-        const presentNode = this.querySelector('.data-node');
-        const pastSlot = activeDragNode.parentElement;
-
-        if (!presentNode) {
-            this.appendChild(activeDragNode);
-            playCyberSound('click');
-        } else if (presentNode !== activeDragNode) {
-            const lvlSource = parseInt(activeDragNode.dataset.level);
-            const lvlTarget = parseInt(presentNode.dataset.level);
-
-            if (lvlSource === lvlTarget && lvlSource < 6) {
-                pastSlot.innerHTML = '';
-                this.innerHTML = '';
-                spawnNodeInSlot(this, lvlSource + 1);
-                
-                playCyberSound('merge');
-                appState.qubits += lvlSource * 20; // Bonus finansowy za fuzję
-                recalculatePowerMatrix();
+    function getBestHandelekIncome() {
+        // Funkcja przeszukuje całe imperium, by znaleźć pojedynczy najbardziej dochodowy statek handlowy
+        let maxIncome = 0;
+        
+        // Sprawdzamy standardowy sklep
+        state.shopItems.forEach(i => {
+            if(i.count > 0 && i.income > maxIncome) {
+                maxIncome = i.income;
             }
-        }
-        saveSystemState();
-    }
-
-    /* ==========================================================================
-       SILNIK MATRYCOWY, AUTOMATYKA I ZAPIS STATE
-       ========================================================================== */
-    function recalculatePowerMatrix() {
-        let currentPower = 0;
-        document.querySelectorAll('.data-node').forEach(node => {
-            const lvl = parseInt(node.dataset.level);
-            currentPower += nodeRegistry[lvl].power;
+        });
+        // Sprawdzamy dotychczasowe nagrody z wygranych topek
+        state.rewardHandelki.forEach(r => {
+            if(r.finalIncome > maxIncome) {
+                maxIncome = r.finalIncome;
+            }
         });
 
-        if (appState.premiumTime > 0) {
-            currentPower = currentPower * 5; // Mnożnik z darmowego Premium
-        }
-
-        appState.totalPower = currentPower;
+        // Jeśli gracz nie ma nic, punktem odniesienia staje się bazowy dochód drona (2)
+        return maxIncome > 0 ? maxIncome : 2;
     }
 
-    function updateSystemUI() {
-        cryptoDisplay.innerText = Math.floor(appState.qubits).toLocaleString();
-        powerDisplay.innerText = `${appState.totalPower.toLocaleString()} MFlops`;
-        nodeCostDisplay.innerText = Math.floor(appState.nodeCost);
-        tempDisplay.innerText = `${appState.coreTemp.toFixed(1)}°C`;
+    let calculatedPlayerIPS = 0;
 
-        if (appState.premiumTime > 0) {
-            boostDisplay.innerText = `AKTYWNY (${appState.premiumTime}s) [x5]`;
-            boostDisplay.style.color = "var(--neon-pink)";
-        } else {
-            boostDisplay.innerText = "NIEAKTYWNY";
-            boostDisplay.style.color = "#666";
+    function recalculateTotalIncome() {
+        let total = 0;
+        state.shopItems.forEach(item => {
+            total += item.count * item.income;
+        });
+        state.rewardHandelki.forEach(bonus => {
+            total += bonus.finalIncome;
+        });
+
+        if(state.globalBoosterTime > 0) {
+            total = total * 2; // Dopalacz x2
         }
 
-        document.getElementById('btn-buy-node').disabled = (appState.qubits < appState.nodeCost);
+        calculatedPlayerIPS = total;
     }
 
-    // Interakcja manualna
-    document.getElementById('btn-manual').addEventListener('click', () => {
-        let revenue = 5 + Math.floor(appState.totalPower * 0.1);
-        if (appState.premiumTime > 0) revenue *= 5;
-        appState.qubits += revenue;
-        playCyberSound('click');
-        updateSystemUI();
+    document.getElementById('btn-manual-click').addEventListener('click', () => {
+        let clickPower = 10 + Math.floor(calculatedPlayerIPS * 0.1);
+        state.cash += clickPower;
+        playBeep(800, "sine", 0.05);
+        updateInterface();
     });
 
-    document.getElementById('btn-buy-node').addEventListener('click', () => {
-        if (appState.qubits >= appState.nodeCost) {
-            const firstEmpty = Array.from(document.querySelectorAll('.lab-slot')).find(s => !s.hasChildNodes());
-            if (firstEmpty) {
-                appState.qubits -= appState.nodeCost;
-                appState.nodeCost = Math.floor(appState.nodeCost * 1.18);
-                spawnNodeInSlot(firstEmpty, 1);
-                playCyberSound('click');
-                recalculatePowerMatrix();
-                updateSystemUI();
-                saveSystemState();
-            }
-        }
-    });
-
-    window.injectPremiumBooster = function(seconds) {
-        appState.premiumTime += seconds;
-        playCyberSound('merge');
-        logTerminal(`ZASILANIE PREMIUM URUCHOMIONE (+${seconds}s). Zwiększono parametry mnożnika.`, "var(--neon-gold)");
-        recalculatePowerMatrix();
-        updateSystemUI();
-        saveSystemState();
+    window.triggerFreeBoost = function(seconds) {
+        state.globalBoosterTime += seconds;
+        playBeep(400, "square", 0.2);
+        recalculateTotalIncome();
+        updateInterface();
     };
 
     /* ==========================================================================
-       PERSISTENCE SYSTEM (AUTO-SAVE W LOCALSTORAGE)
-       ========================================================================== */
-    function saveSystemState() {
-        const structuralData = [];
-        document.querySelectorAll('.lab-slot').forEach((slot, index) => {
-            const node = slot.querySelector('.data-node');
-            if (node) {
-                structuralData.push({ slotId: index, lvl: parseInt(node.dataset.level) });
+       DYNAMICZNA TOPKA (LEADERBOARD AI ENGINE) & SEZONY
+       ========================================================================= */
+    function runLeaderboardEngine() {
+        // Symulacja przychodów dla botów w czasie rzeczywistym
+        state.competitors.forEach(bot => {
+            bot.cash += (bot.incomeRate / 5);
+            // Boty mają 5% szans na ulepszenie swoich systemów co sekundę
+            if(Math.random() < 0.05) {
+                bot.incomeRate = Math.floor(bot.incomeRate * 1.12);
             }
         });
-        localStorage.setItem('quantum_os_state', JSON.stringify(appState));
-        localStorage.setItem('quantum_os_nodes', JSON.stringify(structuralData));
+
+        // Tworzenie zestawienia (Gracz + Boty) do posortowania rankingu
+        let fullRanking = [];
+        fullRanking.push({ name: "TWOJA FIRMA (TY)", cash: state.cash, isPlayer: true });
+        
+        state.competitors.forEach(bot => {
+            fullRanking.push({ name: bot.name, cash: bot.cash, isPlayer: false });
+        });
+
+        // Sortowanie od największej ilości gotówki
+        fullRanking.sort((a, b) => b.cash - a.cash);
+
+        // Renderowanie rankingu na żywo w strukturze HTML dom
+        const boardDOM = document.getElementById('leaderboard-dom');
+        boardDOM.innerHTML = '';
+
+        fullRanking.forEach((row, idx) => {
+            const rank = idx + 1;
+            const element = document.createElement('div');
+            element.classList.add('leader-row');
+            if(row.isPlayer) {
+                element.classList.add('player');
+                state.currentPlayerRank = rank; // Zapamiętujemy miejsce gracza
+            }
+
+            element.innerHTML = `
+                <div style="display:flex; align-items:center;">
+                    <div class="rank-badge">#${rank}</div>
+                    <div>${row.name}</div>
+                </div>
+                <div style="font-weight:bold; color:var(--neon-green);">${Math.floor(row.cash).toLocaleString()} 🪙</div>
+            `;
+            boardDOM.appendChild(element);
+        });
     }
 
-    function loadSystemState() {
-        const storedState = localStorage.getItem('quantum_os_state');
-        const storedNodes = localStorage.getItem('quantum_os_nodes');
+    function executeSeasonEnd() {
+        const rank = state.currentPlayerRank;
+        const logBox = document.getElementById('rewards-log');
+        const bestBase = getBestHandelekIncome();
 
-        if (storedState) {
-            appState = { ...appState, ...JSON.parse(storedState) };
+        playBeep(300, "square", 0.5);
+
+        if(rank === 1) {
+            // Nagroda za TOP 1 -> 300% (3x lepszy od najlepszego)
+            const finalValue = bestBase * 3;
+            const itemBonus = { name: `Super-Artefakt Sezonu (TOP 1)`, bonusPercent: 300, finalIncome: finalValue };
+            state.rewardHandelki.push(itemBonus);
+            logBox.innerHTML = `[SEZON ZAKOŃCZONY] WYGRAŁEŚ! Miejsce #1. Otrzymujesz Handelek z bonusem 300% (+${Math.floor(finalValue)} 🪙/s)!`;
+        } else if(rank === 2) {
+            // Nagroda za TOP 2 -> 200% (2x lepszy od najlepszego)
+            const finalValue = bestBase * 2;
+            const itemBonus = { name: `Sonda Kwantowa (TOP 2)`, bonusPercent: 200, finalIncome: finalValue };
+            state.rewardHandelki.push(itemBonus);
+            logBox.innerHTML = `[SEZON ZAKOŃCZONY] Świetnie! Miejsce #2. Otrzymujesz Handelek z bonusem 200% (+${Math.floor(finalValue)} 🪙/s)!`;
+        } else if(rank === 3) {
+            // Nagroda za TOP 3 -> 150% (1.5x lepszy od najlepszego)
+            const finalValue = bestBase * 1.5;
+            const itemBonus = { name: `Kuter Przebicia (TOP 3)`, bonusPercent: 150, finalIncome: finalValue };
+            state.rewardHandelki.push(itemBonus);
+            logBox.innerHTML = `[SEZON ZAKOŃCZONY] Dobrze! Miejsce #3. Otrzymujesz Handelek z bonusem 150% (+${Math.floor(finalValue)} 🪙/s)!`;
+        } else {
+            logBox.innerHTML = `[SEZON ZAKOŃCZONY] Ukończyłeś na miejscu #${rank}. Brak darmowych nagród z floty premium. Celuj w TOP 3!`;
         }
 
-        initializeMatrixGrid();
-
-        if (storedNodes) {
-            const parsed = JSON.parse(storedNodes);
-            const slots = document.querySelectorAll('.lab-slot');
-            parsed.forEach(d => {
-                if (slots[d.slotId]) spawnNodeInSlot(slots[d.slotId], d.lvl);
-            });
-        }
-        recalculatePowerMatrix();
-        updateSystemUI();
+        // Reset gotówki i parametrów botów na nowy sezon rywalizacji
+        state.competitors.forEach(bot => {
+            bot.cash = Math.floor(state.cash * (0.5 + Math.random())); 
+            bot.incomeRate = Math.floor(calculatedPlayerIPS * (0.6 + Math.random()));
+        });
+        
+        state.seasonTimeLeft = 60; // Nowe 60 sekund
+        recalculateTotalIncome();
+        updateInterface();
+        saveGameData();
     }
 
     /* ==========================================================================
-       DODATKOWE MODUŁY DOŚWIADCZALNE (LIVE NET SNIFFER & MATRIX BACKGROUND)
+       SYSTEM MONITOROWANIA, AKTUALIZACJI UI I AUTO-SAVE
        ========================================================================== */
-    const packetTypes = ["TCP/IP", "UDP/STREAM", "HTTP/GET", "HTTPS/POST", "SSH/AUTH", "DNS/RESOLVE"];
-    const hexChars = "0123456789ABCDEF";
-
-    function generateNetworkPackets() {
-        const type = packetTypes[Math.floor(Math.random() * packetTypes.length)];
-        let hex = "0x";
-        for (let i = 0; i < 8; i++) hex += hexChars[Math.floor(Math.random() * 16)];
+    function updateInterface() {
+        document.getElementById('player-cash').innerText = Math.floor(state.cash).toLocaleString();
+        document.getElementById('total-ips').innerText = `${Math.floor(calculatedPlayerIPS).toLocaleString()} 🪙/s`;
+        document.getElementById('timer-txt').innerText = `${state.seasonTimeLeft}s`;
         
-        const logLine = document.createElement('div');
-        logLine.classList.add('net-packet');
-        logLine.innerHTML = `[${new Date().toLocaleTimeString()}] INBOUND: <span style="color:var(--neon-pink)">${type}</span> ADDR: ${hex} -> ALLOWED`;
+        // Pasek postępu sezonu
+        const percent = (state.seasonTimeLeft / 60) * 100;
+        document.getElementById('season-progress').style.width = `${percent}%`;
 
-        netStreamerDOM.appendChild(logLine);
-        if (netStreamerDOM.childNodes.length > 8) {
-            netStreamerDOM.removeChild(netStreamerDOM.firstChild);
-        }
-        netStreamerDOM.scrollTop = netStreamerDOM.scrollHeight;
+        // Najlepsza posiadana pojedyncza wartość
+        let best = getBestHandelekIncome();
+        document.getElementById('best-item-txt').innerText = `+${Math.floor(best)} 🪙/s`;
 
-        // Fluctuating network speeds on ui
-        document.getElementById('net-speed-val').innerText = `${Math.floor(Math.random() * 800) + 100} KB/s`;
+        renderShop();
     }
-    setInterval(generateNetworkPackets, 1500);
 
-    // Główne pętle procesora aplikacji
+    // Pętla główna (10 razy na sekundę) dla zachowania płynności przyrostu gotówki
     setInterval(() => {
-        if (appState.premiumTime > 0) {
-            appState.premiumTime--;
-            if (appState.premiumTime === 0) recalculatePowerMatrix();
+        if(state.globalBoosterTime > 0) {
+            state.globalBoosterTime -= 0.1;
+            if(state.globalBoosterTime <= 0) recalculateTotalIncome();
         }
 
-        if (appState.totalPower > 0) {
-            appState.qubits += (appState.totalPower / 10);
+        if(calculatedPlayerIPS > 0) {
+            state.cash += (calculatedPlayerIPS / 10);
         }
 
-        // Symulacja temperatury procesora pod obciążeniem
-        appState.coreTemp = 36.4 + (appState.totalPower * 0.005) + (Math.sin(Date.now() / 5000) * 0.4);
-
-        updateSystemUI();
+        runLeaderboardEngine();
+        updateInterface();
     }, 100);
 
-    // Real-time clock widget
+    // Zmniejszanie czasu sezonu (Co 1 sekundę)
     setInterval(() => {
-        document.getElementById('clock-display').innerText = `STACJA SYNC: ${new Date().toLocaleString()}`;
+        if(state.seasonTimeLeft > 0) {
+            state.seasonTimeLeft--;
+            if(state.seasonTimeLeft === 0) {
+                executeSeasonEnd();
+            }
+        }
     }, 1000);
 
     /* ==========================================================================
-       MATRIX DIGITAL RAIN CANVAS ANIMATION
+       PERSISTENCE (ZAPIS STANU GRY)
        ========================================================================== */
-    const canvas = document.getElementById('matrix-canvas');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const dataGlyphs = "0123456789XΩΨΦ⚡🌌💎🧬⚙️💻⚛️";
-    const glyphArr = dataGlyphs.split("");
-    const fSize = 14;
-    const columns = canvas.width / fSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function paintChromaRain() {
-        ctx.fillStyle = 'rgba(3, 3, 7, 0.06)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        let currentHue = (Date.now() / 60) % 360;
-        ctx.fillStyle = `hsla(${currentHue}, 100%, 50%, 1)`;
-        ctx.font = fSize + 'px monospace';
-
-        for (let i = 0; i < drops.length; i++) {
-            const char = glyphArr[Math.floor(Math.random() * glyphArr.length)];
-            ctx.fillText(char, i * fSize, drops[i] * fSize);
-
-            if (drops[i] * fSize > canvas.height && Math.random() > 0.98) {
-                drops[i] = 0;
-            }
-            drops[i]++;
-        }
+    function saveGameData() {
+        localStorage.setItem('intergalactic_tycoon_save', JSON.stringify(state));
     }
-    setInterval(paintChromaRain, 33);
 
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
+    function loadGameData() {
+        const saved = localStorage.getItem('intergalactic_tycoon_save');
+        if(saved) {
+            const parsed = JSON.parse(saved);
+            state.cash = parsed.cash || 100;
+            if(parsed.shopItems) state.shopItems = parsed.shopItems;
+            if(parsed.rewardHandelki) state.rewardHandelki = parsed.rewardHandelki;
+        }
+        recalculateTotalIncome();
+        updateInterface();
+    }
 
-    // Uruchomienie aplikacji przy starcie witryny
+    // Inicjalizacja przy ładowaniu okna przeglądarki
     window.onload = () => {
-        loadSystemState();
+        init3DEngine();
+        loadGameData();
     };
 
 </script>
