@@ -3,589 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D World Clicker // Earth, Sky & Space</title>
+    <title>Matrix Core // 3D Infrastructure Dashboard</title>
     <style>
         :root {
             --neon-blue: #00f0ff;
             --neon-magenta: #ff0077;
             --neon-green: #00ff66;
-            --neon-gold: #ffcc00;
-            --panel-bg: rgba(10, 10, 20, 0.94);
+            --cyber-bg: #04040a;
+            --panel-bg: rgba(6, 6, 16, 0.85);
         }
 
         body {
-            background-color: #020205; color: #fff;
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background-color: var(--cyber-bg);
+            color: #ffffff;
+            font-family: 'Consolas', monospace;
             margin: 0; padding: 0; overflow: hidden;
-            width: 100vw; height: 100vh; user-select: none;
+            width: 100vw; height: 100vh;
         }
 
         #canvas-3d {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
         }
 
-        #hud-container {
+        #app-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
-            pointer-events: none; display: grid; grid-template-columns: 380px 1fr 380px;
+            pointer-events: none; display: grid; grid-template-columns: 360px 1fr 360px;
             padding: 20px; box-sizing: border-box; gap: 20px;
         }
 
-        @media (max-width: 1100px) {
-            #hud-container { grid-template-columns: 1fr; overflow-y: auto; pointer-events: auto; }
-            .hud-panel { pointer-events: auto !important; max-height: none !important; }
-        }
-
-        .hud-panel {
-            background: var(--panel-bg); border: 2px solid #222; border-radius: 12px;
+        .ui-panel {
+            background: var(--panel-bg); border: 1px solid #1a1a2e; border-radius: 8px;
             padding: 16px; display: flex; flex-direction: column; pointer-events: auto;
-            backdrop-filter: blur(10px); max-height: 92vh; overflow-y: auto;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            backdrop-filter: blur(14px); box-shadow: 0 0 25px rgba(0,0,0,0.7);
         }
 
-        .panel-title {
-            font-size: 12px; font-weight: bold; color: var(--neon-blue); letter-spacing: 2px;
-            text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 6px; margin-bottom: 12px;
-            display: flex; justify-content: space-between;
+        .panel-header {
+            font-size: 11px; font-weight: bold; color: var(--neon-blue); letter-spacing: 2px;
+            text-transform: uppercase; border-bottom: 1px solid #1a1a2e;
+            padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between;
         }
 
-        .main-stats {
-            background: rgba(0,0,0,0.5); border: 1px solid #222; border-radius: 8px;
-            padding: 12px; text-align: center; font-size: 28px; font-weight: bold;
-            color: var(--neon-green); text-shadow: 0 0 10px rgba(0,255,102,0.3); margin-bottom: 12px;
+        /* PRZEŁĄCZNIKI MONITORINGU */
+        .mode-selector { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+        .btn-mode {
+            background: #090914; color: #888; border: 1px solid #1c1c30;
+            padding: 10px; border-radius: 4px; cursor: pointer; text-align: left;
+            font-family: inherit; font-size: 11px; text-transform: uppercase; transition: all 0.2s;
+        }
+        .btn-mode.active {
+            color: #fff; border-color: var(--neon-blue); background: rgba(0,240,255,0.05);
+            box-shadow: 0 0 10px rgba(0,240,255,0.2);
         }
 
-        .btn-cyber {
-            background: #090915; color: #fff; border: 1px solid #444;
-            padding: 8px 12px; border-radius: 6px; font-family: inherit;
-            font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px;
-            transition: all 0.2s;
+        /* METRYKI SYSTEMOWE */
+        .metric-box {
+            background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 4px;
+            padding: 12px; margin-bottom: 10px;
         }
-        .btn-cyber:hover:not(:disabled) {
-            border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,102,0.3);
-        }
-        .btn-cyber:disabled { opacity: 0.2; cursor: not-allowed; }
+        .metric-value { font-size: 22px; font-weight: bold; color: var(--neon-green); margin-top: 4px; }
 
-        /* ŚWIATY */
-        .world-selector {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px;
+        /* KONTROLA SUWAKAMI */
+        .slider-group { margin-bottom: 15px; }
+        .slider-group label { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-bottom: 4px;}
+        .cyber-slider {
+            width: 100%; -webkit-appearance: none; background: #111; height: 4px; outline: none;
+            border-radius: 2px;
         }
-        .btn-world { font-size: 10px; padding: 6px 2px; border-color: #333; }
-        .btn-world.active { border-color: var(--neon-magenta); background: rgba(255,0,119,0.1); }
-
-        /* KARTY ULEPSZEŃ (MAX 4) */
-        .upgrade-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-        .upgrade-card {
-            background: rgba(255,255,255,0.02); border: 1px solid #222; border-radius: 6px;
-            padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+        .cyber-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 12px; height: 12px; background: var(--neon-blue);
+            cursor: pointer; border-radius: 50%;
         }
 
-        /* JAJKA I EKWIPUNEK */
-        .egg-zone {
-            background: rgba(255,204,0,0.04); border: 1px dashed var(--neon-gold);
-            border-radius: 8px; padding: 10px; text-align: center; margin-bottom: 12px;
-        }
-        .inventory-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
-            flex: 1; overflow-y: auto; max-height: 200px;
-        }
-        .item-card {
-            background: rgba(0,0,0,0.3); border: 1px solid #222; border-radius: 6px;
-            padding: 8px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px;
-        }
-        .item-card.equipped { border-color: var(--neon-magenta); background: rgba(255,0,119,0.03); }
-
-        /* RZADKOŚCI */
-        .c-common { color: #aaa; }
-        .c-rare { color: var(--neon-blue); font-weight: bold; }
-        .c-legendary { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 5px rgba(255,204,0,0.3); }
-
-        /* TOPKA */
-        .rank-row {
-            display: flex; justify-content: space-between; background: rgba(0,0,0,0.4);
-            padding: 6px 10px; border-radius: 4px; font-size: 11px; margin-bottom: 4px;
-        }
-        .rank-row.user { border: 1px solid var(--neon-magenta); background: rgba(255,0,119,0.08); font-weight: bold; }
-
-        #progress-track { width: 100%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; margin-top: 4px; }
-        #progress-fill { width: 100%; height: 100%; background: var(--neon-magenta); transition: width 1s linear; }
-
-        #console-log {
-            background: #000; border: 1px solid #111; border-radius: 6px;
-            padding: 6px; font-size: 11px; color: var(--neon-gold); height: 60px;
-            overflow-y: auto; margin-top: 10px;
+        /* LOGI TERMINALA */
+        #terminal-stream {
+            background: #010103; border: 1px solid #111; border-radius: 4px;
+            padding: 8px; font-size: 10px; color: #66ff66; height: 180px;
+            overflow-y: auto; flex: 1; line-height: 1.4;
         }
 
-        #big-click-zone {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            cursor: pointer; z-index: 1;
+        .btn-action {
+            background: #00f0ff; color: #000; font-family: inherit; font-weight: bold;
+            border: none; padding: 12px; border-radius: 4px; cursor: pointer;
+            text-transform: uppercase; font-size: 11px; letter-spacing: 1px; transition: all 0.2s;
         }
+        .btn-action:hover { background: #fff; box-shadow: 0 0 15px #00f0ff; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #222; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <div id="big-click-zone"></div>
     <canvas id="canvas-3d"></canvas>
 
-    <div id="hud-container">
+    <div id="app-container">
         
-        <div class="hud-panel">
-            <div class="panel-title"><div>[01] WYBÓR ŚWIATA</div></div>
-            <div class="world-selector">
-                <button class="btn-cyber btn-world active" id="w-1" onclick="changeWorld(1)">1. Ziemia</button>
-                <button class="btn-cyber btn-world" id="w-2" onclick="changeWorld(2)">2. Niebo</button>
-                <button class="btn-cyber btn-world" id="w-3" onclick="changeWorld(3)">3. Kosmos</button>
+        <div class="ui-panel">
+            <div class="panel-header"><div>[01] TRYB MONITOROWANIA REJESTRU</div></div>
+            <div class="mode-selector">
+                <button class="btn-mode active" id="m-1" onclick="setAppMode(1)">1. Global Network Traffic</button>
+                <button class="btn-mode" id="m-2" onclick="setAppMode(2)">2. Cyber Security Matrix</button>
+                <button class="btn-mode" id="m-3" onclick="setAppMode(3)">3. Quantum Core Database</button>
             </div>
 
-            <div class="main-stats"><span id="ui-clicks">0</span> ⚡</div>
-            <div style="font-size:11px; text-align:center; color:#888; margin-bottom:10px;">
-                Klikaj w dowolne miejsce na środku ekranu 3D!
+            <div class="panel-header"><div>[02] WYDAJNOŚĆ INFRASTRUKTURY</div></div>
+            <div class="metric-box">
+                <div style="font-size:10px; color:#777;">PRZEPUSTOWOŚĆ DUPLIKATÓW</div>
+                <div class="metric-value" id="val-speed">450 Mb/s</div>
             </div>
-
-            <div class="panel-title"><div>[02] ULEPSZENIA (MAX 4)</div></div>
-            <div class="upgrade-grid">
-                <div class="upgrade-card">
-                    <div><div>Siła Kliknięcia</div><small id="up-1-desc" style="color:#666;">+1 / klik</small></div>
-                    <button class="btn-cyber" id="up-1-btn" onclick="buyUpgrade(1)">Kup [50 ⚡]</button>
-                </div>
-                <div class="upgrade-card">
-                    <div><div>Zniżka na Jaja</div><small id="up-2-desc" style="color:#666;">Poziom 0</small></div>
-                    <button class="btn-cyber" id="up-2-btn" onclick="buyUpgrade(2)">Kup [150 ⚡]</button>
-                </div>
-                <div class="upgrade-card">
-                    <div><div>Mnożnik Monet</div><small id="up-3-desc" style="color:#666;">x1.0</small></div>
-                    <button class="btn-cyber" id="up-3-btn" onclick="buyUpgrade(3)">Kup [300 ⚡]</button>
-                </div>
-                <div class="upgrade-card">
-                    <div><div>Szczęśliwy Los</div><small id="up-4-desc" style="color:#666;">Poziom 0</small></div>
-                    <button class="btn-cyber" id="up-4-btn" onclick="buyUpgrade(4)">Kup [500 ⚡]</button>
-                </div>
+            <div class="metric-box">
+                <div style="font-size:10px; color:#777;">AKTYWNE MIKROSERWERY (3D)</div>
+                <div class="metric-value" style="color:var(--neon-blue);">64 NODES</div>
+            </div>
+            <div class="metric-box">
+                <div style="font-size:10px; color:#777;">WSPÓŁCZYNNIK INTEGRALNOŚCI</div>
+                <div class="metric-value" id="val-integrity" style="color:var(--neon-magenta);">99.982%</div>
             </div>
         </div>
 
         <div></div>
 
-        <div class="hud-panel">
-            <div class="panel-title"><div>[03] INKUBATOR JAJEK</div><div id="ui-egg-name" style="color:var(--neon-gold);">Jajo Ziemi</div></div>
-            <div class="egg-zone">
-                <div style="font-size:12px; margin-bottom:6px; color:#aaa;">Koszt otwarcia: <span id="ui-egg-cost" style="color:#fff; font-weight:bold;">100</span> ⚡</div>
-                <button class="btn-cyber" style="width:100%; border-color:var(--neon-gold);" onclick="openEgg()">OTWÓRZ JAJKO</button>
+        <div class="ui-panel">
+            <div class="panel-header"><div>[03] PARAMETRYZACJA STRUMIENIA</div></div>
+            
+            <div class="slider-group">
+                <label><span>Prędkość Symulacji 3D</span><span id="lbl-slide-1">1.0x</span></label>
+                <input type="range" class="cyber-slider" id="sld-speed" min="0.2" max="3.0" step="0.1" value="1.0" oninput="adjustSimSpeed()">
+            </div>
+            <div class="slider-group">
+                <label><span>Gęstość Pakietów (Danych)</span><span id="lbl-slide-2">Normal</span></label>
+                <input type="range" class="cyber-slider" id="sld-density" min="1" max="3" step="1" value="2">
             </div>
 
-            <div class="panel-title"><div>[04] ZWIERZAKI (PLECAK)</div><div id="ui-inv-count" style="color:#666;">0/30</div></div>
-            <div class="inventory-grid" id="ui-inv-dom">
-                </div>
+            <button class="btn-action" style="margin-bottom:15px;" onclick="triggerPingBurst()">Inicjuj Ping Test (Wstrzyknięcie)</button>
 
-            <div class="panel-title" style="margin-top:15px;"><div>[05] SEZONOWY WYŚCIG KLIKÓW</div></div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:#888;">
-                KONIEC SEZONU ZA: <span id="ui-timer" style="color:var(--neon-magenta); font-weight:bold;">60s</span>
-            </div>
-            <div id="progress-track"><div id="progress-fill"></div></div>
-
-            <div id="ui-leaderboard" style="margin-top:10px;">
-                </div>
-
-            <div id="console-log">Witaj w Clickerze 3D! Wybierz świat, zbieraj kliknięcia, otwieraj jajka i walcz o TOP 1!</div>
+            <div class="panel-header"><div>[04] STRUMIEŃ SYGNAŁÓW SYSTÉMOWYCH</div></div>
+            <div id="terminal-stream"></div>
         </div>
 
     </div>
 
 <script>
     /* ==========================================================================
-       SILNIK LOGIKI I KONFIGURACJI ŚWIATÓW
+       KONFIGURACJA APLIKACJI I STRUMIENI DANYCH
        ========================================================================== */
-    const worldConfigs = {
-        1: { name: "Ziemia", eggCost: 100, color: 0x00ff66, pCount: 200, pool: [
-            { name: "Piesek Ziemi", multiplier: 2, rarity: "common", geo: "box", color: 0x8b5a2b },
-            { name: "Kot Ziemi", multiplier: 4, rarity: "rare", geo: "octa", color: 0x00f0ff },
-            { name: "Golem Natury", multiplier: 12, rarity: "legendary", geo: "ico", color: 0x00ff66 }
-        ]},
-        2: { name: "Niebo", eggCost: 800, color: 0x00f0ff, pCount: 400, pool: [
-            { name: "Chmurka", multiplier: 15, rarity: "common", geo: "box", color: 0xffffff },
-            { name: "Gryf Niebios", multiplier: 40, rarity: "rare", geo: "tetra", color: 0xff0077 },
-            { name: "Anielski Feniks", multiplier: 150, rarity: "legendary", geo: "ico", color: 0xffcc00 }
-        ]},
-        3: { name: "Kosmos", eggCost: 5000, color: 0xff0077, pCount: 700, pool: [
-            { name: "Meteor", multiplier: 120, rarity: "common", geo: "octa", color: 0x444455 },
-            { name: "Obcy", multiplier: 350, rarity: "rare", geo: "tetra", color: 0x00ff66 },
-            { name: "Gwiezdny Smok", multiplier: 1500, rarity: "legendary", geo: "ico", color: 0xff0077 }
-        ]}
+    let currentMode = 1;
+    let simSpeed = 1.0;
+    
+    const modeMeta = {
+        1: { name: "Global Traffic", color: 0x00f0ff, baseMetric: "Mb/s" },
+        2: { name: "Security Matrix", color: 0xff0077, baseMetric: "Threats/s" },
+        3: { name: "Quantum Core", color: 0x00ff66, baseMetric: "Qubits/s" }
     };
 
-    const aiNames = ["SpeedyClicker", "ProPlayer99", "RobloxFan", "ClickMaster", "HyperActive"];
-
-    let save = {
-        clicks: 0,
-        currentWorld: 1,
-        upgrades: { clickPower: 1, eggDiscount: 0, coinMult: 1.0, luck: 0 },
-        inventory: [],
-        equippedId: null,
-        bots: aiNames.map(name => ({ name: name, clicks: Math.floor(Math.random()*50), speed: 2 + Math.random()*5 })),
-        seasonTime: 60
-    };
-
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function beep(f, t="sine", d=0.08) {
-        try {
-            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
-            o.connect(g); g.connect(audioCtx.destination);
-            g.gain.setValueAtTime(0.02, audioCtx.currentTime);
-            g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + d);
-            o.start(); o.stop(audioCtx.currentTime + d);
-        } catch(e){}
+    function appendLog(text) {
+        const term = document.getElementById('terminal-stream');
+        const time = new Date().toLocaleTimeString();
+        term.innerHTML += `<div>[${time}] ${text}</div>`;
+        term.scrollTop = term.scrollHeight;
     }
 
     /* ==========================================================================
-       SILNIK GRAFIKI TRÓJWYMIAROWEJ (THREE.JS)
+       SILNIK WIZUALIZACJI TRÓJWYMIAROWEJ THREE.JS
        ========================================================================== */
-    let scene, camera, renderer, environmentGroup, petMesh3D;
-    let particles = [];
+    let scene, camera, renderer, serverGroup, packetParticles = [];
 
-    function init3D() {
+    function init3DApp() {
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x020206);
-        scene.fog = new THREE.FogExp2(0x020206, 0.02);
+        scene.background = new THREE.Color(0x030308);
+        scene.fog = new THREE.FogExp2(0x030308, 0.03);
 
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5, 15);
+        camera.position.set(10, 10, 18);
         camera.lookAt(0, 0, 0);
 
         renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-3d'), antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
-        const ambLight = new THREE.AmbientLight(0xffffff, 0.8);
-        scene.add(ambLight);
+        // Światła budujące głębię przestrzeni cyfrowej
+        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambient);
+        
+        const mainLight = new THREE.PointLight(0x00f0ff, 2, 50);
+        mainLight.position.set(0, 0, 0);
+        scene.add(mainLight);
 
-        environmentGroup = new THREE.Group();
-        scene.add(environmentGroup);
+        // Tworzenie "cyber-rdzenia serwerów" w siatce 4x4x4 (64 nody)
+        serverGroup = new THREE.Group();
+        const nodeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        
+        for(let x = -1.5; x <= 1.5; x += 1) {
+            for(let y = -1.5; y <= 1.5; y += 1) {
+                for(let z = -1.5; z <= 1.5; z += 1) {
+                    const nodeMat = new THREE.MeshBasicMaterial({ 
+                        color: 0x00f0ff, 
+                        wireframe: true,
+                        transparent: true,
+                        opacity: 0.7 
+                    });
+                    const nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
+                    nodeMesh.position.set(x * 1.8, y * 1.8, z * 1.8);
+                    
+                    // Każdy serwer przechowuje losowe przesunięcie fazy pulsu
+                    nodeMesh.userData = { phase: Math.random() * Math.PI * 2 };
+                    serverGroup.add(nodeMesh);
+                }
+            }
+        }
+        scene.add(serverGroup);
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        rebuild3DEnvironment();
-        renderLoop();
+        appendLog("Inicjalizacja silnika WebGL 3D zakończona powodzeniem.");
+        appendLog("Mapowanie 64 węzłów mikroserwera w sieci...");
+        
+        animateApp();
     }
 
-    function rebuild3DEnvironment() {
-        // Czyszczenie starego świata 3D
-        while(environmentGroup.children.length > 0){
-            environmentGroup.remove(environmentGroup.children[0]);
-        }
+    /* GENEROWANIE WIĄZKI PAKIETÓW DANYCH 3D (NEONOWE CZĄSTECZKI) */
+    function spawnDataPacket(isBurst = false) {
+        const meta = modeMeta[currentMode];
+        const pGeo = new THREE.SphereGeometry(0.08, 4, 4);
+        const pMat = new THREE.MeshBasicMaterial({ color: meta.color });
+        const mesh = new THREE.Mesh(pGeo, pMat);
 
-        const config = worldConfigs[save.currentWorld];
-        scene.background.setHex(save.currentWorld === 1 ? 0x020804 : save.currentWorld === 2 ? 0x05101a : 0x020206);
+        // Pakiety zaczynają z zewnątrz i lecą do środka (do rdzenia serwerów)
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 15;
+        mesh.position.set(
+            Math.cos(angle) * radius,
+            (Math.random() - 0.5) * 10,
+            Math.sin(angle) * radius
+        );
 
-        // Generowanie platformy centralnej świata
-        const stageGeo = new THREE.CylinderGeometry(4, 4.5, 0.5, 6);
-        const stageMat = new THREE.MeshBasicMaterial({ color: config.color, wireframe: true });
-        const stage = new THREE.Mesh(stageGeo, stageMat);
-        stage.position.y = -2;
-        environmentGroup.add(stage);
+        // Obliczanie kierunku wektora lotu do centrum (0,0,0)
+        const speedFactor = isBurst ? 0.3 : 0.08 * simSpeed;
+        mesh.userData = {
+            target: new THREE.Vector3(0, 0, 0),
+            speed: speedFactor
+        };
 
-        // Cząsteczki unikalne dla świata
-        const pGeo = new THREE.BufferGeometry();
-        const pCoords = new Float32Array(config.pCount * 3);
-        for(let i=0; i<config.pCount*3; i++) pCoords[i] = (Math.random() - 0.5) * 60;
-        pGeo.setAttribute('position', new THREE.BufferAttribute(pCoords, 3));
-        const pMat = new THREE.PointsMaterial({ color: config.color, size: 0.2, transparent: true, opacity: 0.6 });
-        const pSystem = new THREE.Points(pGeo, pMat);
-        environmentGroup.add(pSystem);
+        scene.add(mesh);
+        packetParticles.push(mesh);
     }
 
-    function updatePet3DModel(item) {
-        if(petMesh3D) scene.remove(petMesh3D);
-        if(!item) return;
-
-        let geo;
-        if(item.geo === 'box') geo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
-        else if(item.geo === 'octa') geo = new THREE.OctahedronGeometry(1.4);
-        else geo = new THREE.IcosahedronGeometry(1.3);
-
-        const mat = new THREE.MeshBasicMaterial({ color: item.color, wireframe: true });
-        petMesh3D = new THREE.Mesh(geo, mat);
-        petMesh3D.position.set(0, 0, 0);
-        scene.add(petMesh3D);
-
-        // Efekt spawnu cząsteczek
-        for(let i=0; i<15; i++) {
-            const pG = new THREE.SphereGeometry(0.08, 3, 3);
-            const pM = new THREE.MeshBasicMaterial({ color: item.color, transparent: true, opacity: 1 });
-            const pMesh = new THREE.Mesh(pG, pM);
-            pMesh.position.set((Math.random()-0.5)*2, (Math.random()-0.5)*2, (Math.random()-0.5)*2);
-            pMesh.userData = { vx: (Math.random()-0.5)*0.2, vy: (Math.random()-0.5)*0.2, vz: (Math.random()-0.5)*0.2, life: 1 };
-            scene.add(pMesh); particles.push(pMesh);
+    /* WYWOŁANIE NAGŁEGO TESTU PING (POTĘŻNY WYSTRZAŁ SYGNAŁÓW) */
+    window.triggerPingBurst = function() {
+        appendLog(">> WYKRYTO ŻĄDANIE UŻYTKOWNIKA: INICJACJA PING TEST BURST...");
+        for(let i=0; i<60; i++) {
+            spawnDataPacket(true);
         }
-    }
+    };
 
-    function renderLoop() {
-        requestAnimationFrame(renderLoop);
+    window.setAppMode = function(modeId) {
+        currentMode = modeId;
+        document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+        document.getElementById(`m-${modeId}`).classList.add('active');
 
-        environmentGroup.rotation.y += 0.001;
+        const meta = modeMeta[modeId];
+        appendLog(`ZMIANA KONTEKSTU SYSTEMU: Aktywowano tryb -> ${meta.name}`);
 
-        if(petMesh3D) {
-            petMesh3D.rotation.y += 0.01;
-            petMesh3D.rotation.x = Math.sin(Date.now() * 0.002) * 0.2;
-        }
+        // Aktualizacja kolorów całej architektury 3D pod nowy tryb aplikacji
+        serverGroup.children.forEach(node => {
+            node.material.color.setHex(meta.color);
+        });
+    };
 
-        for(let i=particles.length-1; i>=0; i--) {
-            const p = particles[i];
-            p.position.x += p.userData.vx; p.position.y += p.userData.vy; p.position.z += p.userData.vz;
-            p.userData.life -= 0.04; p.material.opacity = p.userData.life;
-            if(p.userData.life <= 0) { scene.remove(p); particles.splice(i, 1); }
+    window.adjustSimSpeed = function() {
+        simSpeed = parseFloat(document.getElementById('sld-speed').value);
+        document.getElementById('lbl-slide-1').innerText = `${simSpeed.toFixed(1)}x`;
+    };
+
+    /* GŁÓWNA PĘTLA RENDEROWANIA I ANALIZY MATEMATYCZNEJ */
+    function animateApp() {
+        requestAnimationFrame(animateApp);
+
+        // Powolna rotacja całej chmury serwerów dla efektu głębi
+        serverGroup.rotation.y += 0.003 * simSpeed;
+        serverGroup.rotation.x = Math.sin(Date.now() * 0.0005) * 0.1;
+
+        // Dynamiczna animacja pulsowania pojedynczych serwerów
+        serverGroup.children.forEach(node => {
+            node.userData.phase += 0.04 * simSpeed;
+            const scale = 1.0 + Math.sin(node.userData.phase) * 0.18;
+            node.scale.set(scale, scale, scale);
+        });
+
+        // Przetwarzanie ruchu pakietów danych
+        for(let i = packetParticles.length - 1; i >= 0; i--) {
+            const p = packetParticles[i];
+            // Ruch w kierunku środka aplikacji
+            p.position.lerp(p.userData.target, p.userData.speed);
+
+            // Jeśli pakiet doleciał blisko centrum – zostaje przetworzony i usunięty
+            if(p.position.length() < 0.5) {
+                scene.remove(p);
+                packetParticles.splice(i, 1);
+                
+                if(Math.random() < 0.05) {
+                    appendLog(`Pakiet wejściowy przetworzony przez Node_${Math.floor(Math.random()*64)}`);
+                }
+            }
         }
 
         renderer.render(scene, camera);
     }
 
-    /* ==========================================================================
-       MECHANIKA GRY (KLIKANIE, UPGRADE, JAJA, ŚWIATY)
-       ========================================================================== */
-    document.getElementById('big-click-zone').addEventListener('mousedown', () => {
-        let basePower = save.upgrades.clickPower;
-        
-        // Sprawdzanie czy mamy założonego peta
-        if(save.equippedId) {
-            const pet = save.inventory.find(p => p.id === save.equippedId);
-            if(pet) basePower += pet.multiplier;
-        }
-
-        let totalGain = Math.floor(basePower * save.upgrades.coinMult);
-        save.clicks += totalGain;
-        
-        beep(800 + (Math.random()*200), "sine", 0.04);
-        
-        if(petMesh3D) {
-            petMesh3D.scale.set(1.3, 1.3, 1.3);
-            setTimeout(() => petMesh3D.scale.set(1,1,1), 60);
-        }
-        updateUI();
-    });
-
-    window.changeWorld = function(wId) {
-        save.currentWorld = wId;
-        document.querySelectorAll('.btn-world').forEach(b => b.classList.remove('active'));
-        document.getElementById(`w-${wId}`).classList.add('active');
-        
-        beep(400, "sine");
-        rebuild3DEnvironment();
-        updateUI();
-    };
-
-    window.buyUpgrade = function(type) {
-        if(type === 1 && save.clicks >= 50 * save.upgrades.clickPower) {
-            save.clicks -= 50 * save.upgrades.clickPower;
-            save.upgrades.clickPower += 2;
-        }
-        else if(type === 2 && save.clicks >= 150 * (save.upgrades.eggDiscount + 1)) {
-            save.clicks -= 150 * (save.upgrades.eggDiscount + 1);
-            save.upgrades.eggDiscount += 1;
-        }
-        else if(type === 3 && save.clicks >= Math.floor(300 * save.upgrades.coinMult)) {
-            save.clicks -= Math.floor(300 * save.upgrades.coinMult);
-            save.upgrades.coinMult += 0.5;
-        }
-        else if(type === 4 && save.clicks >= 500 * (save.upgrades.luck + 1)) {
-            save.clicks -= 500 * (save.upgrades.luck + 1);
-            save.upgrades.luck += 1;
-        }
-        beep(600, "triangle");
-        updateUI();
-    };
-
-    window.openEgg = function() {
-        const config = worldConfigs[save.currentWorld];
-        const finalCost = Math.max(10, config.eggCost - (save.upgrades.eggDiscount * 15));
-
-        if(save.clicks >= finalCost) {
-            save.clicks -= finalCost;
-
-            // Szczęśliwy los zmienia rozkład szans na wyciągnięcie legendy
-            let rolled = Math.random() * 100;
-            let luckBonus = save.upgrades.luck * 5; 
-            let petTemplate;
-
-            if(rolled > 90 - luckBonus) petTemplate = config.pool[2]; // Legenda
-            else if(rolled > 60 - luckBonus) petTemplate = config.pool[1]; // Rzadki
-            else petTemplate = config.pool[0]; // Zwykły
-
-            const newPet = {
-                id: "pet_" + Date.now() + "_" + Math.floor(Math.random()*1000),
-                name: petTemplate.name,
-                multiplier: petTemplate.multiplier,
-                rarity: petTemplate.rarity,
-                color: petTemplate.color,
-                geo: petTemplate.geo
-            };
-
-            save.inventory.push(newPet);
-            beep(700, "square", 0.15);
-            document.getElementById('console-log').innerHTML = `[JAJKO] Wyklułeś zwierzaka: <span class="c-${newPet.rarity}">${newPet.name} (+${newPet.multiplier} do kliku)</span>!`;
-            
-            updateUI();
-        }
-    };
-
-    window.toggleEquip = function(id) {
-        if(save.equippedId === id) {
-            save.equippedId = null; // Zdejmij
-            updatePet3DModel(null);
-        } else {
-            save.equippedId = id; // Załóż
-            const pet = save.inventory.find(p => p.id === id);
-            updatePet3DModel(pet);
-        }
-        beep(900, "sine");
-        updateUI();
-    };
-
-    function getAbsoluteBestMultiplier() {
-        if(save.inventory.length === 0) return 1;
-        let max = 1;
-        save.inventory.forEach(p => { if(p.multiplier > max) max = p.multiplier; });
-        return max;
-    }
-
-    /* ==========================================================================
-       PĘTLA LEADERBOARDU AI I SEZONY Z POZYCJĄ PROCENTOWĄ
-       ========================================================================== */
-    function processAI() {
-        save.bots.forEach(b => {
-            b.clicks += b.speed;
-            if(Math.random() < 0.05) b.speed += Math.floor(Math.random()*3);
-        });
-
-        let list = [{ name: "TY (KORPORACJA)", clicks: save.clicks, isUser: true }];
-        save.bots.forEach(b => list.push({ name: b.name, clicks: b.clicks, isUser: false }));
-        list.sort((a,b) => b.clicks - a.clicks);
-
-        const lb = document.getElementById('ui-leaderboard');
-        lb.innerHTML = '';
-        list.forEach((row, idx) => {
-            const rank = idx + 1;
-            if(row.isUser) save.currentRank = rank;
-            const div = document.createElement('div');
-            div.classList.add('rank-row');
-            if(row.isUser) div.classList.add('user');
-            div.innerHTML = `<div>#${rank} ${row.name}</div><strong>${Math.floor(row.clicks).toLocaleString()} ⚡</strong>`;
-            lb.appendChild(div);
-        });
-    }
-
-    function handleSeasonEnd() {
-        const rank = save.currentRank;
-        const log = document.getElementById('console-log');
-        const bestMult = getAbsoluteBestMultiplier();
-
-        beep(300, "square", 0.4);
-
-        if(rank === 1) {
-            const finalValue = Math.floor(bestMult * 2.5); // Nagroda 250%
-            const prize = { id: "reward_" + Date.now(), name: "Mistrz Galaktyki (TOP 1)", multiplier: finalValue, rarity: "legendary", color: 0xffcc00, geo: "ico" };
-            save.inventory.push(prize);
-            log.innerHTML = `[KONIEC SEZONU] WYGRAŁEŚ TOP 1! Otrzymujesz Peta Sezonowego o mocy 250% Twojego najlepszego (+${finalValue} do kliknięcia)!`;
-        } 
-        else if(rank === 2) {
-            const finalValue = Math.floor(bestMult * 2.0); // Nagroda 200%
-            const prize = { id: "reward_" + Date.now(), name: "Astra-Feniks (TOP 2)", multiplier: finalValue, rarity: "rare", color: 0xff0077, geo: "octa" };
-            save.inventory.push(prize);
-            log.innerHTML = `[KONIEC SEZONU] Drugie miejsce! Otrzymujesz Peta o mocy 200% Twojego najlepszego (+${finalValue} do kliknięcia).`;
-        } 
-        else if(rank === 3) {
-            const finalValue = Math.floor(bestMult * 1.5); // Nagroda 150%
-            const prize = { id: "reward_" + Date.now(), name: "Gwiezdny Strażnik (TOP 3)", multiplier: finalValue, rarity: "rare", color: 0x00f0ff, geo: "box" };
-            save.inventory.push(prize);
-            log.innerHTML = `[KONIEC SEZONU] Trzecie miejsce! Otrzymujesz Peta o mocy 150% Twojego najlepszego (+${finalValue} do kliknięcia).`;
-        } 
-        else {
-            log.innerHTML = `[KONIEC SEZONU] Zająłeś miejsce #${rank}. Brak bonusowych nagród procentowych. Celuj w TOP 3 w nowym sezonie!`;
-        }
-
-        // Reset botów na nowy sezon
-        save.bots.forEach(b => {
-            b.clicks = Math.floor(save.clicks * (0.4 + Math.random()));
-            b.speed = Math.floor(save.upgrades.clickPower * (1 + Math.random() * 3));
-        });
-
-        save.seasonTime = 60;
-        updateUI();
-    }
-
-    /* OBRÓBKA KART INTERFEJSU */
-    function updateUI() {
-        document.getElementById('ui-clicks').innerText = Math.floor(save.clicks).toLocaleString();
-        document.getElementById('ui-timer').innerText = `${save.seasonTime}s`;
-        document.getElementById('progress-fill').style.width = `${(save.seasonTime / 60) * 100}%`;
-
-        // Teksty ulepszeń
-        document.getElementById('up-1-desc').innerText = `+${save.upgrades.clickPower} / klik`;
-        document.getElementById('up-1-btn').innerText = `Kup [${50 * save.upgrades.clickPower} ⚡]`;
-        document.getElementById('up-1-btn').disabled = save.clicks < (50 * save.upgrades.clickPower);
-
-        document.getElementById('up-2-desc').innerText = `Poziom ${save.upgrades.eggDiscount} (-${save.upgrades.eggDiscount * 15} kosztu)`;
-        document.getElementById('up-2-btn').innerText = `Kup [${150 * (save.upgrades.eggDiscount + 1)} ⚡]`;
-        document.getElementById('up-2-btn').disabled = save.clicks < (150 * (save.upgrades.eggDiscount + 1));
-
-        document.getElementById('up-3-desc').innerText = `Mnożnik: x${save.upgrades.coinMult.toFixed(1)}`;
-        document.getElementById('up-3-btn').innerText = `Kup [${Math.floor(300 * save.upgrades.coinMult)} ⚡]`;
-        document.getElementById('up-3-btn').disabled = save.clicks < Math.floor(300 * save.upgrades.coinMult);
-
-        document.getElementById('up-4-desc').innerText = `Poziom ${save.upgrades.luck} (+${save.upgrades.luck * 5}% Szans)`;
-        document.getElementById('up-4-btn').innerText = `Kup [${500 * (save.upgrades.luck + 1)} ⚡]`;
-        document.getElementById('up-4-btn').disabled = save.clicks < (500 * (save.upgrades.luck + 1));
-
-        // Jajko dane dla świata
-        const wConfig = worldConfigs[save.currentWorld];
-        document.getElementById('ui-egg-name').innerText = `Jajo Świata: ${wConfig.name}`;
-        document.getElementById('ui-egg-cost').innerText = Math.max(10, wConfig.eggCost - (save.upgrades.eggDiscount * 15));
-
-        // Renderowanie plecaka
-        const invDOM = document.getElementById('ui-inv-dom');
-        invDOM.innerHTML = '';
-        save.inventory.forEach(p => {
-            const isEquipped = save.equippedId === p.id;
-            const card = document.createElement('div');
-            card.classList.add('item-card');
-            if(isEquipped) card.classList.add('equipped');
-            card.innerHTML = `
-                <div>
-                    <div class="c-${p.rarity}" style="font-size:11px; font-weight:bold;">${p.name}</div>
-                    <div style="font-size:12px; color:var(--neon-green);">+${p.multiplier} klik</div>
-                </div>
-                <button class="btn-cyber" style="font-size:9px; padding:3px 0;" onclick="toggleEquip('${p.id}')">
-                    ${isEquipped ? 'Zdejmij' : 'Załóż'}
-                </button>
-            `;
-            invDOM.appendChild(card);
-        });
-        document.getElementById('ui-inv-count').innerText = `${save.inventory.length}/30`;
-    }
-
-    // Pętla odświeżania gry (10 razy na sekundę)
+    // Generator pakietów oparty na suwaku gęstości danych
     setInterval(() => {
-        processAI();
-        // Sprawdzanie dostępności przycisków
-        document.querySelectorAll('.upgrade-card button').forEach((btn, idx) => {
-            // Szybkie sprawdzenie zniżek i warunków bez pełnego przeładowania
-        });
-    }, 100);
-
-    // Sekundnik sezonu
-    setInterval(() => {
-        if(save.seasonTime > 0) {
-            save.seasonTime--;
-            updateUI();
-            if(save.seasonTime === 0) handleSeasonEnd();
+        const density = parseInt(document.getElementById('sld-density').value);
+        for(let i=0; i<density; i++) {
+            if(Math.random() < 0.6) spawnDataPacket();
         }
-    }, 1000);
+    }, 150);
+
+    // Dynamiczna symulacja i losowanie wartości na panelu metryk (Dashboardu)
+    setInterval(() => {
+        const density = parseInt(document.getElementById('sld-density').value);
+        const meta = modeMeta[currentMode];
+        
+        let baseValue = (currentMode === 1 ? 300 : currentMode === 2 ? 5 : 1200) * simSpeed * density;
+        baseValue += (Math.random() - 0.5) * (baseValue * 0.1);
+
+        document.getElementById('val-speed').innerText = `${Math.floor(baseValue)} ${meta.baseMetric}`;
+        
+        let integrity = 99.9 + (Math.random() * 0.09);
+        document.getElementById('val-integrity').innerText = `${integrity.toFixed(3)}%`;
+        
+        document.getElementById('lbl-slide-2').innerText = density === 1 ? "Low" : density === 2 ? "Normal" : "Maximum";
+    }, 800);
+
 
     window.onload = () => {
-        init3D();
-        updateUI();
+        init3DApp();
     };
+
 </script>
 </body>
 </html>
