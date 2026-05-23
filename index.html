@@ -3,348 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Orbit Tycoon // Inventory & Custom Equip System</title>
+    <title>3D World Clicker // Earth, Sky & Space</title>
     <style>
-        /* ==========================================================================
-           CYBERPUNK INTERFACE & INVENTORY MATRIX GRID
-           ========================================================================== */
         :root {
             --neon-blue: #00f0ff;
             --neon-magenta: #ff0077;
             --neon-green: #00ff66;
             --neon-gold: #ffcc00;
-            --panel-bg: rgba(6, 6, 14, 0.94);
-        }
-
-        @keyframes panel-pulse {
-            0% { border-color: #222; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-            50% { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0,240,255,0.15); }
-            100% { border-color: #222; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+            --panel-bg: rgba(10, 10, 20, 0.94);
         }
 
         body {
-            background-color: #020204;
-            color: #ffffff;
-            font-family: 'Consolas', 'Segoe UI', monospace;
+            background-color: #020205; color: #fff;
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
             margin: 0; padding: 0; overflow: hidden;
             width: 100vw; height: 100vh; user-select: none;
         }
 
         #canvas-3d {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; z-index: 1;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
         }
 
         #hud-container {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; z-index: 2;
-            pointer-events: none;
-            display: grid;
-            grid-template-columns: 400px 1fr 400px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
+            pointer-events: none; display: grid; grid-template-columns: 380px 1fr 380px;
             padding: 20px; box-sizing: border-box; gap: 20px;
         }
 
-        @media (max-width: 1200px) {
+        @media (max-width: 1100px) {
             #hud-container { grid-template-columns: 1fr; overflow-y: auto; pointer-events: auto; }
             .hud-panel { pointer-events: auto !important; max-height: none !important; }
         }
 
         .hud-panel {
-            background: var(--panel-bg);
-            border: 2px solid #222; border-radius: 12px; padding: 20px;
-            display: flex; flex-direction: column; pointer-events: auto;
-            backdrop-filter: blur(12px);
-            animation: panel-pulse 12s infinite ease-in-out;
-            max-height: 92vh; overflow-y: auto;
+            background: var(--panel-bg); border: 2px solid #222; border-radius: 12px;
+            padding: 16px; display: flex; flex-direction: column; pointer-events: auto;
+            backdrop-filter: blur(10px); max-height: 92vh; overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
 
         .panel-title {
-            font-size: 13px; font-weight: bold; color: var(--neon-blue);
-            letter-spacing: 2px; text-transform: uppercase;
-            border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 15px;
+            font-size: 12px; font-weight: bold; color: var(--neon-blue); letter-spacing: 2px;
+            text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 6px; margin-bottom: 12px;
             display: flex; justify-content: space-between;
         }
 
-        .cash-box {
-            background: rgba(0,0,0,0.6); border: 1px solid #222; border-radius: 6px;
-            padding: 12px; text-align: center; font-size: 30px; font-weight: bold;
-            color: var(--neon-green); text-shadow: 0 0 12px rgba(0,255,102,0.4);
-            margin-bottom: 15px;
+        .main-stats {
+            background: rgba(0,0,0,0.5); border: 1px solid #222; border-radius: 8px;
+            padding: 12px; text-align: center; font-size: 28px; font-weight: bold;
+            color: var(--neon-green); text-shadow: 0 0 10px rgba(0,255,102,0.3); margin-bottom: 12px;
         }
 
         .btn-cyber {
-            background: #07070f; color: #fff; border: 1px solid #333;
-            padding: 10px 14px; border-radius: 5px; font-family: inherit;
-            font-weight: bold; cursor: pointer; text-transform: uppercase;
-            font-size: 11px; transition: all 0.2s;
+            background: #090915; color: #fff; border: 1px solid #444;
+            padding: 8px 12px; border-radius: 6px; font-family: inherit;
+            font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px;
+            transition: all 0.2s;
         }
         .btn-cyber:hover:not(:disabled) {
             border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,102,0.3);
-            background: #0f1911;
         }
         .btn-cyber:disabled { opacity: 0.2; cursor: not-allowed; }
 
-        /* AKTYWNE SLOTY NA STATEK */
-        .active-slots-container {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-            margin-bottom: 15px;
+        /* ŚWIATY */
+        .world-selector {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px;
         }
-        .active-slot {
-            background: rgba(0,0,0,0.5); border: 1px dashed #444;
-            border-radius: 6px; height: 85px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; font-size: 10px; text-align: center;
-            padding: 4px; box-sizing: border-box; position: relative;
-        }
-        .active-slot.filled { border: 1px solid var(--neon-blue); background: rgba(0, 240, 255, 0.03); }
+        .btn-world { font-size: 10px; padding: 6px 2px; border-color: #333; }
+        .btn-world.active { border-color: var(--neon-magenta); background: rgba(255,0,119,0.1); }
 
-        /* MACIERZ EKWIPUNKU (INVENTORY GRID) */
+        /* KARTY ULEPSZEŃ (MAX 4) */
+        .upgrade-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        .upgrade-card {
+            background: rgba(255,255,255,0.02); border: 1px solid #222; border-radius: 6px;
+            padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* JAJKA I EKWIPUNEK */
+        .egg-zone {
+            background: rgba(255,204,0,0.04); border: 1px dashed var(--neon-gold);
+            border-radius: 8px; padding: 10px; text-align: center; margin-bottom: 12px;
+        }
         .inventory-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-            flex: 1; overflow-y: auto; padding-right: 2px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+            flex: 1; overflow-y: auto; max-height: 200px;
         }
-        .inventory-item {
-            background: rgba(255,255,255,0.02); border: 1px solid #222;
-            border-radius: 8px; padding: 10px; display: flex; flex-direction: column;
-            justify-content: space-between; gap: 8px; position: relative;
+        .item-card {
+            background: rgba(0,0,0,0.3); border: 1px solid #222; border-radius: 6px;
+            padding: 8px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px;
         }
-        .inventory-item.equipped { border-color: var(--neon-magenta); background: rgba(255,0,119,0.02); }
+        .item-card.equipped { border-color: var(--neon-magenta); background: rgba(255,0,119,0.03); }
 
-        /* RZADKOŚCI PRZEDMIOTÓW */
-        .rarity-common { color: #a3a3a3; }
-        .rarity-rare { color: var(--neon-blue); font-weight: bold; }
-        .rarity-epic { color: var(--neon-magenta); font-weight: bold; }
-        .rarity-legendary { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 5px rgba(255,204,0,0.4); }
+        /* RZADKOŚCI */
+        .c-common { color: #aaa; }
+        .c-rare { color: var(--neon-blue); font-weight: bold; }
+        .c-legendary { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 5px rgba(255,204,0,0.3); }
 
-        /* LEADERBOARD & TIMERS */
-        .rank-list { display: flex; flex-direction: column; gap: 5px; }
+        /* TOPKA */
         .rank-row {
             display: flex; justify-content: space-between; background: rgba(0,0,0,0.4);
-            padding: 8px 12px; border-radius: 6px; font-size: 12px; border: 1px solid transparent;
+            padding: 6px 10px; border-radius: 4px; font-size: 11px; margin-bottom: 4px;
         }
-        .rank-row.user { border-color: var(--neon-magenta); background: rgba(255,0,119,0.08); font-weight: bold; }
+        .rank-row.user { border: 1px solid var(--neon-magenta); background: rgba(255,0,119,0.08); font-weight: bold; }
 
-        #progress-track { width: 100%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; margin-top: 5px; }
+        #progress-track { width: 100%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; margin-top: 4px; }
         #progress-fill { width: 100%; height: 100%; background: var(--neon-magenta); transition: width 1s linear; }
 
-        #event-console {
-            background: #020205; border: 1px solid #1c1c28; border-radius: 6px;
-            padding: 8px; font-size: 11px; color: var(--neon-gold); height: 75px;
-            overflow-y: auto; margin-top: 15px; line-height: 1.4;
+        #console-log {
+            background: #000; border: 1px solid #111; border-radius: 6px;
+            padding: 6px; font-size: 11px; color: var(--neon-gold); height: 60px;
+            overflow-y: auto; margin-top: 10px;
         }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+        #big-click-zone {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            cursor: pointer; z-index: 1;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
+    <div id="big-click-zone"></div>
     <canvas id="canvas-3d"></canvas>
 
     <div id="hud-container">
         
         <div class="hud-panel">
-            <div class="panel-title"><div>[01] SKRZYNIE & KONTENERY</div></div>
-            <div class="cash-box"><span id="ui-cash">0</span> 🪙</div>
-
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:15px;">
-                <button class="btn-cyber" onclick="buyLootbox('common')">Zwykła [100 🪙]</button>
-                <button class="btn-cyber" onclick="buyLootbox('rare')" style="border-color:var(--neon-blue);">Rzadka [400 🪙]</button>
+            <div class="panel-title"><div>[01] WYBÓR ŚWIATA</div></div>
+            <div class="world-selector">
+                <button class="btn-cyber btn-world active" id="w-1" onclick="changeWorld(1)">1. Ziemia</button>
+                <button class="btn-cyber btn-world" id="w-2" onclick="changeWorld(2)">2. Niebo</button>
+                <button class="btn-cyber btn-world" id="w-3" onclick="changeWorld(3)">3. Kosmos</button>
             </div>
 
-            <div class="panel-title"><div>[02] AKTYWNE SYSTEMY STATKU (SLOTY)</div></div>
-            <div class="active-slots-container" id="ui-active-slots">
-                </div>
+            <div class="main-stats"><span id="ui-clicks">0</span> ⚡</div>
+            <div style="font-size:11px; text-align:center; color:#888; margin-bottom:10px;">
+                Klikaj w dowolne miejsce na środku ekranu 3D!
+            </div>
 
-            <div class="panel-title"><div>[03] TWÓJ EKWIPUNEK (PLECAK)</div><div id="ui-inv-count" style="color:#666;">0/20</div></div>
-            <div class="inventory-grid" id="ui-inventory-grid">
+            <div class="panel-title"><div>[02] ULEPSZENIA (MAX 4)</div></div>
+            <div class="upgrade-grid">
+                <div class="upgrade-card">
+                    <div><div>Siła Kliknięcia</div><small id="up-1-desc" style="color:#666;">+1 / klik</small></div>
+                    <button class="btn-cyber" id="up-1-btn" onclick="buyUpgrade(1)">Kup [50 ⚡]</button>
                 </div>
+                <div class="upgrade-card">
+                    <div><div>Zniżka na Jaja</div><small id="up-2-desc" style="color:#666;">Poziom 0</small></div>
+                    <button class="btn-cyber" id="up-2-btn" onclick="buyUpgrade(2)">Kup [150 ⚡]</button>
+                </div>
+                <div class="upgrade-card">
+                    <div><div>Mnożnik Monet</div><small id="up-3-desc" style="color:#666;">x1.0</small></div>
+                    <button class="btn-cyber" id="up-3-btn" onclick="buyUpgrade(3)">Kup [300 ⚡]</button>
+                </div>
+                <div class="upgrade-card">
+                    <div><div>Szczęśliwy Los</div><small id="up-4-desc" style="color:#666;">Poziom 0</small></div>
+                    <button class="btn-cyber" id="up-4-btn" onclick="buyUpgrade(4)">Kup [500 ⚡]</button>
+                </div>
+            </div>
         </div>
 
         <div></div>
 
         <div class="hud-panel">
-            <div class="panel-title"><div>[04] SEZONOWY RANKING HANDLU</div></div>
-            <div class="data-row">ZAKOŃCZENIE SEZONU ZA: <span id="ui-timer" style="color:var(--neon-magenta);">60s</span></div>
-            <div id="progress-track"><div id="progress-fill"></div></div>
+            <div class="panel-title"><div>[03] INKUBATOR JAJEK</div><div id="ui-egg-name" style="color:var(--neon-gold);">Jajo Ziemi</div></div>
+            <div class="egg-zone">
+                <div style="font-size:12px; margin-bottom:6px; color:#aaa;">Koszt otwarcia: <span id="ui-egg-cost" style="color:#fff; font-weight:bold;">100</span> ⚡</div>
+                <button class="btn-cyber" style="width:100%; border-color:var(--neon-gold);" onclick="openEgg()">OTWÓRZ JAJKO</button>
+            </div>
 
-            <div class="rank-list" id="ui-leaderboard" style="margin-top:15px;">
+            <div class="panel-title"><div>[04] ZWIERZAKI (PLECAK)</div><div id="ui-inv-count" style="color:#666;">0/30</div></div>
+            <div class="inventory-grid" id="ui-inv-dom">
                 </div>
 
-            <div class="panel-title" style="margin-top:20px; margin-bottom:5px;"><div>[05] DZIENNIK SYSTEMOWY NAGRÓD</div></div>
-            <div id="event-console">System operacyjny aktywny. Kup skrzynię, wyciągnij handelek i załóż go do wolnego slotu, by aktywować jego model 3D na orbicie...</div>
+            <div class="panel-title" style="margin-top:15px;"><div>[05] SEZONOWY WYŚCIG KLIKÓW</div></div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#888;">
+                KONIEC SEZONU ZA: <span id="ui-timer" style="color:var(--neon-magenta); font-weight:bold;">60s</span>
+            </div>
+            <div id="progress-track"><div id="progress-fill"></div></div>
 
-            <button class="btn-cyber" id="btn-click" style="width:100%; margin-top:15px; border-color:var(--neon-green); background:#09140c;">
-                Generuj Szybki Przychód Ręczny (+10 🪙)
-            </button>
+            <div id="ui-leaderboard" style="margin-top:10px;">
+                </div>
+
+            <div id="console-log">Witaj w Clickerze 3D! Wybierz świat, zbieraj kliknięcia, otwieraj jajka i walcz o TOP 1!</div>
         </div>
 
     </div>
 
 <script>
     /* ==========================================================================
-       ZAAWANSOWANY SILNIK INTERAKTYWNEGO EKWIPUNKU I ORBITY 3D
+       SILNIK LOGIKI I KONFIGURACJI ŚWIATÓW
        ========================================================================== */
-
-    // Definicje puli przedmiotów (handelków) możliwych do trafienia ze skrzyń
-    const lootTable = {
-        common: [
-            { name: "Moduł Drona", income: 3, rarity: "common", color: 0xa3a3a3, geo: "box" },
-            { name: "Laser Kupiecki", income: 6, rarity: "common", color: 0xa3a3a3, geo: "box" }
-        ],
-        rare: [
-            { name: "Hiper Żagiel", income: 18, rarity: "rare", color: 0x00f0ff, geo: "octa" },
-            { name: "Reaktor Tacytu", income: 35, rarity: "rare", color: 0x00f0ff, geo: "octa" },
-            { name: "Rdzeń Korporacji", income: 80, rarity: "epic", color: 0xff0077, geo: "tetra" }
-        ]
+    const worldConfigs = {
+        1: { name: "Ziemia", eggCost: 100, color: 0x00ff66, pCount: 200, pool: [
+            { name: "Piesek Ziemi", multiplier: 2, rarity: "common", geo: "box", color: 0x8b5a2b },
+            { name: "Kot Ziemi", multiplier: 4, rarity: "rare", geo: "octa", color: 0x00f0ff },
+            { name: "Golem Natury", multiplier: 12, rarity: "legendary", geo: "ico", color: 0x00ff66 }
+        ]},
+        2: { name: "Niebo", eggCost: 800, color: 0x00f0ff, pCount: 400, pool: [
+            { name: "Chmurka", multiplier: 15, rarity: "common", geo: "box", color: 0xffffff },
+            { name: "Gryf Niebios", multiplier: 40, rarity: "rare", geo: "tetra", color: 0xff0077 },
+            { name: "Anielski Feniks", multiplier: 150, rarity: "legendary", geo: "ico", color: 0xffcc00 }
+        ]},
+        3: { name: "Kosmos", eggCost: 5000, color: 0xff0077, pCount: 700, pool: [
+            { name: "Meteor", multiplier: 120, rarity: "common", geo: "octa", color: 0x444455 },
+            { name: "Obcy", multiplier: 350, rarity: "rare", geo: "tetra", color: 0x00ff66 },
+            { name: "Gwiezdny Smok", multiplier: 1500, rarity: "legendary", geo: "ico", color: 0xff0077 }
+        ]}
     };
 
-    const aiBots = [
-        { name: "Alpha Cargo", cash: 1500, incomeRate: 10 },
-        { name: "Beta Logistics", cash: 4000, incomeRate: 35 },
-        { name: "Giga Freight", cash: 20000, incomeRate: 180 },
-        { name: "Zetta Shipping", cash: 90000, incomeRate: 750 }
-    ];
+    const aiNames = ["SpeedyClicker", "ProPlayer99", "RobloxFan", "ClickMaster", "HyperActive"];
 
-    let state = {
-        cash: 200,
-        inventory: [],     // Wszystkie posiadane przedmioty gracza
-        equippedIds: [null, null, null], // Trzy sloty: przechowują unikalne ID założonych przedmiotów
-        competitors: JSON.parse(JSON.stringify(aiBots)),
-        seasonTime: 60,
-        currentRank: 5
+    let save = {
+        clicks: 0,
+        currentWorld: 1,
+        upgrades: { clickPower: 1, eggDiscount: 0, coinMult: 1.0, luck: 0 },
+        inventory: [],
+        equippedId: null,
+        bots: aiNames.map(name => ({ name: name, clicks: Math.floor(Math.random()*50), speed: 2 + Math.random()*5 })),
+        seasonTime: 60
     };
 
-    // Obsługa efektów dźwiękowych Web Audio API
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(f, t="sine", d=0.1) {
+    function beep(f, t="sine", d=0.08) {
         try {
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = t; osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + d);
-            osc.start(); osc.stop(audioCtx.currentTime + d);
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+            o.connect(g); g.connect(audioCtx.destination);
+            g.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + d);
+            o.start(); o.stop(audioCtx.currentTime + d);
         } catch(e){}
     }
 
     /* ==========================================================================
-       SILNIK 3D THREE.JS (MODELE ORBITALNE I CZĄSTECZKI)
+       SILNIK GRAFIKI TRÓJWYMIAROWEJ (THREE.JS)
        ========================================================================== */
-    let scene, camera, renderer, mainShipCore, spaceDust;
-    let active3DModels = new Map(); // Mapa przechowująca aktywne bryły 3D dla ZAŁOŻONYCH handelków
+    let scene, camera, renderer, environmentGroup, petMesh3D;
     let particles = [];
 
     function init3D() {
-        const canvas = document.getElementById('canvas-3d');
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x010103);
-        scene.fog = new THREE.FogExp2(0x010103, 0.02);
+        scene.background = new THREE.Color(0x020206);
+        scene.fog = new THREE.FogExp2(0x020206, 0.02);
 
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 12, 28);
+        camera.position.set(0, 5, 15);
         camera.lookAt(0, 0, 0);
 
-        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-3d'), antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
-        // Oświetlenie kosmiczne
-        const ambLight = new THREE.AmbientLight(0xffffff, 0.7);
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.8);
         scene.add(ambLight);
-        const dirLight = new THREE.PointLight(0xff0077, 2, 50);
-        dirLight.position.set(0, 5, 5);
-        scene.add(dirLight);
 
-        // Statek centralny gracza (Baza)
-        const coreGeo = new THREE.CylinderGeometry(0, 3, 5, 4, 1);
-        const coreMat = new THREE.MeshBasicMaterial({ color: 0x222233, wireframe: true });
-        mainShipCore = new THREE.Mesh(coreGeo, coreMat);
-        scene.add(mainShipCore);
-
-        // Gwiezdne tło
-        const dustCount = 400;
-        const dustGeo = new THREE.BufferGeometry();
-        const dustPos = new Float32Array(dustCount * 3);
-        for(let i=0; i<dustCount*3; i++) dustPos[i] = (Math.random() - 0.5) * 120;
-        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-        const dustMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, transparent: true, opacity: 0.4 });
-        spaceDust = new THREE.Points(dustGeo, dustMat);
-        scene.add(spaceDust);
+        environmentGroup = new THREE.Group();
+        scene.add(environmentGroup);
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        render3DLoop();
+        rebuild3DEnvironment();
+        renderLoop();
     }
 
-    /* FUNKCJA MATERIALIZACJI MODELU 3D PO ZAŁOŻENIU HANDELKU */
-    function createEquippedMesh3D(item, slotIdx) {
-        if(active3DModels.has(slotIdx)) {
-            scene.remove(active3DModels.get(slotIdx));
+    function rebuild3DEnvironment() {
+        // Czyszczenie starego świata 3D
+        while(environmentGroup.children.length > 0){
+            environmentGroup.remove(environmentGroup.children[0]);
         }
 
+        const config = worldConfigs[save.currentWorld];
+        scene.background.setHex(save.currentWorld === 1 ? 0x020804 : save.currentWorld === 2 ? 0x05101a : 0x020206);
+
+        // Generowanie platformy centralnej świata
+        const stageGeo = new THREE.CylinderGeometry(4, 4.5, 0.5, 6);
+        const stageMat = new THREE.MeshBasicMaterial({ color: config.color, wireframe: true });
+        const stage = new THREE.Mesh(stageGeo, stageMat);
+        stage.position.y = -2;
+        environmentGroup.add(stage);
+
+        // Cząsteczki unikalne dla świata
+        const pGeo = new THREE.BufferGeometry();
+        const pCoords = new Float32Array(config.pCount * 3);
+        for(let i=0; i<config.pCount*3; i++) pCoords[i] = (Math.random() - 0.5) * 60;
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pCoords, 3));
+        const pMat = new THREE.PointsMaterial({ color: config.color, size: 0.2, transparent: true, opacity: 0.6 });
+        const pSystem = new THREE.Points(pGeo, pMat);
+        environmentGroup.add(pSystem);
+    }
+
+    function updatePet3DModel(item) {
+        if(petMesh3D) scene.remove(petMesh3D);
+        if(!item) return;
+
         let geo;
-        if(item.geo === 'box') geo = new THREE.BoxGeometry(1.4, 1.4, 1.4);
-        else if(item.geo === 'octa') geo = new THREE.OctahedronGeometry(1.2);
-        else if(item.geo === 'tetra') geo = new THREE.TetrahedronGeometry(1.2);
-        else geo = new THREE.IcosahedronGeometry(1.1);
+        if(item.geo === 'box') geo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
+        else if(item.geo === 'octa') geo = new THREE.OctahedronGeometry(1.4);
+        else geo = new THREE.IcosahedronGeometry(1.3);
 
         const mat = new THREE.MeshBasicMaterial({ color: item.color, wireframe: true });
-        const mesh = new THREE.Mesh(geo, mat);
+        petMesh3D = new THREE.Mesh(geo, mat);
+        petMesh3D.position.set(0, 0, 0);
+        scene.add(petMesh3D);
 
-        // Każdy z 3 slotów ma przydzielony inny promień orbity, by modele się nie zderzały
-        const radius = 6 + (slotIdx * 3);
-        const startAngle = (slotIdx * (Math.PI * 2 / 3));
-        mesh.position.set(Math.cos(startAngle) * radius, 0, Math.sin(startAngle) * radius);
-
-        mesh.userData = { radius: radius, angle: startAngle, speed: 0.015 + (slotIdx * 0.005) };
-
-        scene.add(mesh);
-        active3DModels.set(slotIdx, mesh);
-
-        // Wytworzenie natychmiastowego impulsu cząsteczek (Teleport na statek)
-        for(let i=0; i<20; i++) {
+        // Efekt spawnu cząsteczek
+        for(let i=0; i<15; i++) {
             const pG = new THREE.SphereGeometry(0.08, 3, 3);
             const pM = new THREE.MeshBasicMaterial({ color: item.color, transparent: true, opacity: 1 });
             const pMesh = new THREE.Mesh(pG, pM);
-            pMesh.position.copy(mesh.position);
-            pMesh.userData = { vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, vz: (Math.random()-0.5)*0.3, life: 1 };
-            scene.add(pMesh);
-            particles.push(pMesh);
+            pMesh.position.set((Math.random()-0.5)*2, (Math.random()-0.5)*2, (Math.random()-0.5)*2);
+            pMesh.userData = { vx: (Math.random()-0.5)*0.2, vy: (Math.random()-0.5)*0.2, vz: (Math.random()-0.5)*0.2, life: 1 };
+            scene.add(pMesh); particles.push(pMesh);
         }
     }
 
-    /* DE-MATERIALIZACJA MODELU 3D PO ZDJĘCIU HANDELKU */
-    function removeEquippedMesh3D(slotIdx) {
-        if(active3DModels.has(slotIdx)) {
-            scene.remove(active3DModels.get(slotIdx));
-            active3DModels.delete(slotIdx);
+    function renderLoop() {
+        requestAnimationFrame(renderLoop);
+
+        environmentGroup.rotation.y += 0.001;
+
+        if(petMesh3D) {
+            petMesh3D.rotation.y += 0.01;
+            petMesh3D.rotation.x = Math.sin(Date.now() * 0.002) * 0.2;
         }
-    }
 
-    function render3DLoop() {
-        requestAnimationFrame(render3DLoop);
-
-        mainShipCore.rotation.y += 0.005;
-        spaceDust.rotation.y += 0.0002;
-
-        // Aktualizacja pozycji założonych przedmiotów na orbicie wokół rdzenia
-        active3DModels.forEach((mesh) => {
-            mesh.userData.angle += mesh.userData.speed;
-            mesh.position.x = Math.cos(mesh.userData.angle) * mesh.userData.radius;
-            mesh.position.z = Math.sin(mesh.userData.angle) * mesh.userData.radius;
-            mesh.rotation.x += 0.01; mesh.rotation.y += 0.02;
-        });
-
-        // Obsługa cząsteczek
         for(let i=particles.length-1; i>=0; i--) {
             const p = particles[i];
             p.position.x += p.userData.vx; p.position.y += p.userData.vy; p.position.z += p.userData.vz;
-            p.userData.life -= 0.03; p.material.opacity = p.userData.life;
+            p.userData.life -= 0.04; p.material.opacity = p.userData.life;
             if(p.userData.life <= 0) { scene.remove(p); particles.splice(i, 1); }
         }
 
@@ -352,253 +342,250 @@
     }
 
     /* ==========================================================================
-       LOGIKA PLECAKA (INVENTORY), SYSTEMU EMISJI I WALUTY
+       MECHANIKA GRY (KLIKANIE, UPGRADE, JAJA, ŚWIATY)
        ========================================================================== */
-    window.buyLootbox = function(tier) {
-        const cost = tier === 'common' ? 100 : 400;
-        if(state.cash >= cost) {
-            state.cash -= cost;
-            
-            // Losowanie przedmiotu z puli rzadkości
-            const pool = lootTable[tier];
-            const baseItem = pool[Math.floor(Math.random() * pool.length)];
-            
-            // Generowanie unikalnego obiektu z własnym ID
-            const newItem = {
-                id: "item_" + Date.now() + "_" + Math.floor(Math.random()*1000),
-                name: baseItem.name,
-                income: baseItem.income,
-                rarity: baseItem.rarity,
-                color: baseItem.color,
-                geo: baseItem.geo
+    document.getElementById('big-click-zone').addEventListener('mousedown', () => {
+        let basePower = save.upgrades.clickPower;
+        
+        // Sprawdzanie czy mamy założonego peta
+        if(save.equippedId) {
+            const pet = save.inventory.find(p => p.id === save.equippedId);
+            if(pet) basePower += pet.multiplier;
+        }
+
+        let totalGain = Math.floor(basePower * save.upgrades.coinMult);
+        save.clicks += totalGain;
+        
+        beep(800 + (Math.random()*200), "sine", 0.04);
+        
+        if(petMesh3D) {
+            petMesh3D.scale.set(1.3, 1.3, 1.3);
+            setTimeout(() => petMesh3D.scale.set(1,1,1), 60);
+        }
+        updateUI();
+    });
+
+    window.changeWorld = function(wId) {
+        save.currentWorld = wId;
+        document.querySelectorAll('.btn-world').forEach(b => b.classList.remove('active'));
+        document.getElementById(`w-${wId}`).classList.add('active');
+        
+        beep(400, "sine");
+        rebuild3DEnvironment();
+        updateUI();
+    };
+
+    window.buyUpgrade = function(type) {
+        if(type === 1 && save.clicks >= 50 * save.upgrades.clickPower) {
+            save.clicks -= 50 * save.upgrades.clickPower;
+            save.upgrades.clickPower += 2;
+        }
+        else if(type === 2 && save.clicks >= 150 * (save.upgrades.eggDiscount + 1)) {
+            save.clicks -= 150 * (save.upgrades.eggDiscount + 1);
+            save.upgrades.eggDiscount += 1;
+        }
+        else if(type === 3 && save.clicks >= Math.floor(300 * save.upgrades.coinMult)) {
+            save.clicks -= Math.floor(300 * save.upgrades.coinMult);
+            save.upgrades.coinMult += 0.5;
+        }
+        else if(type === 4 && save.clicks >= 500 * (save.upgrades.luck + 1)) {
+            save.clicks -= 500 * (save.upgrades.luck + 1);
+            save.upgrades.luck += 1;
+        }
+        beep(600, "triangle");
+        updateUI();
+    };
+
+    window.openEgg = function() {
+        const config = worldConfigs[save.currentWorld];
+        const finalCost = Math.max(10, config.eggCost - (save.upgrades.eggDiscount * 15));
+
+        if(save.clicks >= finalCost) {
+            save.clicks -= finalCost;
+
+            // Szczęśliwy los zmienia rozkład szans na wyciągnięcie legendy
+            let rolled = Math.random() * 100;
+            let luckBonus = save.upgrades.luck * 5; 
+            let petTemplate;
+
+            if(rolled > 90 - luckBonus) petTemplate = config.pool[2]; // Legenda
+            else if(rolled > 60 - luckBonus) petTemplate = config.pool[1]; // Rzadki
+            else petTemplate = config.pool[0]; // Zwykły
+
+            const newPet = {
+                id: "pet_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+                name: petTemplate.name,
+                multiplier: petTemplate.multiplier,
+                rarity: petTemplate.rarity,
+                color: petTemplate.color,
+                geo: petTemplate.geo
             };
 
-            state.inventory.push(newItem);
-            playBeep(650, "triangle");
-            document.getElementById('event-console').innerHTML = `[SKRZYNIA] Otworzyłeś kontener i znalazłeś: <span class="rarity-${newItem.rarity}">${newItem.name} (+${newItem.income} 🪙/s)</span>! Trafił do Twojego plecaka.`;
+            save.inventory.push(newPet);
+            beep(700, "square", 0.15);
+            document.getElementById('console-log').innerHTML = `[JAJKO] Wyklułeś zwierzaka: <span class="c-${newPet.rarity}">${newPet.name} (+${newPet.multiplier} do kliku)</span>!`;
             
-            recalculateGlobalIPS();
-            updateInterfaceUI();
+            updateUI();
         }
     };
 
-    window.equipItem = function(itemId) {
-        const item = state.inventory.find(i => i.id === itemId);
-        if(!item) return;
-
-        // Sprawdzamy czy przedmiot nie jest już gdzieś założony
-        if(state.equippedIds.includes(itemId)) return;
-
-        // Szukamy pierwszego wolnego aktywnego slotu na statku
-        const freeSlotIdx = state.equippedIds.findIndex(id => id === null);
-
-        if(freeSlotIdx !== -1) {
-            state.equippedIds[freeSlotIdx] = itemId;
-            createEquippedMesh3D(item, freeSlotIdx);
-            playBeep(800, "sine", 0.15);
-            document.getElementById('event-console').innerText = `[STATEK] Założyłeś pomyślnie system: ${item.name} do Slotu #${freeSlotIdx+1}!`;
+    window.toggleEquip = function(id) {
+        if(save.equippedId === id) {
+            save.equippedId = null; // Zdejmij
+            updatePet3DModel(null);
         } else {
-            document.getElementById('event-console').innerText = `[BŁĄD] Brak wolnych slotów na statku! Zdejmij najpierw inny handelek.`;
+            save.equippedId = id; // Załóż
+            const pet = save.inventory.find(p => p.id === id);
+            updatePet3DModel(pet);
         }
-
-        recalculateGlobalIPS();
-        updateInterfaceUI();
+        beep(900, "sine");
+        updateUI();
     };
 
-    window.unequipItem = function(slotIdx) {
-        const itemId = state.equippedIds[slotIdx];
-        if(!itemId) return;
-
-        state.equippedIds[slotIdx] = null;
-        removeEquippedMesh3D(slotIdx);
-        playBeep(400, "sine", 0.1);
-        document.getElementById('event-console').innerText = `[STATEK] Zdemontowano handelek ze Slotu #${slotIdx+1}. Powrócił do plecaka.`;
-
-        recalculateGlobalIPS();
-        updateInterfaceUI();
-    };
-
-    function getAbsoluteBestItemIncome() {
-        // Przeszukujemy cały plecak (niezależnie czy założony, czy nie), by znaleźć najwyższy dochód jako punkt odniesienia dla nagród TOP
-        if(state.inventory.length === 0) return 3; // bazowa podstawa jeśli plecak pusty
-        let max = 0;
-        state.inventory.forEach(i => { if(i.income > max) max = i.income; });
+    function getAbsoluteBestMultiplier() {
+        if(save.inventory.length === 0) return 1;
+        let max = 1;
+        save.inventory.forEach(p => { if(p.multiplier > max) max = p.multiplier; });
         return max;
     }
 
-    let currentCalculatedIPS = 0;
-
-    function recalculateGlobalIPS() {
-        let total = 0;
-        // Zarabiają TYLKO te handelki, które są aktualnie ZAŁOŻONE w slotach statku
-        state.equippedIds.forEach(id => {
-            if(id) {
-                const item = state.inventory.find(i => i.id === id);
-                if(item) total += item.income;
-            }
-        });
-        currentCalculatedIPS = total;
-    }
-
-    document.getElementById('btn-click').addEventListener('click', () => {
-        state.cash += 10 + Math.floor(currentCalculatedIPS * 0.1);
-        playBeep(950, "sine", 0.03);
-        updateInterfaceUI();
-    });
-
-    /* RENDEROWANIE STRUKTURY HUD DLA SLOTÓW I EKWIPUNKU */
-    function renderInventoryAndSlotsDOM() {
-        // 1. Renderowanie 3 Aktywnych Slotów statku
-        const slotsContainer = document.getElementById('ui-active-slots');
-        slotsContainer.innerHTML = '';
-        
-        for(let i=0; i<3; i++) {
-            const itemId = state.equippedIds[i];
-            const slotDiv = document.createElement('div');
-            slotDiv.classList.add('active-slot');
-            
-            if(itemId) {
-                const item = state.inventory.find(inv => inv.id === itemId);
-                slotDiv.classList.add('filled');
-                slotDiv.style.borderColor = item.color;
-                slotDiv.innerHTML = `
-                    <div class="rarity-${item.rarity}" style="font-weight:bold;">${item.name}</div>
-                    <div style="color:var(--neon-green); margin:3px 0;">+${item.income} 🪙/s</div>
-                    <button class="btn-cyber" onclick="unequipItem(${i})" style="font-size:8px; padding:2px 6px; border-color:var(--neon-magenta);">Zdejmij</button>
-                `;
-            } else {
-                slotDiv.innerHTML = `<span style="color:#444;">SLOT #${i+1}<br>[PUSTY]</span>`;
-            }
-            slotsContainer.appendChild(slotDiv);
-        }
-
-        // 2. Renderowanie Macierzy Plecaka (Ekwipunku)
-        const gridContainer = document.getElementById('ui-inventory-grid');
-        gridContainer.innerHTML = '';
-
-        state.inventory.forEach(item => {
-            const isEquipped = state.equippedIds.includes(item.id);
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('inventory-item');
-            if(isEquipped) itemDiv.classList.add('equipped');
-
-            itemDiv.innerHTML = `
-                <div>
-                    <div class="rarity-${item.rarity}" style="font-size:11px;">${item.name}</div>
-                    <div style="font-size:12px; color:var(--neon-green); font-weight:bold; margin-top:2px;">+${item.income} 🪙/s</div>
-                </div>
-                <button class="btn-cyber" onclick="equipItem('${item.id}')" ${isEquipped ? 'disabled' : ''} style="font-size:9px; padding:4px 0; width:100%;">
-                    ${isEquipped ? 'Założony' : 'Założ'}
-                </button>
-            `;
-            gridContainer.appendChild(itemDiv);
-        });
-
-        document.getElementById('ui-inv-count').innerText = `${state.inventory.length}/24`;
-    }
-
     /* ==========================================================================
-       RANKING GLOBALNY AI & OBSŁUGA SEZONÓW Z PRECYZYJNĄ NAGRODĄ %
+       PĘTLA LEADERBOARDU AI I SEZONY Z POZYCJĄ PROCENTOWĄ
        ========================================================================== */
-    function runAILeaderboard() {
-        state.competitors.forEach(bot => {
-            bot.cash += (bot.incomeRate / 10);
-            if(Math.random() < 0.05) bot.incomeRate = Math.floor(bot.incomeRate * 1.14);
+    function processAI() {
+        save.bots.forEach(b => {
+            b.clicks += b.speed;
+            if(Math.random() < 0.05) b.speed += Math.floor(Math.random()*3);
         });
 
-        let fullList = [];
-        fullList.push({ name: "TWOJA FLOTA (TY)", cash: state.cash, isUser: true });
-        state.competitors.forEach(b => fullList.push({ name: b.name, cash: b.cash, isUser: false }));
-        fullList.sort((a,b) => b.cash - a.cash);
+        let list = [{ name: "TY (KORPORACJA)", clicks: save.clicks, isUser: true }];
+        save.bots.forEach(b => list.push({ name: b.name, clicks: b.clicks, isUser: false }));
+        list.sort((a,b) => b.clicks - a.clicks);
 
-        const leaderboardDOM = document.getElementById('ui-leaderboard');
-        leaderboardDOM.innerHTML = '';
-
-        fullList.forEach((row, idx) => {
+        const lb = document.getElementById('ui-leaderboard');
+        lb.innerHTML = '';
+        list.forEach((row, idx) => {
             const rank = idx + 1;
+            if(row.isUser) save.currentRank = rank;
             const div = document.createElement('div');
             div.classList.add('rank-row');
-            if(row.isUser) { div.classList.add('user'); state.currentRank = rank; }
-            div.innerHTML = `<div>#${rank} ${row.name}</div><strong>${Math.floor(row.cash).toLocaleString()} 🪙</strong>`;
-            leaderboardDOM.appendChild(div);
+            if(row.isUser) div.classList.add('user');
+            div.innerHTML = `<div>#${rank} ${row.name}</div><strong>${Math.floor(row.clicks).toLocaleString()} ⚡</strong>`;
+            lb.appendChild(div);
         });
     }
 
-    function endCurrentSeason() {
-        const rank = state.currentRank;
-        const consoleDOM = document.getElementById('event-console');
-        const bestItemPower = getAbsoluteBestItemIncome(); // sprawdzamy absolutnie najlepszy handelek w plecaku
+    function handleSeasonEnd() {
+        const rank = save.currentRank;
+        const log = document.getElementById('console-log');
+        const bestMult = getAbsoluteBestMultiplier();
 
-        playBeep(300, "square", 0.5);
+        beep(300, "square", 0.4);
 
-        // Wyliczanie nagrody na podstawie Twoich wytycznych:
         if(rank === 1) {
-            const incomeReward = Math.floor(bestItemPower * 3.0); // 300% lepszy od najlepszego
-            const prizeItem = { id: "reward_" + Date.now(), name: "Mistrzowski Rdzeń Sezonu", income: incomeReward, rarity: "legendary", color: 0xffcc00, geo: "ico" };
-            state.inventory.push(prizeItem);
-            consoleDOM.innerHTML = `[KONIEC SEZONU] <span style="color:var(--neon-gold); font-weight:bold;">UKOŃCZYŁEŚ NA MIEJSCU #1!</span> Otrzymujesz legendarny handelek o mocy 300% Twojego najlepszego przedmiotu (+${incomeReward} 🪙/s)! Sprawdź plecak!`;
+            const finalValue = Math.floor(bestMult * 2.5); // Nagroda 250%
+            const prize = { id: "reward_" + Date.now(), name: "Mistrz Galaktyki (TOP 1)", multiplier: finalValue, rarity: "legendary", color: 0xffcc00, geo: "ico" };
+            save.inventory.push(prize);
+            log.innerHTML = `[KONIEC SEZONU] WYGRAŁEŚ TOP 1! Otrzymujesz Peta Sezonowego o mocy 250% Twojego najlepszego (+${finalValue} do kliknięcia)!`;
         } 
         else if(rank === 2) {
-            const incomeReward = Math.floor(bestItemPower * 2.0); // 200% lepszy od najlepszego
-            const prizeItem = { id: "reward_" + Date.now(), name: "Kwantowy Silnik Top 2", income: incomeReward, rarity: "epic", color: 0xff0077, geo: "tetra" };
-            state.inventory.push(prizeItem);
-            consoleDOM.innerHTML = `[KONIEC SEZONU] Wielki sukces! Miejsce #2. Otrzymujesz epicki handelek o mocy 200% Twojego najlepszego przedmiotu (+${incomeReward} 🪙/s). Trafił do plecaka!`;
+            const finalValue = Math.floor(bestMult * 2.0); // Nagroda 200%
+            const prize = { id: "reward_" + Date.now(), name: "Astra-Feniks (TOP 2)", multiplier: finalValue, rarity: "rare", color: 0xff0077, geo: "octa" };
+            save.inventory.push(prize);
+            log.innerHTML = `[KONIEC SEZONU] Drugie miejsce! Otrzymujesz Peta o mocy 200% Twojego najlepszego (+${finalValue} do kliknięcia).`;
         } 
         else if(rank === 3) {
-            const incomeReward = Math.floor(bestItemPower * 1.5); // 150% lepszy od najlepszego
-            const prizeItem = { id: "reward_" + Date.now(), name: "Sonda Przebicia Top 3", income: incomeReward, rarity: "rare", color: 0x00f0ff, geo: "octa" };
-            state.inventory.push(prizeItem);
-            consoleDOM.innerHTML = `[KONIEC SEZONU] Bardzo dobrze! Miejsce #3. Otrzymujesz rzadki handelek o mocy 150% Twojego najlepszego przedmiotu (+${incomeReward} 🪙/s). Trafił do plecaka!`;
+            const finalValue = Math.floor(bestMult * 1.5); // Nagroda 150%
+            const prize = { id: "reward_" + Date.now(), name: "Gwiezdny Strażnik (TOP 3)", multiplier: finalValue, rarity: "rare", color: 0x00f0ff, geo: "box" };
+            save.inventory.push(prize);
+            log.innerHTML = `[KONIEC SEZONU] Trzecie miejsce! Otrzymujesz Peta o mocy 150% Twojego najlepszego (+${finalValue} do kliknięcia).`;
         } 
         else {
-            consoleDOM.innerHTML = `[KONIEC SEZONU] Ukończyłeś wyścig na pozycji #${rank}. Żeby otrzymać specjalny darmowy handelek z bonusami procentowymi, musisz wskoczyć do TOP 3!`;
+            log.innerHTML = `[KONIEC SEZONU] Zająłeś miejsce #${rank}. Brak bonusowych nagród procentowych. Celuj w TOP 3 w nowym sezonie!`;
         }
 
-        // Reset finansów botów pod nowy sezon walki
-        state.competitors.forEach(bot => {
-            bot.cash = Math.floor(state.cash * (0.6 + Math.random()));
-            bot.incomeRate = Math.floor(currentCalculatedIPS * (0.7 + Math.random())) + 10;
+        // Reset botów na nowy sezon
+        save.bots.forEach(b => {
+            b.clicks = Math.floor(save.clicks * (0.4 + Math.random()));
+            b.speed = Math.floor(save.upgrades.clickPower * (1 + Math.random() * 3));
         });
 
-        state.seasonTime = 60;
-        recalculateGlobalIPS();
-        updateInterfaceUI();
+        save.seasonTime = 60;
+        updateUI();
     }
 
-    /* OBRÓBKA GRAFICZNA INTERFEJSU */
-    function updateInterfaceUI() {
-        document.getElementById('ui-cash').innerText = Math.floor(state.cash).toLocaleString();
-        document.getElementById('ui-timer').innerText = `${state.seasonTime}s`;
-        
-        const percent = (state.seasonTime / 60) * 100;
-        document.getElementById('progress-fill').style.width = `${percent}%`;
+    /* OBRÓBKA KART INTERFEJSU */
+    function updateUI() {
+        document.getElementById('ui-clicks').innerText = Math.floor(save.clicks).toLocaleString();
+        document.getElementById('ui-timer').innerText = `${save.seasonTime}s`;
+        document.getElementById('progress-fill').style.width = `${(save.seasonTime / 60) * 100}%`;
 
-        renderInventoryAndSlotsDOM();
+        // Teksty ulepszeń
+        document.getElementById('up-1-desc').innerText = `+${save.upgrades.clickPower} / klik`;
+        document.getElementById('up-1-btn').innerText = `Kup [${50 * save.upgrades.clickPower} ⚡]`;
+        document.getElementById('up-1-btn').disabled = save.clicks < (50 * save.upgrades.clickPower);
+
+        document.getElementById('up-2-desc').innerText = `Poziom ${save.upgrades.eggDiscount} (-${save.upgrades.eggDiscount * 15} kosztu)`;
+        document.getElementById('up-2-btn').innerText = `Kup [${150 * (save.upgrades.eggDiscount + 1)} ⚡]`;
+        document.getElementById('up-2-btn').disabled = save.clicks < (150 * (save.upgrades.eggDiscount + 1));
+
+        document.getElementById('up-3-desc').innerText = `Mnożnik: x${save.upgrades.coinMult.toFixed(1)}`;
+        document.getElementById('up-3-btn').innerText = `Kup [${Math.floor(300 * save.upgrades.coinMult)} ⚡]`;
+        document.getElementById('up-3-btn').disabled = save.clicks < Math.floor(300 * save.upgrades.coinMult);
+
+        document.getElementById('up-4-desc').innerText = `Poziom ${save.upgrades.luck} (+${save.upgrades.luck * 5}% Szans)`;
+        document.getElementById('up-4-btn').innerText = `Kup [${500 * (save.upgrades.luck + 1)} ⚡]`;
+        document.getElementById('up-4-btn').disabled = save.clicks < (500 * (save.upgrades.luck + 1));
+
+        // Jajko dane dla świata
+        const wConfig = worldConfigs[save.currentWorld];
+        document.getElementById('ui-egg-name').innerText = `Jajo Świata: ${wConfig.name}`;
+        document.getElementById('ui-egg-cost').innerText = Math.max(10, wConfig.eggCost - (save.upgrades.eggDiscount * 15));
+
+        // Renderowanie plecaka
+        const invDOM = document.getElementById('ui-inv-dom');
+        invDOM.innerHTML = '';
+        save.inventory.forEach(p => {
+            const isEquipped = save.equippedId === p.id;
+            const card = document.createElement('div');
+            card.classList.add('item-card');
+            if(isEquipped) card.classList.add('equipped');
+            card.innerHTML = `
+                <div>
+                    <div class="c-${p.rarity}" style="font-size:11px; font-weight:bold;">${p.name}</div>
+                    <div style="font-size:12px; color:var(--neon-green);">+${p.multiplier} klik</div>
+                </div>
+                <button class="btn-cyber" style="font-size:9px; padding:3px 0;" onclick="toggleEquip('${p.id}')">
+                    ${isEquipped ? 'Zdejmij' : 'Załóż'}
+                </button>
+            `;
+            invDOM.appendChild(card);
+        });
+        document.getElementById('ui-inv-count').innerText = `${save.inventory.length}/30`;
     }
 
-    // Pętla główna odświeżania danych (10 razy na sekundę)
+    // Pętla odświeżania gry (10 razy na sekundę)
     setInterval(() => {
-        if(currentCalculatedIPS > 0) {
-            state.cash += (currentCalculatedIPS / 10);
-        }
-        runAILeaderboard();
-        document.getElementById('ui-cash').innerText = Math.floor(state.cash).toLocaleString();
+        processAI();
+        // Sprawdzanie dostępności przycisków
+        document.querySelectorAll('.upgrade-card button').forEach((btn, idx) => {
+            // Szybkie sprawdzenie zniżek i warunków bez pełnego przeładowania
+        });
     }, 100);
 
-    // Odliczanie sekundowe zegara sezonu
+    // Sekundnik sezonu
     setInterval(() => {
-        if(state.seasonTime > 0) {
-            state.seasonTime--;
-            updateInterfaceUI();
-            if(state.seasonTime === 0) endCurrentSeason();
+        if(save.seasonTime > 0) {
+            save.seasonTime--;
+            updateUI();
+            if(save.seasonTime === 0) handleSeasonEnd();
         }
     }, 1000);
 
     window.onload = () => {
         init3D();
-        updateInterfaceUI();
+        updateUI();
     };
-
 </script>
 </body>
 </html>
