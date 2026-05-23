@@ -3,39 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intergalactic Trade Tycoon 3D // System OS v12</title>
+    <title>3D Interstellar Tycoon Pro // OS v15.4</title>
     <style>
         /* ==========================================================================
-           CYBERPUNK CHROMA GLOW & FULLSCREEN LAYOUT
+           CYBERPUNK NEON CHROMA FULLSCREEN LAYOUT & ANIMATIONS
            ========================================================================== */
         :root {
             --neon-blue: #00f0ff;
             --neon-magenta: #ff0077;
             --neon-green: #00ff66;
             --neon-gold: #ffcc00;
-            --panel-bg: rgba(6, 6, 14, 0.9);
+            --panel-bg: rgba(5, 5, 12, 0.92);
         }
 
-        @keyframes border-chroma {
-            0% { border-color: var(--neon-magenta); box-shadow: 0 0 15px var(--neon-magenta); }
-            33% { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
-            66% { border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
-            100% { border-color: var(--neon-magenta); box-shadow: 0 0 15px var(--neon-magenta); }
+        @keyframes panel-glow {
+            0% { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0,240,255,0.2); }
+            50% { border-color: var(--neon-magenta); box-shadow: 0 0 15px rgba(255,0,119,0.2); }
+            100% { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0,240,255,0.2); }
         }
 
         body {
-            background-color: #020205;
+            background-color: #010103;
             color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Consolas', 'Segoe UI', monospace;
             margin: 0;
             padding: 0;
             overflow: hidden;
-            user-select: none;
             width: 100vw;
             height: 100vh;
+            user-select: none;
         }
 
-        /* Canvas dla silnika 3D */
+        /* Widok trójwymiarowy na całą stronę */
         #canvas-3d {
             position: absolute;
             top: 0; left: 0;
@@ -43,103 +42,109 @@
             z-index: 1;
         }
 
-        /* Warstwa Interfejsu 2D (HUD) */
-        #hud-layer {
+        /* Warstwa HUD (2D Interface) */
+        #hud-container {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 2;
             pointer-events: none;
             display: grid;
-            grid-template-columns: 360px 1fr 380px;
+            grid-template-columns: 380px 1fr 380px;
             padding: 20px;
             box-sizing: border-box;
             gap: 20px;
         }
 
-        @media (max-width: 1100px) {
-            #hud-layer {
+        @media (max-width: 1150px) {
+            #hud-container {
                 grid-template-columns: 1fr;
                 overflow-y: auto;
                 pointer-events: auto;
             }
-            .interactive-panel { pointer-events: auto !important; }
+            .hud-panel { pointer-events: auto !important; max-height: none !important; }
         }
 
-        .interactive-panel {
+        .hud-panel {
             background: var(--panel-bg);
-            border: 2px solid #222;
-            border-radius: 14px;
+            border: 2px solid #111;
+            border-radius: 12px;
             padding: 20px;
             display: flex;
             flex-direction: column;
             pointer-events: auto;
-            backdrop-filter: blur(8px);
-            animation: border-chroma 20s infinite linear;
-            max-height: 92vh;
+            backdrop-filter: blur(10px);
+            animation: panel-glow 10s infinite ease-in-out;
+            max-height: 90vh;
             overflow-y: auto;
+            position: relative;
         }
 
-        .panel-header {
-            font-size: 14px;
+        .panel-title {
+            font-size: 13px;
             font-weight: bold;
             color: var(--neon-blue);
             letter-spacing: 2px;
             text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 6px;
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
-        /* STATYSTYKI FINANSOWE */
-        .wallet-container {
-            background: rgba(0,0,0,0.4);
+        /* WALUTA I STATY */
+        .cash-box {
+            background: rgba(0,0,0,0.5);
             border: 1px solid #222;
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 15px;
             text-align: center;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
             color: var(--neon-green);
-            text-shadow: 0 0 10px rgba(0,255,102,0.3);
+            text-shadow: 0 0 12px rgba(0,255,102,0.4);
             margin-bottom: 15px;
         }
 
-        .stat-row {
+        .data-row {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 8px;
-            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 6px;
+            color: #888;
         }
-        .stat-row span { color: #fff; font-weight: bold; }
+        .data-row span { color: #fff; font-weight: bold; }
 
-        /* SKLEP / HANDELKI */
-        .trade-item-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #333;
+        /* KARTY ZAKUPÓW / KONTROLERY */
+        .shop-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #222;
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 10px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 8px;
             transition: all 0.2s;
         }
-        .trade-item-card:hover {
-            background: rgba(255,255,255,0.07);
+        .shop-card:hover {
             border-color: var(--neon-blue);
+            background: rgba(0,240,255,0.02);
         }
 
-        .btn-action {
-            background: #090912;
+        .shop-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-cyber {
+            background: #06060c;
             color: #fff;
-            border: 1px solid #444;
-            padding: 10px 14px;
-            border-radius: 6px;
+            border: 1px solid #333;
+            padding: 8px 14px;
+            border-radius: 4px;
             font-family: inherit;
             font-weight: bold;
             cursor: pointer;
@@ -147,86 +152,72 @@
             font-size: 11px;
             transition: all 0.2s;
         }
-        .btn-action:hover:not(:disabled) {
+        .btn-cyber:hover:not(:disabled) {
             border-color: var(--neon-green);
-            box-shadow: 0 0 10px rgba(0,255,102,0.4);
-            transform: translateY(-1px);
+            box-shadow: 0 0 10px rgba(0,255,102,0.3);
+            background: #0c140c;
         }
-        .btn-action:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-cyber:disabled { opacity: 0.2; cursor: not-allowed; }
 
-        /* TOPKA / LEADERBOARD */
-        .leaderboard-list {
+        /* LEADERBOARD / LEGILE TOPKI */
+        .rank-list { display: flex; flex-direction: column; gap: 5px; }
+        .rank-row {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .leader-row {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4);
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
             border: 1px solid transparent;
         }
-        .leader-row.player {
+        .rank-row.user {
             border-color: var(--neon-magenta);
-            background: rgba(255,0,119,0.1);
+            background: rgba(255,0,119,0.08);
             font-weight: bold;
-        }
-        .rank-badge {
-            width: 24px;
-            font-weight: bold;
-            color: var(--neon-blue);
         }
 
-        /* TIMER SEZONU */
-        #season-timer-bar {
-            width: 100%;
-            height: 4px;
-            background: #222;
-            margin-top: 5px;
-            border-radius: 2px;
-            overflow: hidden;
+        /* SEZONOWY TIMELINE */
+        #progress-track {
+            width: 100%; height: 4px; background: #222;
+            border-radius: 2px; overflow: hidden; margin-top: 5px;
         }
-        #season-progress {
-            width: 100%;
-            height: 100%;
-            background: var(--neon-magenta);
+        #progress-fill {
+            width: 100%; height: 100%; background: var(--neon-magenta);
             transition: width 1s linear;
         }
 
-        /* SKLEP DOPOALACZY */
-        .booster-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .btn-boost {
-            font-size: 9px;
-            padding: 8px 4px;
-            text-align: center;
-        }
-
-        /* HISTORIA NAGRÓD */
-        #rewards-log {
+        /* EVENT REWARDS LOG */
+        #event-console {
+            background: #020205;
+            border: 1px solid #1c1c28;
+            border-radius: 6px;
+            padding: 8px;
             font-size: 11px;
             color: var(--neon-gold);
-            background: rgba(0,0,0,0.5);
-            padding: 8px;
-            border-radius: 6px;
-            height: 70px;
+            height: 80px;
             overflow-y: auto;
-            margin-top: 10px;
-            border: 1px solid #222;
+            margin-top: 15px;
         }
 
-        /* SCROLLBARS */
+        /* WSKAŹNIK TRAFIENIA DOŚWIADCZENIA */
+        #canvas-overlay-text {
+            position: absolute;
+            top: 20%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--neon-magenta);
+            text-shadow: 0 0 15px var(--neon-magenta);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 3;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -234,458 +225,517 @@
 
     <canvas id="canvas-3d"></canvas>
 
-    <div id="hud-layer">
+    <div id="canvas-overlay-text">LEVEL UP! +150%</div>
+
+    <div id="hud-container">
         
-        <div class="interactive-panel">
-            <div class="panel-header"><div>[01] Licencje Handlowe</div></div>
-            <div class="wallet-container"><span id="player-cash">0</span> 🪙</div>
+        <div class="hud-panel">
+            <div class="panel-title"><div>[01] KONTROLA FLOTY HANDLOWEJ</div></div>
+            <div class="cash-box"><span id="ui-cash">0</span> 🪙</div>
+
+            <div class="data-row">GLOBALNY PRZYCHÓD: <span id="ui-ips" style="color:var(--neon-green);">0 🪙/s</span></div>
+            <div class="data-row">NAJSILNIEJSZA LICENCJA: <span id="ui-best-ship">Brak</span></div>
             
-            <div class="stat-row">CAŁKOWITY PRZYCHÓD: <span id="total-ips">0 🪙/s</span></div>
-            <div class="stat-row">NAJLEPSZY HANDELEK: <span id="best-item-txt">Brak</span></div>
-            
-            <button class="btn-action" id="btn-manual-click" style="width:100%; margin-bottom:15px; background:#111125; border-color:var(--neon-blue);">
-                Wymuś Transakcję Ręczną (+10 🪙)
+            <button class="btn-cyber" id="btn-click" style="width:100%; margin-bottom:15px; border-color:var(--neon-blue);">
+                Inicjuj Szybki Handel (+10 🪙)
             </button>
 
-            <div style="flex:1; overflow-y:auto;" id="shop-items-container">
+            <div style="flex:1; overflow-y:auto;" id="shop-list-dom">
                 </div>
         </div>
 
         <div></div>
 
-        <div class="interactive-panel">
-            <div class="panel-header">
-                <div>[02] Globalna Topka Handlowa</div>
-                <div style="font-size:10px; color:#666;">SEZON #1</div>
-            </div>
+        <div class="hud-panel">
+            <div class="panel-title"><div>[02] RANKING GALAKTYCZNY</div><div style="color:var(--neon-gold);">SEZON LIVE</div></div>
             
-            <div class="stat-row">KONIEC SEZONU ZA: <span id="timer-txt">60s</span></div>
-            <div id="season-timer-bar"><div id="season-progress"></div></div>
+            <div class="data-row">ZAKOŃCZENIE SEZONU ZA: <span id="ui-timer" style="color:var(--neon-magenta);">60s</span></div>
+            <div id="progress-track"><div id="progress-fill"></div></div>
 
-            <div style="margin: 15px 0;" class="leaderboard-list" id="leaderboard-dom">
+            <div class="rank-list" id="ui-leaderboard" style="margin-top:15px;">
                 </div>
 
-            <div class="panel-header" style="margin-top:10px;"><div>[03] Dopalacze Matrycy</div></div>
-            <div class="booster-grid">
-                <button class="btn-action btn-boost" onclick="triggerFreeBoost(30)">Impuls 30s (x2)</button>
-                <button class="btn-action btn-boost" onclick="triggerFreeBoost(300)">Błysk 5m (x2)</button>
-                <button class="btn-action btn-boost" onclick="triggerFreeBoost(3600)">Hiper 1H (x2)</button>
-            </div>
+            <div class="panel-title" style="margin-top:20px; margin-bottom:5px;"><div>[03] REJESTR OPERACYJNY NAGRÓD</div></div>
+            <div id="event-console">Uruchomiono system. Kup pierwszą licencję handlową, by wysłać obiekt testowy 3D w przestrzeń kosmiczną...</div>
 
-            <div class="panel-header" style="margin-top:20px; margin-bottom:5px;"><div>Dziennik Przyznanych Nagród</div></div>
-            <div id="rewards-log">Oczekiwanie na zakończenie pierwszego sezonu handlowego...</div>
+            <div class="panel-title" style="margin-top:15px; margin-bottom:5px;"><div>Dopalacze Prędkości</div></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+                <button class="btn-cyber" onclick="triggerBoost(15)">Hiper Skok 15s (x3)</button>
+                <button class="btn-cyber" onclick="triggerBoost(60)">Tunel Czasowy 1m (x3)</button>
+            </div>
         </div>
 
     </div>
 
 <script>
     /* ==========================================================================
-       ZAAWANSOWANY SILNIK INTERGALAKTYCZNEGO TYCOONA 3D
+       ZAAWANSOWANY SILNIK GRY DOŚWIADCZALNEJ Z ANIMACJAMI 3D
        ========================================================================== */
 
-    // Definicje domyślnych typów handlowych (Sklep)
-    const baseShopConfig = [
-        { id: "h1", name: "Dron Kurierski", cost: 50, income: 2, count: 0 },
-        { id: "h2", name: "Kuter Handlowy", cost: 250, income: 12, count: 0 },
-        { id: "h3", name: "Fregata Transportowa", cost: 1200, income: 65, count: 0 },
-        { id: "h4", name: "Gwiezdny Transporter", cost: 7500, income: 380, count: 0 },
-        { id: "h5", name: "Mega-Galeon Korporacji", cost: 45000, income: 2100, count: 0 }
+    // Rejestr bazowy statków handlowych (Sklep)
+    const baseConfig = [
+        { id: "s1", name: "Dron Transportowy", cost: 100, income: 2, count: 0, level: 1, color: 0x00f0ff, geoType: "box" },
+        { id: "s2", name: "Satelita Wydobywczy", cost: 500, income: 15, count: 0, level: 1, color: 0x00ff66, geoType: "octa" },
+        { id: "s3", name: "Kuter Korporacyjny", cost: 2500, income: 90, count: 0, level: 1, color: 0xff0077, geoType: "tetra" },
+        { id: "s4", name: "Hiper Krążownik", cost: 12000, income: 550, count: 0, level: 1, color: 0xffcc00, geoType: "ico" }
     ];
 
-    // Nazwy botów do symulacji rankingu (Topki)
-    const corporateCompetitors = [
-        { name: "Apex Corp", cash: 3000, incomeRate: 15 },
-        { name: "Vortex Logistics", cash: 1500, incomeRate: 35 },
-        { name: "Nexus Freight", cash: 8000, incomeRate: 90 },
-        { name: "Quantum Cargo", cash: 25000, incomeRate: 400 },
-        { name: "Nebula Trade", cash: 90000, incomeRate: 1800 },
-        { name: "Hyperion Inc", cash: 200, incomeRate: 2 },
-        { name: "Chroma Shipping", cash: 400, incomeRate: 8 },
-        { name: "Core Systems", cash: 12000, incomeRate: 150 },
-        { name: "Solar Wind Ltd", cash: 60000, incomeRate: 1100 }
+    // Korporacje AI do symulacji rywalizacji w topce
+    const aiCompetitors = [
+        { name: "Quantum Shipping", cash: 2000, incomeRate: 10 },
+        { name: "Zeta Logistics", cash: 6000, incomeRate: 45 },
+        { name: "Aether Cargo", cash: 25000, incomeRate: 250 },
+        { name: "Vortex Trading", cash: 110000, incomeRate: 1200 },
+        { name: "Nebula Holdings", cash: 400, incomeRate: 4 }
     ];
 
-    // Globalny stan aplikacji
-    let state = {
-        cash: 100,
-        shopItems: JSON.parse(JSON.stringify(baseShopConfig)),
-        competitors: JSON.parse(JSON.stringify(corporateCompetitors)),
-        rewardHandelki: [], // Tu trafiają wygrane super-handelki z topki
-        seasonTimeLeft: 60,
-        globalBoosterTime: 0
+    let gameData = {
+        cash: 150,
+        fleet: JSON.parse(JSON.stringify(baseConfig)),
+        competitors: JSON.parse(JSON.stringify(aiCompetitors)),
+        customRewards: [], // Specjalne nagrody z topek (+150%, +200%, +300%)
+        seasonTime: 60,
+        boosterTime: 0
     };
 
-    // Inicjalizacja Audio Synthesizera
+    // Obsługa Web Audio API do generowania cybernetycznych efektów dźwiękowych
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(freq, type="sine", duration=0.1) {
+    function playSound(f, t="sine", d=0.1) {
         try {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            osc.type = t; osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + d);
+            osc.start(); osc.stop(audioCtx.currentTime + d);
         } catch(e){}
     }
 
     /* ==========================================================================
-       SILNIK 3D (THREE.JS GRAPHICS ENGINE)
+       SILNIK TRÓJWYMIAROWY THREE.JS (RENDERER, ANIMACJE, CZĄSTECZKI)
        ========================================================================== */
-    let scene, camera, renderer, stationGroup, particles;
+    let scene, camera, renderer, centralStation, particleSystem;
+    let visualShipsMap = new Map(); // Mapa łącząca ID przedmiotów z obiektami 3D na ekranie
+    let explosionParticles = [];    // Tablica aktywnych cząsteczek wybuchu ulepszenia
 
-    function init3DEngine() {
+    function init3D() {
         const container = document.getElementById('canvas-3d');
-        
+
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x020206);
-        scene.fog = new THREE.FogExp2(0x020206, 0.015);
+        scene.background = new THREE.Color(0x020205);
+        scene.fog = new THREE.FogExp2(0x020205, 0.015);
 
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 45;
+        camera.position.set(0, 15, 35);
+        camera.lookAt(0, 0, 0);
 
         renderer = new THREE.WebGLRenderer({ canvas: container, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
-        // Tworzenie stacji kosmicznej 3D
-        stationGroup = new THREE.Group();
-        
-        // Pierścień główny stacji
-        const ringGeo = new THREE.TorusGeometry(12, 0.6, 16, 100);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
-        const mainRing = new THREE.Mesh(ringGeo, ringMat);
-        stationGroup.add(mainRing);
+        // Oświetlenie sceny 3D
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0x00f0ff, 1.5, 100);
+        pointLight.position.set(0, 10, 10);
+        scene.add(pointLight);
 
-        // Drugi pierścień (krzyżowy)
-        const ringGeo2 = new THREE.TorusGeometry(9, 0.3, 12, 80);
-        const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xff0077, wireframe: true });
-        const crossRing = new THREE.Mesh(ringGeo2, ringMat2);
-        crossRing.rotation.x = Math.PI / 2;
-        stationGroup.add(crossRing);
+        // Budowanie bazy centralnej (stacji kosmicznej)
+        const stationGeo = new THREE.TorusGeometry(6, 0.4, 8, 48);
+        const stationMat = new THREE.MeshBasicMaterial({ color: 0x333355, wireframe: true });
+        centralStation = new THREE.Mesh(stationGeo, stationMat);
+        centralStation.rotation.x = Math.PI / 2;
+        scene.add(centralStation);
 
-        // Rdzeń energetyczny stacji
-        const coreGeo = new THREE.IcosahedronGeometry(3, 1);
-        const coreMat = new THREE.MeshBasicMaterial({ color: 0x00ff66, wireframe: true });
-        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-        stationGroup.add(coreMesh);
+        // System gwiezdnego pyłu w tle
+        const pCount = 500;
+        const pGeo = new THREE.BufferGeometry();
+        const pCoords = new Float32Array(pCount * 3);
+        for(let i=0; i<pCount*3; i++) pCoords[i] = (Math.random() - 0.5) * 150;
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pCoords, 3));
+        const pMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, transparent: true, opacity: 0.5 });
+        particleSystem = new THREE.Points(pGeo, pMat);
+        scene.add(particleSystem);
 
-        scene.add(stationGroup);
-
-        // System cząsteczek gwiazd w tle
-        const starsGeo = new THREE.BufferGeometry();
-        const starsCount = 800;
-        const starPositions = new Float32Array(starsCount * 3);
-
-        for(let i=0; i<starsCount*3; i++) {
-            starPositions[i] = (Math.random() - 0.5) * 200;
-        }
-        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.4, transparent: true });
-        particles = new THREE.Points(starsGeo, starsMat);
-        scene.add(particles);
-
-        // Obsługa ruchu myszką
-        window.addEventListener('mousemove', (e) => {
-            const mouseX = (e.clientX / window.innerWidth) - 0.5;
-            const mouseY = (e.clientY / window.innerHeight) - 0.5;
-            stationGroup.rotation.y = mouseX * 2;
-            stationGroup.rotation.x = mouseY * 2;
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        window.addEventListener('resize', onWindowResize);
-        animate3D();
+        animateLoop();
     }
 
-    function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+    /* TWORZENIE I INTEGRACJA NOWYCH MAKIET 3D DLA HANDELKÓW */
+    function spawnShip3D(itemId, geoType, colorHex) {
+        if (visualShipsMap.has(itemId)) return;
 
-    function animate3D() {
-        requestAnimationFrame(animate3D);
+        let geometry;
+        switch(geoType) {
+            case 'box':   geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); break;
+            case 'octa':  geometry = new THREE.OctahedronGeometry(1.2); break;
+            case 'tetra': geometry = new THREE.TetrahedronGeometry(1.3); break;
+            case 'ico':   geometry = new THREE.IcosahedronGeometry(1.2); break;
+            default:      geometry = new THREE.ConeGeometry(1, 2, 4);
+        }
+
+        const material = new THREE.MeshBasicMaterial({ color: colorHex, wireframe: true });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        // Losowanie pozycji startowej na orbicie stacji centralnej
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 10 + (visualShipsMap.size * 2.5);
+        mesh.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
         
-        // Autonomiczny obrót obiektów 3D
-        stationGroup.children[0].rotation.z += 0.005;
-        stationGroup.children[1].rotation.z -= 0.008;
-        stationGroup.children[2].rotation.y += 0.01;
+        // Dynamiczne zmienne pomocnicze dla animacji orbitowania
+        mesh.userData = { angle: angle, radius: radius, speed: 0.01 + (Math.random() * 0.01), baseScale: 1.0 };
 
-        particles.rotation.y += 0.0005;
+        scene.add(mesh);
+        visualShipsMap.set(itemId, mesh);
+    }
+
+    /* WYWOŁANIE ANIMACJI EKSPLOZJI CZĄSTECZEK (LEVEL UP IMPACT EFFECT) */
+    function triggerUpgradeAnimation3D(itemId) {
+        const mesh = visualShipsMap.get(itemId);
+        if(!mesh) return;
+
+        // 1. Efekt rozbłysku/pulsu wielkości modelu 3D
+        mesh.scale.set(2.5, 2.5, 2.5);
+
+        // 2. Wystrzelenie fontanny neonowych drobin z koordynatów obiektu
+        const pCount = 35;
+        for(let i=0; i<pCount; i++) {
+            const partGeo = new THREE.SphereGeometry(0.1, 4, 4);
+            const partMat = new THREE.MeshBasicMaterial({ color: mesh.material.color, transparent: true, opacity: 1.0 });
+            const partMesh = new THREE.Mesh(partGeo, partMat);
+            
+            partMesh.position.copy(mesh.position);
+            
+            // Wektor kierunku wybuchu
+            partMesh.userData = {
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                vz: (Math.random() - 0.5) * 0.4,
+                life: 1.0 // współczynnik wygasania
+            };
+
+            scene.add(partMesh);
+            explosionParticles.push(partMesh);
+        }
+    }
+
+    /* GŁÓWNA PĘTLA RENDEROWANIA GRAFIKI 3D */
+    function animateLoop() {
+        requestAnimationFrame(animateLoop);
+
+        // Obrót bazy centralnej
+        centralStation.rotation.z += 0.002;
+        particleSystem.rotation.y += 0.0003;
+
+        // Animacja orbitowania i rotacji własnej statków handlowych
+        visualShipsMap.forEach((mesh) => {
+            mesh.userData.angle += mesh.userData.speed;
+            mesh.position.x = Math.cos(mesh.userData.angle) * mesh.userData.radius;
+            mesh.position.z = Math.sin(mesh.userData.angle) * mesh.userData.radius;
+            
+            mesh.rotation.x += 0.01;
+            mesh.rotation.y += 0.015;
+
+            // Płynny powrót skali do bazy po animacji podniesienia poziomu
+            if (mesh.scale.x > mesh.userData.baseScale) {
+                mesh.scale.x -= 0.05;
+                mesh.scale.y -= 0.05;
+                mesh.scale.z -= 0.05;
+            }
+        });
+
+        // Aktualizacja i usuwanie wygasłych cząsteczek z eksplozji
+        for(let i = explosionParticles.length - 1; i >= 0; i--) {
+            const p = explosionParticles[i];
+            p.position.x += p.userData.vx;
+            p.position.y += p.userData.vy;
+            p.position.z += p.userData.vz;
+            
+            p.userData.life -= 0.02;
+            p.material.opacity = p.userData.life;
+
+            if(p.userData.life <= 0) {
+                scene.remove(p);
+                explosionParticles.splice(i, 1);
+            }
+        }
 
         renderer.render(scene, camera);
     }
 
     /* ==========================================================================
-       LOGIKA BIZNESOWA, SKLEP I STRUKTURA EKONOMII
+       LOGIKA EKONOMICZNA, OBSŁUGA SEZONÓW I PODNOSZENIA POZIOMÓW
        ========================================================================== */
-    function renderShop() {
-        const container = document.getElementById('shop-items-container');
+    function renderShopUI() {
+        const container = document.getElementById('shop-list-dom');
         container.innerHTML = '';
 
-        // Najpierw renderujemy standardowe kupne licencje
-        state.shopItems.forEach((item, index) => {
+        gameData.fleet.forEach((item) => {
             const card = document.createElement('div');
-            card.classList.add('trade-item-card');
+            card.classList.add('shop-card');
+            
+            // Obliczenie aktualnego zysku z uwzględnieniem poziomu ulepszenia (+2 za poziom)
+            const currentItemIncome = item.count > 0 ? (item.income + (item.level - 1) * 2) * item.count : 0;
+
             card.innerHTML = `
-                <div>
-                    <div style="font-weight:bold; font-size:13px;">${item.name} (x${item.count})</div>
-                    <div style="font-size:11px; color:var(--neon-green);">+${item.income} 🪙/s</div>
+                <div class="shop-card-header">
+                    <div>
+                        <strong style="font-size:13px;">${item.name} (x${item.count})</strong>
+                        <div style="font-size:10px; color:#666;">Poziom Wydajności: ${item.level}</div>
+                    </div>
+                    <div style="color:var(--neon-green); font-size:12px; font-weight:bold;">+${currentItemIncome} 🪙/s</div>
                 </div>
-                <button class="btn-action" onclick="buyStandardItem(${index})" ${state.cash < item.cost ? 'disabled' : ''}>
-                    Kup [${Math.floor(item.cost)} 🪙]
-                </button>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                    <button class="btn-cyber" onclick="buyShip('${item.id}')" ${gameData.cash < item.cost ? 'disabled' : ''}>
+                        Kup [${item.cost} 🪙]
+                    </button>
+                    <button class="btn-cyber" onclick="upgradeShip('${item.id}')" ${item.count === 0 || gameData.cash < (item.cost * 1.5) ? 'disabled' : ''} style="border-color:var(--neon-magenta);">
+                        Ulepsz (+2) [${Math.floor(item.cost * 1.5)} 🪙]
+                    </button>
+                </div>
             `;
             container.appendChild(card);
         });
 
-        // Jeśli posiadamy specjalne statki zdobyte z nagród TOP 1/2/3, wyświetlamy je niżej
-        if(state.rewardHandelki.length > 0) {
-            const separator = document.createElement('div');
-            separator.style.cssText = "margin:15px 0 10px 0; font-size:11px; color:var(--neon-gold); text-transform:uppercase; font-weight:bold; border-top:1px dashed #444; padding-top:10px;";
-            separator.innerText = "Flota Nagród Specjalnych (Topka)";
-            container.appendChild(separator);
+        // Wyświetlanie legendarnych bonusów z Topki procentowej
+        if (gameData.customRewards.length > 0) {
+            const divider = document.createElement('div');
+            divider.style.cssText = "margin:15px 0 5px 0; font-size:11px; color:var(--neon-gold); font-weight:bold; text-transform:uppercase; border-top:1px dashed #333; padding-top:10px;";
+            divider.innerText = "Flota Nagród Specjalnych (Mnożniki %)";
+            container.appendChild(divider);
 
-            state.rewardHandelki.forEach(bonus => {
+            gameData.customRewards.forEach((r) => {
                 const card = document.createElement('div');
-                card.classList.add('trade-item-card');
+                card.classList.add('shop-card');
                 card.style.borderColor = "var(--neon-gold)";
                 card.innerHTML = `
-                    <div>
-                        <div style="font-weight:bold; font-size:13px; color:var(--neon-gold);">${bonus.name}</div>
-                        <div style="font-size:11px; color:#fff;">Mnożnik Pozycji: +${bonus.bonusPercent}%</div>
+                    <div class="shop-card-header">
+                        <span style="color:var(--neon-gold); font-weight:bold; font-size:12px;">${r.name}</span>
+                        <span style="color:var(--neon-green); font-weight:bold;">+${Math.floor(r.incomeValue)} 🪙/s</span>
                     </div>
-                    <div style="font-weight:bold; color:var(--neon-green); font-size:13px;">+${Math.floor(bonus.finalIncome)} 🪙/s</div>
+                    <div style="font-size:10px; color:#aaa;">Wydajność zwiększona o: +${r.percent}% względem najlepszego.</div>
                 `;
                 container.appendChild(card);
             });
         }
     }
 
-    window.buyStandardItem = function(index) {
-        const item = state.shopItems[index];
-        if(state.cash >= item.cost) {
-            state.cash -= item.cost;
+    window.buyShip = function(id) {
+        const item = gameData.fleet.find(f => f.id === id);
+        if(gameData.cash >= item.cost) {
+            gameData.cash -= item.cost;
             item.count++;
-            item.cost = Math.floor(item.cost * 1.25); // Skalowanie ceny o 25%
-            playBeep(600, "triangle");
-            recalculateTotalIncome();
-            updateInterface();
-            saveGameData();
+            
+            // Tworzenie makiety 3D na ekranie jeśli to pierwszy zakup
+            spawnShip3D(item.id, item.geoType, item.color);
+            triggerUpgradeAnimation3D(item.id);
+
+            item.cost = Math.floor(item.cost * 1.25);
+            playSound(550, "sine");
+            recalculateIncome();
+            updateUI();
         }
     };
 
-    function getBestHandelekIncome() {
-        // Funkcja przeszukuje całe imperium, by znaleźć pojedynczy najbardziej dochodowy statek handlowy
-        let maxIncome = 0;
-        
-        // Sprawdzamy standardowy sklep
-        state.shopItems.forEach(i => {
-            if(i.count > 0 && i.income > maxIncome) {
-                maxIncome = i.income;
-            }
-        });
-        // Sprawdzamy dotychczasowe nagrody z wygranych topek
-        state.rewardHandelki.forEach(r => {
-            if(r.finalIncome > maxIncome) {
-                maxIncome = r.finalIncome;
-            }
-        });
+    window.upgradeShip = function(id) {
+        const item = gameData.fleet.find(f => f.id === id);
+        const upgradeCost = Math.floor(item.cost * 1.5);
 
-        // Jeśli gracz nie ma nic, punktem odniesienia staje się bazowy dochód drona (2)
-        return maxIncome > 0 ? maxIncome : 2;
-    }
+        if (item.count > 0 && gameData.cash >= upgradeCost) {
+            gameData.cash -= upgradeCost;
+            item.level++; // Podniesienie poziomu przedmiotu
 
-    let calculatedPlayerIPS = 0;
+            // Wywołanie potężnej animacji rozbłysku i fontanny cząsteczek 3D
+            triggerUpgradeAnimation3D(item.id);
+            playSound(750, "triangle", 0.2);
 
-    function recalculateTotalIncome() {
-        let total = 0;
-        state.shopItems.forEach(item => {
-            total += item.count * item.income;
-        });
-        state.rewardHandelki.forEach(bonus => {
-            total += bonus.finalIncome;
-        });
+            // Wyświetlenie lewitującego napisu 2D nad silnikiem
+            const overlay = document.getElementById('canvas-overlay-text');
+            overlay.innerText = `UPGRADE: ${item.name} LVL ${item.level}!`;
+            overlay.style.opacity = "1";
+            setTimeout(() => overlay.style.opacity = "0", 1200);
 
-        if(state.globalBoosterTime > 0) {
-            total = total * 2; // Dopalacz x2
+            recalculateIncome();
+            updateUI();
         }
+    };
 
-        calculatedPlayerIPS = total;
+    function getBestShipIncomeValue() {
+        let max = 2; // bazowa podstawa bezpieczeństwa algorytmu
+        gameData.fleet.forEach(f => {
+            if(f.count > 0) {
+                const totalIncomeSingle = f.income + (f.level - 1) * 2;
+                if(totalIncomeSingle > max) max = totalIncomeSingle;
+            }
+        });
+        gameData.customRewards.forEach(r => {
+            if(r.incomeValue > max) max = r.incomeValue;
+        });
+        return max;
     }
 
-    document.getElementById('btn-manual-click').addEventListener('click', () => {
-        let clickPower = 10 + Math.floor(calculatedPlayerIPS * 0.1);
-        state.cash += clickPower;
-        playBeep(800, "sine", 0.05);
-        updateInterface();
+    let globalCalculatedIPS = 0;
+
+    function recalculateIncome() {
+        let total = 0;
+        gameData.fleet.forEach(f => {
+            total += f.count * (f.income + (f.level - 1) * 2);
+        });
+        gameData.customRewards.forEach(r => {
+            total += r.incomeValue;
+        });
+
+        if (gameData.boosterTime > 0) total = total * 3; // Bonus za dopalacz x3
+
+        globalCalculatedIPS = total;
+    }
+
+    document.getElementById('btn-click').addEventListener('click', () => {
+        let clickVal = 10 + Math.floor(globalCalculatedIPS * 0.1);
+        gameData.cash += clickVal;
+        playSound(900, "sine", 0.04);
+        updateUI();
     });
 
-    window.triggerFreeBoost = function(seconds) {
-        state.globalBoosterTime += seconds;
-        playBeep(400, "square", 0.2);
-        recalculateTotalIncome();
-        updateInterface();
+    window.triggerBoost = function(sec) {
+        gameData.boosterTime += sec;
+        playSound(440, "square", 0.3);
+        recalculateIncome();
+        updateUI();
     };
 
     /* ==========================================================================
-       DYNAMICZNA TOPKA (LEADERBOARD AI ENGINE) & SEZONY
-       ========================================================================= */
-    function runLeaderboardEngine() {
-        // Symulacja przychodów dla botów w czasie rzeczywistym
-        state.competitors.forEach(bot => {
-            bot.cash += (bot.incomeRate / 5);
-            // Boty mają 5% szans na ulepszenie swoich systemów co sekundę
-            if(Math.random() < 0.05) {
-                bot.incomeRate = Math.floor(bot.incomeRate * 1.12);
-            }
+       SYSTEM DYNAMICZNEGO RANKINGU I PROCEDURY KOŃCA SEZONU
+       ========================================================================== */
+    function processLeaderboard() {
+        gameData.competitors.forEach(bot => {
+            bot.cash += (bot.incomeRate / 10);
+            if(Math.random() < 0.04) bot.incomeRate = Math.floor(bot.incomeRate * 1.15);
         });
 
-        // Tworzenie zestawienia (Gracz + Boty) do posortowania rankingu
-        let fullRanking = [];
-        fullRanking.push({ name: "TWOJA FIRMA (TY)", cash: state.cash, isPlayer: true });
-        
-        state.competitors.forEach(bot => {
-            fullRanking.push({ name: bot.name, cash: bot.cash, isPlayer: false });
-        });
+        let leaderboardArray = [];
+        leaderboardArray.push({ name: "TWOJA KORPORACJA (TY)", cash: gameData.cash, isUser: true });
+        gameData.competitors.forEach(b => leaderboardArray.push({ name: b.name, cash: b.cash, isUser: false }));
 
-        // Sortowanie od największej ilości gotówki
-        fullRanking.sort((a, b) => b.cash - a.cash);
+        leaderboardArray.sort((a,b) => b.cash - a.cash);
 
-        // Renderowanie rankingu na żywo w strukturze HTML dom
-        const boardDOM = document.getElementById('leaderboard-dom');
+        const boardDOM = document.getElementById('ui-leaderboard');
         boardDOM.innerHTML = '';
 
-        fullRanking.forEach((row, idx) => {
-            const rank = idx + 1;
-            const element = document.createElement('div');
-            element.classList.add('leader-row');
-            if(row.isPlayer) {
-                element.classList.add('player');
-                state.currentPlayerRank = rank; // Zapamiętujemy miejsce gracza
+        leaderboardArray.forEach((row, index) => {
+            const rank = index + 1;
+            const div = document.createElement('div');
+            div.classList.add('rank-row');
+            if(row.isUser) {
+                div.classList.add('user');
+                gameData.currentRankPosition = rank;
             }
-
-            element.innerHTML = `
-                <div style="display:flex; align-items:center;">
-                    <div class="rank-badge">#${rank}</div>
-                    <div>${row.name}</div>
-                </div>
-                <div style="font-weight:bold; color:var(--neon-green);">${Math.floor(row.cash).toLocaleString()} 🪙</div>
-            `;
-            boardDOM.appendChild(element);
+            div.innerHTML = `<div>#${rank} ${row.name}</div><strong>${Math.floor(row.cash).toLocaleString()} 🪙</strong>`;
+            boardDOM.appendChild(div);
         });
     }
 
-    function executeSeasonEnd() {
-        const rank = state.currentPlayerRank;
-        const logBox = document.getElementById('rewards-log');
-        const bestBase = getBestHandelekIncome();
+    function handleSeasonEnd() {
+        const position = gameData.currentRankPosition;
+        const consoleDOM = document.getElementById('event-console');
+        const bestShipPower = getBestShipIncomeValue();
 
-        playBeep(300, "square", 0.5);
+        playSound(350, "square", 0.6);
 
-        if(rank === 1) {
-            // Nagroda za TOP 1 -> 300% (3x lepszy od najlepszego)
-            const finalValue = bestBase * 3;
-            const itemBonus = { name: `Super-Artefakt Sezonu (TOP 1)`, bonusPercent: 300, finalIncome: finalValue };
-            state.rewardHandelki.push(itemBonus);
-            logBox.innerHTML = `[SEZON ZAKOŃCZONY] WYGRAŁEŚ! Miejsce #1. Otrzymujesz Handelek z bonusem 300% (+${Math.floor(finalValue)} 🪙/s)!`;
-        } else if(rank === 2) {
-            // Nagroda za TOP 2 -> 200% (2x lepszy od najlepszego)
-            const finalValue = bestBase * 2;
-            const itemBonus = { name: `Sonda Kwantowa (TOP 2)`, bonusPercent: 200, finalIncome: finalValue };
-            state.rewardHandelki.push(itemBonus);
-            logBox.innerHTML = `[SEZON ZAKOŃCZONY] Świetnie! Miejsce #2. Otrzymujesz Handelek z bonusem 200% (+${Math.floor(finalValue)} 🪙/s)!`;
-        } else if(rank === 3) {
-            // Nagroda za TOP 3 -> 150% (1.5x lepszy od najlepszego)
-            const finalValue = bestBase * 1.5;
-            const itemBonus = { name: `Kuter Przebicia (TOP 3)`, bonusPercent: 150, finalIncome: finalValue };
-            state.rewardHandelki.push(itemBonus);
-            logBox.innerHTML = `[SEZON ZAKOŃCZONY] Dobrze! Miejsce #3. Otrzymujesz Handelek z bonusem 150% (+${Math.floor(finalValue)} 🪙/s)!`;
-        } else {
-            logBox.innerHTML = `[SEZON ZAKOŃCZONY] Ukończyłeś na miejscu #${rank}. Brak darmowych nagród z floty premium. Celuj w TOP 3!`;
+        // Precyzyjne naliczanie nagród zgodnie ze specyfikacją zlecenia użytkownika
+        if(position === 1) {
+            const calculatedIncomeReward = bestShipPower * 3.0; // 300% wydajniejszy od najlepszego
+            const rewardObject = { name: "Mistrzowski Artefakt (TOP 1)", percent: 300, incomeValue: calculatedIncomeReward };
+            gameData.customRewards.push(rewardObject);
+            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] SUKCES! Miejsce #1. Otrzymujesz Handelek Świata o wydajności 300% najlepszego statku (+${Math.floor(calculatedIncomeReward)} 🪙/s)!`;
+            
+            // Spawn unikalnej, złotej bryły 3D na orbicie
+            spawnShip3D(`reward_${Date.now()}`, "ico", 0xffcc00);
+        } 
+        else if(position === 2) {
+            const calculatedIncomeReward = bestShipPower * 2.0; // 200% wydajniejszy od najlepszego
+            const rewardObject = { name: "Kwantowy Krążownik (TOP 2)", percent: 200, incomeValue: calculatedIncomeReward };
+            gameData.customRewards.push(rewardObject);
+            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] Świetnie! Miejsce #2. Przyznano Handelek o wydajności 200% najlepszego statku (+${Math.floor(calculatedIncomeReward)} 🪙/s)!`;
+            
+            spawnShip3D(`reward_${Date.now()}`, "octa", 0xff0077);
+        } 
+        else if(position === 3) {
+            const calculatedIncomeReward = bestShipPower * 1.5; // 150% wydajniejszy od najlepszego
+            const rewardObject = { name: "Sonda Przebicia (TOP 3)", percent: 150, incomeValue: calculatedIncomeReward };
+            gameData.customRewards.push(rewardObject);
+            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] Dobra pozycja! Miejsce #3. Przyznano Handelek o wydajności 150% najlepszego statku (+${Math.floor(calculatedIncomeReward)} 🪙/s)!`;
+            
+            spawnShip3D(`reward_${Date.now()}`, "tetra", 0x00f0ff);
+        } 
+        else {
+            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] Finisz na pozycji #${position}. Brak bonusów floty premium. Zwiększ produkcję, by w nowym sezonie wskoczyć do TOP 3!`;
         }
 
-        // Reset gotówki i parametrów botów na nowy sezon rywalizacji
-        state.competitors.forEach(bot => {
-            bot.cash = Math.floor(state.cash * (0.5 + Math.random())); 
-            bot.incomeRate = Math.floor(calculatedPlayerIPS * (0.6 + Math.random()));
+        // Resetowanie oponentów AI na kolejny sezon wyzwania
+        gameData.competitors.forEach(bot => {
+            bot.cash = Math.floor(gameData.cash * (0.6 + Math.random()));
+            bot.incomeRate = Math.floor(globalCalculatedIPS * (0.7 + Math.random()));
         });
-        
-        state.seasonTimeLeft = 60; // Nowe 60 sekund
-        recalculateTotalIncome();
-        updateInterface();
-        saveGameData();
+
+        gameData.seasonTime = 60; // reset zegara do 60s
+        recalculateIncome();
+        updateUI();
     }
 
     /* ==========================================================================
-       SYSTEM MONITOROWANIA, AKTUALIZACJI UI I AUTO-SAVE
+       GŁÓWNE PĘTLE CZASOWE I ODŚWIEŻANIE INTERFEJSU
        ========================================================================== */
-    function updateInterface() {
-        document.getElementById('player-cash').innerText = Math.floor(state.cash).toLocaleString();
-        document.getElementById('total-ips').innerText = `${Math.floor(calculatedPlayerIPS).toLocaleString()} 🪙/s`;
-        document.getElementById('timer-txt').innerText = `${state.seasonTimeLeft}s`;
-        
-        // Pasek postępu sezonu
-        const percent = (state.seasonTimeLeft / 60) * 100;
-        document.getElementById('season-progress').style.width = `${percent}%`;
+    function updateUI() {
+        document.getElementById('ui-cash').innerText = Math.floor(gameData.cash).toLocaleString();
+        document.getElementById('ui-ips').innerText = `+${Math.floor(globalCalculatedIPS).toLocaleString()} 🪙/s`;
+        document.getElementById('ui-timer').innerText = `${gameData.seasonTime}s`;
 
-        // Najlepsza posiadana pojedyncza wartość
-        let best = getBestHandelekIncome();
-        document.getElementById('best-item-txt').innerText = `+${Math.floor(best)} 🪙/s`;
+        const fillPercent = (gameData.seasonTime / 60) * 100;
+        document.getElementById('progress-fill').style.width = `${fillPercent}%`;
 
-        renderShop();
+        let bestVal = getBestShipIncomeValue();
+        document.getElementById('ui-best-ship').innerText = `+${Math.floor(bestVal)} 🪙/s base`;
+
+        renderShopUI();
     }
 
-    // Pętla główna (10 razy na sekundę) dla zachowania płynności przyrostu gotówki
+    // Pętla główna (10 razy na sekundę) dla zachowania płynności naliczania środków i rankingu
     setInterval(() => {
-        if(state.globalBoosterTime > 0) {
-            state.globalBoosterTime -= 0.1;
-            if(state.globalBoosterTime <= 0) recalculateTotalIncome();
+        if(gameData.boosterTime > 0) {
+            gameData.boosterTime -= 0.1;
+            if(gameData.boosterTime <= 0) recalculateIncome();
         }
 
-        if(calculatedPlayerIPS > 0) {
-            state.cash += (calculatedPlayerIPS / 10);
+        if(globalCalculatedIPS > 0) {
+            gameData.cash += (globalCalculatedIPS / 10);
         }
 
-        runLeaderboardEngine();
-        updateInterface();
+        processLeaderboard();
+        updateUI();
     }, 100);
 
-    // Zmniejszanie czasu sezonu (Co 1 sekundę)
+    // Sekundowa pętla odliczania sezonu
     setInterval(() => {
-        if(state.seasonTimeLeft > 0) {
-            state.seasonTimeLeft--;
-            if(state.seasonTimeLeft === 0) {
-                executeSeasonEnd();
+        if(gameData.seasonTime > 0) {
+            gameData.seasonTime--;
+            if(gameData.seasonTime === 0) {
+                handleSeasonEnd();
             }
         }
     }, 1000);
 
-    /* ==========================================================================
-       PERSISTENCE (ZAPIS STANU GRY)
-       ========================================================================== */
-    function saveGameData() {
-        localStorage.setItem('intergalactic_tycoon_save', JSON.stringify(state));
-    }
-
-    function loadGameData() {
-        const saved = localStorage.getItem('intergalactic_tycoon_save');
-        if(saved) {
-            const parsed = JSON.parse(saved);
-            state.cash = parsed.cash || 100;
-            if(parsed.shopItems) state.shopItems = parsed.shopItems;
-            if(parsed.rewardHandelki) state.rewardHandelki = parsed.rewardHandelki;
-        }
-        recalculateTotalIncome();
-        updateInterface();
-    }
-
-    // Inicjalizacja przy ładowaniu okna przeglądarki
+    // Rozruch systemu po załadowaniu okna przeglądarki
     window.onload = () => {
-        init3DEngine();
-        loadGameData();
+        init3D();
+        recalculateIncome();
+        updateUI();
     };
 
 </script>
