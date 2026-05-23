@@ -3,217 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Interstellar Tycoon Pro // OS v15.4</title>
+    <title>3D Orbit Tycoon // Inventory & Custom Equip System</title>
     <style>
         /* ==========================================================================
-           CYBERPUNK NEON CHROMA FULLSCREEN LAYOUT & ANIMATIONS
+           CYBERPUNK INTERFACE & INVENTORY MATRIX GRID
            ========================================================================== */
         :root {
             --neon-blue: #00f0ff;
             --neon-magenta: #ff0077;
             --neon-green: #00ff66;
             --neon-gold: #ffcc00;
-            --panel-bg: rgba(5, 5, 12, 0.92);
+            --panel-bg: rgba(6, 6, 14, 0.94);
         }
 
-        @keyframes panel-glow {
-            0% { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0,240,255,0.2); }
-            50% { border-color: var(--neon-magenta); box-shadow: 0 0 15px rgba(255,0,119,0.2); }
-            100% { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0,240,255,0.2); }
+        @keyframes panel-pulse {
+            0% { border-color: #222; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+            50% { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0,240,255,0.15); }
+            100% { border-color: #222; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         }
 
         body {
-            background-color: #010103;
+            background-color: #020204;
             color: #ffffff;
             font-family: 'Consolas', 'Segoe UI', monospace;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-            user-select: none;
+            margin: 0; padding: 0; overflow: hidden;
+            width: 100vw; height: 100vh; user-select: none;
         }
 
-        /* Widok trójwymiarowy na całą stronę */
         #canvas-3d {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: 1;
         }
 
-        /* Warstwa HUD (2D Interface) */
         #hud-container {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 2;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: 2;
             pointer-events: none;
             display: grid;
-            grid-template-columns: 380px 1fr 380px;
-            padding: 20px;
-            box-sizing: border-box;
-            gap: 20px;
+            grid-template-columns: 400px 1fr 400px;
+            padding: 20px; box-sizing: border-box; gap: 20px;
         }
 
-        @media (max-width: 1150px) {
-            #hud-container {
-                grid-template-columns: 1fr;
-                overflow-y: auto;
-                pointer-events: auto;
-            }
+        @media (max-width: 1200px) {
+            #hud-container { grid-template-columns: 1fr; overflow-y: auto; pointer-events: auto; }
             .hud-panel { pointer-events: auto !important; max-height: none !important; }
         }
 
         .hud-panel {
             background: var(--panel-bg);
-            border: 2px solid #111;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            pointer-events: auto;
-            backdrop-filter: blur(10px);
-            animation: panel-glow 10s infinite ease-in-out;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
+            border: 2px solid #222; border-radius: 12px; padding: 20px;
+            display: flex; flex-direction: column; pointer-events: auto;
+            backdrop-filter: blur(12px);
+            animation: panel-pulse 12s infinite ease-in-out;
+            max-height: 92vh; overflow-y: auto;
         }
 
         .panel-title {
-            font-size: 13px;
-            font-weight: bold;
-            color: var(--neon-blue);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-bottom: 1px solid #222;
-            padding-bottom: 6px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
+            font-size: 13px; font-weight: bold; color: var(--neon-blue);
+            letter-spacing: 2px; text-transform: uppercase;
+            border-bottom: 1px solid #222; padding-bottom: 6px; margin-bottom: 15px;
+            display: flex; justify-content: space-between;
         }
 
-        /* WALUTA I STATY */
         .cash-box {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid #222;
-            border-radius: 6px;
-            padding: 15px;
-            text-align: center;
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--neon-green);
-            text-shadow: 0 0 12px rgba(0,255,102,0.4);
+            background: rgba(0,0,0,0.6); border: 1px solid #222; border-radius: 6px;
+            padding: 12px; text-align: center; font-size: 30px; font-weight: bold;
+            color: var(--neon-green); text-shadow: 0 0 12px rgba(0,255,102,0.4);
             margin-bottom: 15px;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-bottom: 6px;
-            color: #888;
-        }
-        .data-row span { color: #fff; font-weight: bold; }
-
-        /* KARTY ZAKUPÓW / KONTROLERY */
-        .shop-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        .shop-card:hover {
-            border-color: var(--neon-blue);
-            background: rgba(0,240,255,0.02);
-        }
-
-        .shop-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .btn-cyber {
-            background: #06060c;
-            color: #fff;
-            border: 1px solid #333;
-            padding: 8px 14px;
-            border-radius: 4px;
-            font-family: inherit;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 11px;
-            transition: all 0.2s;
+            background: #07070f; color: #fff; border: 1px solid #333;
+            padding: 10px 14px; border-radius: 5px; font-family: inherit;
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
+            font-size: 11px; transition: all 0.2s;
         }
         .btn-cyber:hover:not(:disabled) {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 10px rgba(0,255,102,0.3);
-            background: #0c140c;
+            border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,102,0.3);
+            background: #0f1911;
         }
         .btn-cyber:disabled { opacity: 0.2; cursor: not-allowed; }
 
-        /* LEADERBOARD / LEGILE TOPKI */
+        /* AKTYWNE SLOTY NA STATEK */
+        .active-slots-container {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            margin-bottom: 15px;
+        }
+        .active-slot {
+            background: rgba(0,0,0,0.5); border: 1px dashed #444;
+            border-radius: 6px; height: 85px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; font-size: 10px; text-align: center;
+            padding: 4px; box-sizing: border-box; position: relative;
+        }
+        .active-slot.filled { border: 1px solid var(--neon-blue); background: rgba(0, 240, 255, 0.03); }
+
+        /* MACIERZ EKWIPUNKU (INVENTORY GRID) */
+        .inventory-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+            flex: 1; overflow-y: auto; padding-right: 2px;
+        }
+        .inventory-item {
+            background: rgba(255,255,255,0.02); border: 1px solid #222;
+            border-radius: 8px; padding: 10px; display: flex; flex-direction: column;
+            justify-content: space-between; gap: 8px; position: relative;
+        }
+        .inventory-item.equipped { border-color: var(--neon-magenta); background: rgba(255,0,119,0.02); }
+
+        /* RZADKOŚCI PRZEDMIOTÓW */
+        .rarity-common { color: #a3a3a3; }
+        .rarity-rare { color: var(--neon-blue); font-weight: bold; }
+        .rarity-epic { color: var(--neon-magenta); font-weight: bold; }
+        .rarity-legendary { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 5px rgba(255,204,0,0.4); }
+
+        /* LEADERBOARD & TIMERS */
         .rank-list { display: flex; flex-direction: column; gap: 5px; }
         .rank-row {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.4);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            border: 1px solid transparent;
+            display: flex; justify-content: space-between; background: rgba(0,0,0,0.4);
+            padding: 8px 12px; border-radius: 6px; font-size: 12px; border: 1px solid transparent;
         }
-        .rank-row.user {
-            border-color: var(--neon-magenta);
-            background: rgba(255,0,119,0.08);
-            font-weight: bold;
-        }
+        .rank-row.user { border-color: var(--neon-magenta); background: rgba(255,0,119,0.08); font-weight: bold; }
 
-        /* SEZONOWY TIMELINE */
-        #progress-track {
-            width: 100%; height: 4px; background: #222;
-            border-radius: 2px; overflow: hidden; margin-top: 5px;
-        }
-        #progress-fill {
-            width: 100%; height: 100%; background: var(--neon-magenta);
-            transition: width 1s linear;
-        }
+        #progress-track { width: 100%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; margin-top: 5px; }
+        #progress-fill { width: 100%; height: 100%; background: var(--neon-magenta); transition: width 1s linear; }
 
-        /* EVENT REWARDS LOG */
         #event-console {
-            background: #020205;
-            border: 1px solid #1c1c28;
-            border-radius: 6px;
-            padding: 8px;
-            font-size: 11px;
-            color: var(--neon-gold);
-            height: 80px;
-            overflow-y: auto;
-            margin-top: 15px;
-        }
-
-        /* WSKAŹNIK TRAFIENIA DOŚWIADCZENIA */
-        #canvas-overlay-text {
-            position: absolute;
-            top: 20%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--neon-magenta);
-            text-shadow: 0 0 15px var(--neon-magenta);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 3;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            background: #020205; border: 1px solid #1c1c28; border-radius: 6px;
+            padding: 8px; font-size: 11px; color: var(--neon-gold); height: 75px;
+            overflow-y: auto; margin-top: 15px; line-height: 1.4;
         }
 
         ::-webkit-scrollbar { width: 4px; }
@@ -225,138 +141,136 @@
 
     <canvas id="canvas-3d"></canvas>
 
-    <div id="canvas-overlay-text">LEVEL UP! +150%</div>
-
     <div id="hud-container">
         
         <div class="hud-panel">
-            <div class="panel-title"><div>[01] KONTROLA FLOTY HANDLOWEJ</div></div>
+            <div class="panel-title"><div>[01] SKRZYNIE & KONTENERY</div></div>
             <div class="cash-box"><span id="ui-cash">0</span> 🪙</div>
 
-            <div class="data-row">GLOBALNY PRZYCHÓD: <span id="ui-ips" style="color:var(--neon-green);">0 🪙/s</span></div>
-            <div class="data-row">NAJSILNIEJSZA LICENCJA: <span id="ui-best-ship">Brak</span></div>
-            
-            <button class="btn-cyber" id="btn-click" style="width:100%; margin-bottom:15px; border-color:var(--neon-blue);">
-                Inicjuj Szybki Handel (+10 🪙)
-            </button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:15px;">
+                <button class="btn-cyber" onclick="buyLootbox('common')">Zwykła [100 🪙]</button>
+                <button class="btn-cyber" onclick="buyLootbox('rare')" style="border-color:var(--neon-blue);">Rzadka [400 🪙]</button>
+            </div>
 
-            <div style="flex:1; overflow-y:auto;" id="shop-list-dom">
+            <div class="panel-title"><div>[02] AKTYWNE SYSTEMY STATKU (SLOTY)</div></div>
+            <div class="active-slots-container" id="ui-active-slots">
+                </div>
+
+            <div class="panel-title"><div>[03] TWÓJ EKWIPUNEK (PLECAK)</div><div id="ui-inv-count" style="color:#666;">0/20</div></div>
+            <div class="inventory-grid" id="ui-inventory-grid">
                 </div>
         </div>
 
         <div></div>
 
         <div class="hud-panel">
-            <div class="panel-title"><div>[02] RANKING GALAKTYCZNY</div><div style="color:var(--neon-gold);">SEZON LIVE</div></div>
-            
+            <div class="panel-title"><div>[04] SEZONOWY RANKING HANDLU</div></div>
             <div class="data-row">ZAKOŃCZENIE SEZONU ZA: <span id="ui-timer" style="color:var(--neon-magenta);">60s</span></div>
             <div id="progress-track"><div id="progress-fill"></div></div>
 
             <div class="rank-list" id="ui-leaderboard" style="margin-top:15px;">
                 </div>
 
-            <div class="panel-title" style="margin-top:20px; margin-bottom:5px;"><div>[03] REJESTR OPERACYJNY NAGRÓD</div></div>
-            <div id="event-console">Uruchomiono system. Kup pierwszą licencję handlową, by wysłać obiekt testowy 3D w przestrzeń kosmiczną...</div>
+            <div class="panel-title" style="margin-top:20px; margin-bottom:5px;"><div>[05] DZIENNIK SYSTEMOWY NAGRÓD</div></div>
+            <div id="event-console">System operacyjny aktywny. Kup skrzynię, wyciągnij handelek i załóż go do wolnego slotu, by aktywować jego model 3D na orbicie...</div>
 
-            <div class="panel-title" style="margin-top:15px; margin-bottom:5px;"><div>Dopalacze Prędkości</div></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-                <button class="btn-cyber" onclick="triggerBoost(15)">Hiper Skok 15s (x3)</button>
-                <button class="btn-cyber" onclick="triggerBoost(60)">Tunel Czasowy 1m (x3)</button>
-            </div>
+            <button class="btn-cyber" id="btn-click" style="width:100%; margin-top:15px; border-color:var(--neon-green); background:#09140c;">
+                Generuj Szybki Przychód Ręczny (+10 🪙)
+            </button>
         </div>
 
     </div>
 
 <script>
     /* ==========================================================================
-       ZAAWANSOWANY SILNIK GRY DOŚWIADCZALNEJ Z ANIMACJAMI 3D
+       ZAAWANSOWANY SILNIK INTERAKTYWNEGO EKWIPUNKU I ORBITY 3D
        ========================================================================== */
 
-    // Rejestr bazowy statków handlowych (Sklep)
-    const baseConfig = [
-        { id: "s1", name: "Dron Transportowy", cost: 100, income: 2, count: 0, level: 1, color: 0x00f0ff, geoType: "box" },
-        { id: "s2", name: "Satelita Wydobywczy", cost: 500, income: 15, count: 0, level: 1, color: 0x00ff66, geoType: "octa" },
-        { id: "s3", name: "Kuter Korporacyjny", cost: 2500, income: 90, count: 0, level: 1, color: 0xff0077, geoType: "tetra" },
-        { id: "s4", name: "Hiper Krążownik", cost: 12000, income: 550, count: 0, level: 1, color: 0xffcc00, geoType: "ico" }
-    ];
-
-    // Korporacje AI do symulacji rywalizacji w topce
-    const aiCompetitors = [
-        { name: "Quantum Shipping", cash: 2000, incomeRate: 10 },
-        { name: "Zeta Logistics", cash: 6000, incomeRate: 45 },
-        { name: "Aether Cargo", cash: 25000, incomeRate: 250 },
-        { name: "Vortex Trading", cash: 110000, incomeRate: 1200 },
-        { name: "Nebula Holdings", cash: 400, incomeRate: 4 }
-    ];
-
-    let gameData = {
-        cash: 150,
-        fleet: JSON.parse(JSON.stringify(baseConfig)),
-        competitors: JSON.parse(JSON.stringify(aiCompetitors)),
-        customRewards: [], // Specjalne nagrody z topek (+150%, +200%, +300%)
-        seasonTime: 60,
-        boosterTime: 0
+    // Definicje puli przedmiotów (handelków) możliwych do trafienia ze skrzyń
+    const lootTable = {
+        common: [
+            { name: "Moduł Drona", income: 3, rarity: "common", color: 0xa3a3a3, geo: "box" },
+            { name: "Laser Kupiecki", income: 6, rarity: "common", color: 0xa3a3a3, geo: "box" }
+        ],
+        rare: [
+            { name: "Hiper Żagiel", income: 18, rarity: "rare", color: 0x00f0ff, geo: "octa" },
+            { name: "Reaktor Tacytu", income: 35, rarity: "rare", color: 0x00f0ff, geo: "octa" },
+            { name: "Rdzeń Korporacji", income: 80, rarity: "epic", color: 0xff0077, geo: "tetra" }
+        ]
     };
 
-    // Obsługa Web Audio API do generowania cybernetycznych efektów dźwiękowych
+    const aiBots = [
+        { name: "Alpha Cargo", cash: 1500, incomeRate: 10 },
+        { name: "Beta Logistics", cash: 4000, incomeRate: 35 },
+        { name: "Giga Freight", cash: 20000, incomeRate: 180 },
+        { name: "Zetta Shipping", cash: 90000, incomeRate: 750 }
+    ];
+
+    let state = {
+        cash: 200,
+        inventory: [],     // Wszystkie posiadane przedmioty gracza
+        equippedIds: [null, null, null], // Trzy sloty: przechowują unikalne ID założonych przedmiotów
+        competitors: JSON.parse(JSON.stringify(aiBots)),
+        seasonTime: 60,
+        currentRank: 5
+    };
+
+    // Obsługa efektów dźwiękowych Web Audio API
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(f, t="sine", d=0.1) {
+    function playBeep(f, t="sine", d=0.1) {
         try {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
             osc.type = t; osc.frequency.setValueAtTime(f, audioCtx.currentTime);
             osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + d);
             osc.start(); osc.stop(audioCtx.currentTime + d);
         } catch(e){}
     }
 
     /* ==========================================================================
-       SILNIK TRÓJWYMIAROWY THREE.JS (RENDERER, ANIMACJE, CZĄSTECZKI)
+       SILNIK 3D THREE.JS (MODELE ORBITALNE I CZĄSTECZKI)
        ========================================================================== */
-    let scene, camera, renderer, centralStation, particleSystem;
-    let visualShipsMap = new Map(); // Mapa łącząca ID przedmiotów z obiektami 3D na ekranie
-    let explosionParticles = [];    // Tablica aktywnych cząsteczek wybuchu ulepszenia
+    let scene, camera, renderer, mainShipCore, spaceDust;
+    let active3DModels = new Map(); // Mapa przechowująca aktywne bryły 3D dla ZAŁOŻONYCH handelków
+    let particles = [];
 
     function init3D() {
-        const container = document.getElementById('canvas-3d');
-
+        const canvas = document.getElementById('canvas-3d');
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x020205);
-        scene.fog = new THREE.FogExp2(0x020205, 0.015);
+        scene.background = new THREE.Color(0x010103);
+        scene.fog = new THREE.FogExp2(0x010103, 0.02);
 
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 15, 35);
+        camera.position.set(0, 12, 28);
         camera.lookAt(0, 0, 0);
 
-        renderer = new THREE.WebGLRenderer({ canvas: container, antialias: true });
+        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
-        // Oświetlenie sceny 3D
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0x00f0ff, 1.5, 100);
-        pointLight.position.set(0, 10, 10);
-        scene.add(pointLight);
+        // Oświetlenie kosmiczne
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambLight);
+        const dirLight = new THREE.PointLight(0xff0077, 2, 50);
+        dirLight.position.set(0, 5, 5);
+        scene.add(dirLight);
 
-        // Budowanie bazy centralnej (stacji kosmicznej)
-        const stationGeo = new THREE.TorusGeometry(6, 0.4, 8, 48);
-        const stationMat = new THREE.MeshBasicMaterial({ color: 0x333355, wireframe: true });
-        centralStation = new THREE.Mesh(stationGeo, stationMat);
-        centralStation.rotation.x = Math.PI / 2;
-        scene.add(centralStation);
+        // Statek centralny gracza (Baza)
+        const coreGeo = new THREE.CylinderGeometry(0, 3, 5, 4, 1);
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0x222233, wireframe: true });
+        mainShipCore = new THREE.Mesh(coreGeo, coreMat);
+        scene.add(mainShipCore);
 
-        // System gwiezdnego pyłu w tle
-        const pCount = 500;
-        const pGeo = new THREE.BufferGeometry();
-        const pCoords = new Float32Array(pCount * 3);
-        for(let i=0; i<pCount*3; i++) pCoords[i] = (Math.random() - 0.5) * 150;
-        pGeo.setAttribute('position', new THREE.BufferAttribute(pCoords, 3));
-        const pMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, transparent: true, opacity: 0.5 });
-        particleSystem = new THREE.Points(pGeo, pMat);
-        scene.add(particleSystem);
+        // Gwiezdne tło
+        const dustCount = 400;
+        const dustGeo = new THREE.BufferGeometry();
+        const dustPos = new Float32Array(dustCount * 3);
+        for(let i=0; i<dustCount*3; i++) dustPos[i] = (Math.random() - 0.5) * 120;
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+        const dustMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, transparent: true, opacity: 0.4 });
+        spaceDust = new THREE.Points(dustGeo, dustMat);
+        scene.add(spaceDust);
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -364,378 +278,325 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        animateLoop();
+        render3DLoop();
     }
 
-    /* TWORZENIE I INTEGRACJA NOWYCH MAKIET 3D DLA HANDELKÓW */
-    function spawnShip3D(itemId, geoType, colorHex) {
-        if (visualShipsMap.has(itemId)) return;
-
-        let geometry;
-        switch(geoType) {
-            case 'box':   geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); break;
-            case 'octa':  geometry = new THREE.OctahedronGeometry(1.2); break;
-            case 'tetra': geometry = new THREE.TetrahedronGeometry(1.3); break;
-            case 'ico':   geometry = new THREE.IcosahedronGeometry(1.2); break;
-            default:      geometry = new THREE.ConeGeometry(1, 2, 4);
+    /* FUNKCJA MATERIALIZACJI MODELU 3D PO ZAŁOŻENIU HANDELKU */
+    function createEquippedMesh3D(item, slotIdx) {
+        if(active3DModels.has(slotIdx)) {
+            scene.remove(active3DModels.get(slotIdx));
         }
 
-        const material = new THREE.MeshBasicMaterial({ color: colorHex, wireframe: true });
-        const mesh = new THREE.Mesh(geometry, material);
+        let geo;
+        if(item.geo === 'box') geo = new THREE.BoxGeometry(1.4, 1.4, 1.4);
+        else if(item.geo === 'octa') geo = new THREE.OctahedronGeometry(1.2);
+        else if(item.geo === 'tetra') geo = new THREE.TetrahedronGeometry(1.2);
+        else geo = new THREE.IcosahedronGeometry(1.1);
 
-        // Losowanie pozycji startowej na orbicie stacji centralnej
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 10 + (visualShipsMap.size * 2.5);
-        mesh.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
-        
-        // Dynamiczne zmienne pomocnicze dla animacji orbitowania
-        mesh.userData = { angle: angle, radius: radius, speed: 0.01 + (Math.random() * 0.01), baseScale: 1.0 };
+        const mat = new THREE.MeshBasicMaterial({ color: item.color, wireframe: true });
+        const mesh = new THREE.Mesh(geo, mat);
+
+        // Każdy z 3 slotów ma przydzielony inny promień orbity, by modele się nie zderzały
+        const radius = 6 + (slotIdx * 3);
+        const startAngle = (slotIdx * (Math.PI * 2 / 3));
+        mesh.position.set(Math.cos(startAngle) * radius, 0, Math.sin(startAngle) * radius);
+
+        mesh.userData = { radius: radius, angle: startAngle, speed: 0.015 + (slotIdx * 0.005) };
 
         scene.add(mesh);
-        visualShipsMap.set(itemId, mesh);
-    }
+        active3DModels.set(slotIdx, mesh);
 
-    /* WYWOŁANIE ANIMACJI EKSPLOZJI CZĄSTECZEK (LEVEL UP IMPACT EFFECT) */
-    function triggerUpgradeAnimation3D(itemId) {
-        const mesh = visualShipsMap.get(itemId);
-        if(!mesh) return;
-
-        // 1. Efekt rozbłysku/pulsu wielkości modelu 3D
-        mesh.scale.set(2.5, 2.5, 2.5);
-
-        // 2. Wystrzelenie fontanny neonowych drobin z koordynatów obiektu
-        const pCount = 35;
-        for(let i=0; i<pCount; i++) {
-            const partGeo = new THREE.SphereGeometry(0.1, 4, 4);
-            const partMat = new THREE.MeshBasicMaterial({ color: mesh.material.color, transparent: true, opacity: 1.0 });
-            const partMesh = new THREE.Mesh(partGeo, partMat);
-            
-            partMesh.position.copy(mesh.position);
-            
-            // Wektor kierunku wybuchu
-            partMesh.userData = {
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: (Math.random() - 0.5) * 0.4,
-                vz: (Math.random() - 0.5) * 0.4,
-                life: 1.0 // współczynnik wygasania
-            };
-
-            scene.add(partMesh);
-            explosionParticles.push(partMesh);
+        // Wytworzenie natychmiastowego impulsu cząsteczek (Teleport na statek)
+        for(let i=0; i<20; i++) {
+            const pG = new THREE.SphereGeometry(0.08, 3, 3);
+            const pM = new THREE.MeshBasicMaterial({ color: item.color, transparent: true, opacity: 1 });
+            const pMesh = new THREE.Mesh(pG, pM);
+            pMesh.position.copy(mesh.position);
+            pMesh.userData = { vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, vz: (Math.random()-0.5)*0.3, life: 1 };
+            scene.add(pMesh);
+            particles.push(pMesh);
         }
     }
 
-    /* GŁÓWNA PĘTLA RENDEROWANIA GRAFIKI 3D */
-    function animateLoop() {
-        requestAnimationFrame(animateLoop);
+    /* DE-MATERIALIZACJA MODELU 3D PO ZDJĘCIU HANDELKU */
+    function removeEquippedMesh3D(slotIdx) {
+        if(active3DModels.has(slotIdx)) {
+            scene.remove(active3DModels.get(slotIdx));
+            active3DModels.delete(slotIdx);
+        }
+    }
 
-        // Obrót bazy centralnej
-        centralStation.rotation.z += 0.002;
-        particleSystem.rotation.y += 0.0003;
+    function render3DLoop() {
+        requestAnimationFrame(render3DLoop);
 
-        // Animacja orbitowania i rotacji własnej statków handlowych
-        visualShipsMap.forEach((mesh) => {
+        mainShipCore.rotation.y += 0.005;
+        spaceDust.rotation.y += 0.0002;
+
+        // Aktualizacja pozycji założonych przedmiotów na orbicie wokół rdzenia
+        active3DModels.forEach((mesh) => {
             mesh.userData.angle += mesh.userData.speed;
             mesh.position.x = Math.cos(mesh.userData.angle) * mesh.userData.radius;
             mesh.position.z = Math.sin(mesh.userData.angle) * mesh.userData.radius;
-            
-            mesh.rotation.x += 0.01;
-            mesh.rotation.y += 0.015;
-
-            // Płynny powrót skali do bazy po animacji podniesienia poziomu
-            if (mesh.scale.x > mesh.userData.baseScale) {
-                mesh.scale.x -= 0.05;
-                mesh.scale.y -= 0.05;
-                mesh.scale.z -= 0.05;
-            }
+            mesh.rotation.x += 0.01; mesh.rotation.y += 0.02;
         });
 
-        // Aktualizacja i usuwanie wygasłych cząsteczek z eksplozji
-        for(let i = explosionParticles.length - 1; i >= 0; i--) {
-            const p = explosionParticles[i];
-            p.position.x += p.userData.vx;
-            p.position.y += p.userData.vy;
-            p.position.z += p.userData.vz;
-            
-            p.userData.life -= 0.02;
-            p.material.opacity = p.userData.life;
-
-            if(p.userData.life <= 0) {
-                scene.remove(p);
-                explosionParticles.splice(i, 1);
-            }
+        // Obsługa cząsteczek
+        for(let i=particles.length-1; i>=0; i--) {
+            const p = particles[i];
+            p.position.x += p.userData.vx; p.position.y += p.userData.vy; p.position.z += p.userData.vz;
+            p.userData.life -= 0.03; p.material.opacity = p.userData.life;
+            if(p.userData.life <= 0) { scene.remove(p); particles.splice(i, 1); }
         }
 
         renderer.render(scene, camera);
     }
 
     /* ==========================================================================
-       LOGIKA EKONOMICZNA, OBSŁUGA SEZONÓW I PODNOSZENIA POZIOMÓW
+       LOGIKA PLECAKA (INVENTORY), SYSTEMU EMISJI I WALUTY
        ========================================================================== */
-    function renderShopUI() {
-        const container = document.getElementById('shop-list-dom');
-        container.innerHTML = '';
-
-        gameData.fleet.forEach((item) => {
-            const card = document.createElement('div');
-            card.classList.add('shop-card');
+    window.buyLootbox = function(tier) {
+        const cost = tier === 'common' ? 100 : 400;
+        if(state.cash >= cost) {
+            state.cash -= cost;
             
-            // Obliczenie aktualnego zysku z uwzględnieniem poziomu ulepszenia (+2 za poziom)
-            const currentItemIncome = item.count > 0 ? (item.income + (item.level - 1) * 2) * item.count : 0;
-
-            card.innerHTML = `
-                <div class="shop-card-header">
-                    <div>
-                        <strong style="font-size:13px;">${item.name} (x${item.count})</strong>
-                        <div style="font-size:10px; color:#666;">Poziom Wydajności: ${item.level}</div>
-                    </div>
-                    <div style="color:var(--neon-green); font-size:12px; font-weight:bold;">+${currentItemIncome} 🪙/s</div>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                    <button class="btn-cyber" onclick="buyShip('${item.id}')" ${gameData.cash < item.cost ? 'disabled' : ''}>
-                        Kup [${item.cost} 🪙]
-                    </button>
-                    <button class="btn-cyber" onclick="upgradeShip('${item.id}')" ${item.count === 0 || gameData.cash < (item.cost * 1.5) ? 'disabled' : ''} style="border-color:var(--neon-magenta);">
-                        Ulepsz (+2) [${Math.floor(item.cost * 1.5)} 🪙]
-                    </button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-
-        // Wyświetlanie legendarnych bonusów z Topki procentowej
-        if (gameData.customRewards.length > 0) {
-            const divider = document.createElement('div');
-            divider.style.cssText = "margin:15px 0 5px 0; font-size:11px; color:var(--neon-gold); font-weight:bold; text-transform:uppercase; border-top:1px dashed #333; padding-top:10px;";
-            divider.innerText = "Flota Nagród Specjalnych (Mnożniki %)";
-            container.appendChild(divider);
-
-            gameData.customRewards.forEach((r) => {
-                const card = document.createElement('div');
-                card.classList.add('shop-card');
-                card.style.borderColor = "var(--neon-gold)";
-                card.innerHTML = `
-                    <div class="shop-card-header">
-                        <span style="color:var(--neon-gold); font-weight:bold; font-size:12px;">${r.name}</span>
-                        <span style="color:var(--neon-green); font-weight:bold;">+${Math.floor(r.incomeValue)} 🪙/s</span>
-                    </div>
-                    <div style="font-size:10px; color:#aaa;">Wydajność zwiększona o: +${r.percent}% względem najlepszego.</div>
-                `;
-                container.appendChild(card);
-            });
-        }
-    }
-
-    window.buyShip = function(id) {
-        const item = gameData.fleet.find(f => f.id === id);
-        if(gameData.cash >= item.cost) {
-            gameData.cash -= item.cost;
-            item.count++;
+            // Losowanie przedmiotu z puli rzadkości
+            const pool = lootTable[tier];
+            const baseItem = pool[Math.floor(Math.random() * pool.length)];
             
-            // Tworzenie makiety 3D na ekranie jeśli to pierwszy zakup
-            spawnShip3D(item.id, item.geoType, item.color);
-            triggerUpgradeAnimation3D(item.id);
+            // Generowanie unikalnego obiektu z własnym ID
+            const newItem = {
+                id: "item_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+                name: baseItem.name,
+                income: baseItem.income,
+                rarity: baseItem.rarity,
+                color: baseItem.color,
+                geo: baseItem.geo
+            };
 
-            item.cost = Math.floor(item.cost * 1.25);
-            playSound(550, "sine");
-            recalculateIncome();
-            updateUI();
+            state.inventory.push(newItem);
+            playBeep(650, "triangle");
+            document.getElementById('event-console').innerHTML = `[SKRZYNIA] Otworzyłeś kontener i znalazłeś: <span class="rarity-${newItem.rarity}">${newItem.name} (+${newItem.income} 🪙/s)</span>! Trafił do Twojego plecaka.`;
+            
+            recalculateGlobalIPS();
+            updateInterfaceUI();
         }
     };
 
-    window.upgradeShip = function(id) {
-        const item = gameData.fleet.find(f => f.id === id);
-        const upgradeCost = Math.floor(item.cost * 1.5);
+    window.equipItem = function(itemId) {
+        const item = state.inventory.find(i => i.id === itemId);
+        if(!item) return;
 
-        if (item.count > 0 && gameData.cash >= upgradeCost) {
-            gameData.cash -= upgradeCost;
-            item.level++; // Podniesienie poziomu przedmiotu
+        // Sprawdzamy czy przedmiot nie jest już gdzieś założony
+        if(state.equippedIds.includes(itemId)) return;
 
-            // Wywołanie potężnej animacji rozbłysku i fontanny cząsteczek 3D
-            triggerUpgradeAnimation3D(item.id);
-            playSound(750, "triangle", 0.2);
+        // Szukamy pierwszego wolnego aktywnego slotu na statku
+        const freeSlotIdx = state.equippedIds.findIndex(id => id === null);
 
-            // Wyświetlenie lewitującego napisu 2D nad silnikiem
-            const overlay = document.getElementById('canvas-overlay-text');
-            overlay.innerText = `UPGRADE: ${item.name} LVL ${item.level}!`;
-            overlay.style.opacity = "1";
-            setTimeout(() => overlay.style.opacity = "0", 1200);
-
-            recalculateIncome();
-            updateUI();
+        if(freeSlotIdx !== -1) {
+            state.equippedIds[freeSlotIdx] = itemId;
+            createEquippedMesh3D(item, freeSlotIdx);
+            playBeep(800, "sine", 0.15);
+            document.getElementById('event-console').innerText = `[STATEK] Założyłeś pomyślnie system: ${item.name} do Slotu #${freeSlotIdx+1}!`;
+        } else {
+            document.getElementById('event-console').innerText = `[BŁĄD] Brak wolnych slotów na statku! Zdejmij najpierw inny handelek.`;
         }
+
+        recalculateGlobalIPS();
+        updateInterfaceUI();
     };
 
-    function getBestShipIncomeValue() {
-        let max = 2; // bazowa podstawa bezpieczeństwa algorytmu
-        gameData.fleet.forEach(f => {
-            if(f.count > 0) {
-                const totalIncomeSingle = f.income + (f.level - 1) * 2;
-                if(totalIncomeSingle > max) max = totalIncomeSingle;
-            }
-        });
-        gameData.customRewards.forEach(r => {
-            if(r.incomeValue > max) max = r.incomeValue;
-        });
+    window.unequipItem = function(slotIdx) {
+        const itemId = state.equippedIds[slotIdx];
+        if(!itemId) return;
+
+        state.equippedIds[slotIdx] = null;
+        removeEquippedMesh3D(slotIdx);
+        playBeep(400, "sine", 0.1);
+        document.getElementById('event-console').innerText = `[STATEK] Zdemontowano handelek ze Slotu #${slotIdx+1}. Powrócił do plecaka.`;
+
+        recalculateGlobalIPS();
+        updateInterfaceUI();
+    };
+
+    function getAbsoluteBestItemIncome() {
+        // Przeszukujemy cały plecak (niezależnie czy założony, czy nie), by znaleźć najwyższy dochód jako punkt odniesienia dla nagród TOP
+        if(state.inventory.length === 0) return 3; // bazowa podstawa jeśli plecak pusty
+        let max = 0;
+        state.inventory.forEach(i => { if(i.income > max) max = i.income; });
         return max;
     }
 
-    let globalCalculatedIPS = 0;
+    let currentCalculatedIPS = 0;
 
-    function recalculateIncome() {
+    function recalculateGlobalIPS() {
         let total = 0;
-        gameData.fleet.forEach(f => {
-            total += f.count * (f.income + (f.level - 1) * 2);
+        // Zarabiają TYLKO te handelki, które są aktualnie ZAŁOŻONE w slotach statku
+        state.equippedIds.forEach(id => {
+            if(id) {
+                const item = state.inventory.find(i => i.id === id);
+                if(item) total += item.income;
+            }
         });
-        gameData.customRewards.forEach(r => {
-            total += r.incomeValue;
-        });
-
-        if (gameData.boosterTime > 0) total = total * 3; // Bonus za dopalacz x3
-
-        globalCalculatedIPS = total;
+        currentCalculatedIPS = total;
     }
 
     document.getElementById('btn-click').addEventListener('click', () => {
-        let clickVal = 10 + Math.floor(globalCalculatedIPS * 0.1);
-        gameData.cash += clickVal;
-        playSound(900, "sine", 0.04);
-        updateUI();
+        state.cash += 10 + Math.floor(currentCalculatedIPS * 0.1);
+        playBeep(950, "sine", 0.03);
+        updateInterfaceUI();
     });
 
-    window.triggerBoost = function(sec) {
-        gameData.boosterTime += sec;
-        playSound(440, "square", 0.3);
-        recalculateIncome();
-        updateUI();
-    };
+    /* RENDEROWANIE STRUKTURY HUD DLA SLOTÓW I EKWIPUNKU */
+    function renderInventoryAndSlotsDOM() {
+        // 1. Renderowanie 3 Aktywnych Slotów statku
+        const slotsContainer = document.getElementById('ui-active-slots');
+        slotsContainer.innerHTML = '';
+        
+        for(let i=0; i<3; i++) {
+            const itemId = state.equippedIds[i];
+            const slotDiv = document.createElement('div');
+            slotDiv.classList.add('active-slot');
+            
+            if(itemId) {
+                const item = state.inventory.find(inv => inv.id === itemId);
+                slotDiv.classList.add('filled');
+                slotDiv.style.borderColor = item.color;
+                slotDiv.innerHTML = `
+                    <div class="rarity-${item.rarity}" style="font-weight:bold;">${item.name}</div>
+                    <div style="color:var(--neon-green); margin:3px 0;">+${item.income} 🪙/s</div>
+                    <button class="btn-cyber" onclick="unequipItem(${i})" style="font-size:8px; padding:2px 6px; border-color:var(--neon-magenta);">Zdejmij</button>
+                `;
+            } else {
+                slotDiv.innerHTML = `<span style="color:#444;">SLOT #${i+1}<br>[PUSTY]</span>`;
+            }
+            slotsContainer.appendChild(slotDiv);
+        }
 
-    /* ==========================================================================
-       SYSTEM DYNAMICZNEGO RANKINGU I PROCEDURY KOŃCA SEZONU
-       ========================================================================== */
-    function processLeaderboard() {
-        gameData.competitors.forEach(bot => {
-            bot.cash += (bot.incomeRate / 10);
-            if(Math.random() < 0.04) bot.incomeRate = Math.floor(bot.incomeRate * 1.15);
+        // 2. Renderowanie Macierzy Plecaka (Ekwipunku)
+        const gridContainer = document.getElementById('ui-inventory-grid');
+        gridContainer.innerHTML = '';
+
+        state.inventory.forEach(item => {
+            const isEquipped = state.equippedIds.includes(item.id);
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('inventory-item');
+            if(isEquipped) itemDiv.classList.add('equipped');
+
+            itemDiv.innerHTML = `
+                <div>
+                    <div class="rarity-${item.rarity}" style="font-size:11px;">${item.name}</div>
+                    <div style="font-size:12px; color:var(--neon-green); font-weight:bold; margin-top:2px;">+${item.income} 🪙/s</div>
+                </div>
+                <button class="btn-cyber" onclick="equipItem('${item.id}')" ${isEquipped ? 'disabled' : ''} style="font-size:9px; padding:4px 0; width:100%;">
+                    ${isEquipped ? 'Założony' : 'Założ'}
+                </button>
+            `;
+            gridContainer.appendChild(itemDiv);
         });
 
-        let leaderboardArray = [];
-        leaderboardArray.push({ name: "TWOJA KORPORACJA (TY)", cash: gameData.cash, isUser: true });
-        gameData.competitors.forEach(b => leaderboardArray.push({ name: b.name, cash: b.cash, isUser: false }));
+        document.getElementById('ui-inv-count').innerText = `${state.inventory.length}/24`;
+    }
 
-        leaderboardArray.sort((a,b) => b.cash - a.cash);
+    /* ==========================================================================
+       RANKING GLOBALNY AI & OBSŁUGA SEZONÓW Z PRECYZYJNĄ NAGRODĄ %
+       ========================================================================== */
+    function runAILeaderboard() {
+        state.competitors.forEach(bot => {
+            bot.cash += (bot.incomeRate / 10);
+            if(Math.random() < 0.05) bot.incomeRate = Math.floor(bot.incomeRate * 1.14);
+        });
 
-        const boardDOM = document.getElementById('ui-leaderboard');
-        boardDOM.innerHTML = '';
+        let fullList = [];
+        fullList.push({ name: "TWOJA FLOTA (TY)", cash: state.cash, isUser: true });
+        state.competitors.forEach(b => fullList.push({ name: b.name, cash: b.cash, isUser: false }));
+        fullList.sort((a,b) => b.cash - a.cash);
 
-        leaderboardArray.forEach((row, index) => {
-            const rank = index + 1;
+        const leaderboardDOM = document.getElementById('ui-leaderboard');
+        leaderboardDOM.innerHTML = '';
+
+        fullList.forEach((row, idx) => {
+            const rank = idx + 1;
             const div = document.createElement('div');
             div.classList.add('rank-row');
-            if(row.isUser) {
-                div.classList.add('user');
-                gameData.currentRankPosition = rank;
-            }
+            if(row.isUser) { div.classList.add('user'); state.currentRank = rank; }
             div.innerHTML = `<div>#${rank} ${row.name}</div><strong>${Math.floor(row.cash).toLocaleString()} 🪙</strong>`;
-            boardDOM.appendChild(div);
+            leaderboardDOM.appendChild(div);
         });
     }
 
-    function handleSeasonEnd() {
-        const position = gameData.currentRankPosition;
+    function endCurrentSeason() {
+        const rank = state.currentRank;
         const consoleDOM = document.getElementById('event-console');
-        const bestShipPower = getBestShipIncomeValue();
+        const bestItemPower = getAbsoluteBestItemIncome(); // sprawdzamy absolutnie najlepszy handelek w plecaku
 
-        playSound(350, "square", 0.6);
+        playBeep(300, "square", 0.5);
 
-        // Precyzyjne naliczanie nagród zgodnie ze specyfikacją zlecenia użytkownika
-        if(position === 1) {
-            const calculatedIncomeReward = bestShipPower * 3.0; // 300% wydajniejszy od najlepszego
-            const rewardObject = { name: "Mistrzowski Artefakt (TOP 1)", percent: 300, incomeValue: calculatedIncomeReward };
-            gameData.customRewards.push(rewardObject);
-            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] SUKCES! Miejsce #1. Otrzymujesz Handelek Świata o wydajności 300% najlepszego statku (+${Math.floor(calculatedIncomeReward)} 🪙/s)!`;
-            
-            // Spawn unikalnej, złotej bryły 3D na orbicie
-            spawnShip3D(`reward_${Date.now()}`, "ico", 0xffcc00);
+        // Wyliczanie nagrody na podstawie Twoich wytycznych:
+        if(rank === 1) {
+            const incomeReward = Math.floor(bestItemPower * 3.0); // 300% lepszy od najlepszego
+            const prizeItem = { id: "reward_" + Date.now(), name: "Mistrzowski Rdzeń Sezonu", income: incomeReward, rarity: "legendary", color: 0xffcc00, geo: "ico" };
+            state.inventory.push(prizeItem);
+            consoleDOM.innerHTML = `[KONIEC SEZONU] <span style="color:var(--neon-gold); font-weight:bold;">UKOŃCZYŁEŚ NA MIEJSCU #1!</span> Otrzymujesz legendarny handelek o mocy 300% Twojego najlepszego przedmiotu (+${incomeReward} 🪙/s)! Sprawdź plecak!`;
         } 
-        else if(position === 2) {
-            const calculatedIncomeReward = bestShipPower * 2.0; // 200% wydajniejszy od najlepszego
-            const rewardObject = { name: "Kwantowy Krążownik (TOP 2)", percent: 200, incomeValue: calculatedIncomeReward };
-            gameData.customRewards.push(rewardObject);
-            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] Świetnie! Miejsce #2. Przyznano Handelek o wydajności 200% najlepszego statku (+${Math.floor(calculatedIncomeReward)} 🪙/s)!`;
-            
-            spawnShip3D(`reward_${Date.now()}`, "octa", 0xff0077);
+        else if(rank === 2) {
+            const incomeReward = Math.floor(bestItemPower * 2.0); // 200% lepszy od najlepszego
+            const prizeItem = { id: "reward_" + Date.now(), name: "Kwantowy Silnik Top 2", income: incomeReward, rarity: "epic", color: 0xff0077, geo: "tetra" };
+            state.inventory.push(prizeItem);
+            consoleDOM.innerHTML = `[KONIEC SEZONU] Wielki sukces! Miejsce #2. Otrzymujesz epicki handelek o mocy 200% Twojego najlepszego przedmiotu (+${incomeReward} 🪙/s). Trafił do plecaka!`;
         } 
-        else if(position === 3) {
-            const calculatedIncomeReward = bestShipPower * 1.5; // 150% wydajniejszy od najlepszego
-            const rewardObject = { name: "Sonda Przebicia (TOP 3)", percent: 150, incomeValue: calculatedIncomeReward };
-            gameData.customRewards.push(rewardObject);
-            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] Dobra pozycja! Miejsce #3. Przyznano Handelek o wydajności 150% najlepszego statku (+${Math.floor(calculatedIncomeReward)} 🪙/s)!`;
-            
-            spawnShip3D(`reward_${Date.now()}`, "tetra", 0x00f0ff);
+        else if(rank === 3) {
+            const incomeReward = Math.floor(bestItemPower * 1.5); // 150% lepszy od najlepszego
+            const prizeItem = { id: "reward_" + Date.now(), name: "Sonda Przebicia Top 3", income: incomeReward, rarity: "rare", color: 0x00f0ff, geo: "octa" };
+            state.inventory.push(prizeItem);
+            consoleDOM.innerHTML = `[KONIEC SEZONU] Bardzo dobrze! Miejsce #3. Otrzymujesz rzadki handelek o mocy 150% Twojego najlepszego przedmiotu (+${incomeReward} 🪙/s). Trafił do plecaka!`;
         } 
         else {
-            consoleDOM.innerHTML = `[SEZON ZAKOŃCZONY] Finisz na pozycji #${position}. Brak bonusów floty premium. Zwiększ produkcję, by w nowym sezonie wskoczyć do TOP 3!`;
+            consoleDOM.innerHTML = `[KONIEC SEZONU] Ukończyłeś wyścig na pozycji #${rank}. Żeby otrzymać specjalny darmowy handelek z bonusami procentowymi, musisz wskoczyć do TOP 3!`;
         }
 
-        // Resetowanie oponentów AI na kolejny sezon wyzwania
-        gameData.competitors.forEach(bot => {
-            bot.cash = Math.floor(gameData.cash * (0.6 + Math.random()));
-            bot.incomeRate = Math.floor(globalCalculatedIPS * (0.7 + Math.random()));
+        // Reset finansów botów pod nowy sezon walki
+        state.competitors.forEach(bot => {
+            bot.cash = Math.floor(state.cash * (0.6 + Math.random()));
+            bot.incomeRate = Math.floor(currentCalculatedIPS * (0.7 + Math.random())) + 10;
         });
 
-        gameData.seasonTime = 60; // reset zegara do 60s
-        recalculateIncome();
-        updateUI();
+        state.seasonTime = 60;
+        recalculateGlobalIPS();
+        updateInterfaceUI();
     }
 
-    /* ==========================================================================
-       GŁÓWNE PĘTLE CZASOWE I ODŚWIEŻANIE INTERFEJSU
-       ========================================================================== */
-    function updateUI() {
-        document.getElementById('ui-cash').innerText = Math.floor(gameData.cash).toLocaleString();
-        document.getElementById('ui-ips').innerText = `+${Math.floor(globalCalculatedIPS).toLocaleString()} 🪙/s`;
-        document.getElementById('ui-timer').innerText = `${gameData.seasonTime}s`;
+    /* OBRÓBKA GRAFICZNA INTERFEJSU */
+    function updateInterfaceUI() {
+        document.getElementById('ui-cash').innerText = Math.floor(state.cash).toLocaleString();
+        document.getElementById('ui-timer').innerText = `${state.seasonTime}s`;
+        
+        const percent = (state.seasonTime / 60) * 100;
+        document.getElementById('progress-fill').style.width = `${percent}%`;
 
-        const fillPercent = (gameData.seasonTime / 60) * 100;
-        document.getElementById('progress-fill').style.width = `${fillPercent}%`;
-
-        let bestVal = getBestShipIncomeValue();
-        document.getElementById('ui-best-ship').innerText = `+${Math.floor(bestVal)} 🪙/s base`;
-
-        renderShopUI();
+        renderInventoryAndSlotsDOM();
     }
 
-    // Pętla główna (10 razy na sekundę) dla zachowania płynności naliczania środków i rankingu
+    // Pętla główna odświeżania danych (10 razy na sekundę)
     setInterval(() => {
-        if(gameData.boosterTime > 0) {
-            gameData.boosterTime -= 0.1;
-            if(gameData.boosterTime <= 0) recalculateIncome();
+        if(currentCalculatedIPS > 0) {
+            state.cash += (currentCalculatedIPS / 10);
         }
-
-        if(globalCalculatedIPS > 0) {
-            gameData.cash += (globalCalculatedIPS / 10);
-        }
-
-        processLeaderboard();
-        updateUI();
+        runAILeaderboard();
+        document.getElementById('ui-cash').innerText = Math.floor(state.cash).toLocaleString();
     }, 100);
 
-    // Sekundowa pętla odliczania sezonu
+    // Odliczanie sekundowe zegara sezonu
     setInterval(() => {
-        if(gameData.seasonTime > 0) {
-            gameData.seasonTime--;
-            if(gameData.seasonTime === 0) {
-                handleSeasonEnd();
-            }
+        if(state.seasonTime > 0) {
+            state.seasonTime--;
+            updateInterfaceUI();
+            if(state.seasonTime === 0) endCurrentSeason();
         }
     }, 1000);
 
-    // Rozruch systemu po załadowaniu okna przeglądarki
     window.onload = () => {
         init3D();
-        recalculateIncome();
-        updateUI();
+        updateInterfaceUI();
     };
 
 </script>
