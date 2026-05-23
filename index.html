@@ -3,361 +3,534 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fortress of Gears - RGB Edition</title>
+    <title>Gears Fortress - Ultra RGB Edition</title>
     <style>
-        /* Animacja tęczy RGB */
-        @keyframes rgb-border {
-            0% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
-            33% { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
-            66% { border-color: #0000ff; box-shadow: 0 0 15px #0000ff; }
-            100% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
-        }
-        @keyframes rgb-text {
-            0% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
-            33% { color: #00ff00; text-shadow: 0 0 5px #00ff00; }
-            66% { color: #0000ff; text-shadow: 0 0 5px #0000ff; }
-            100% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+        /* Zaawansowane Animacje Płynnego RGB (Neon Chroma) */
+        @keyframes rgb-glow {
+            0% { border-color: #ff0055; box-shadow: 0 0 20px #ff0055, inset 0 0 10px #ff0055; }
+            20% { border-color: #00ffcc; box-shadow: 0 0 20px #00ffcc, inset 0 0 10px #00ffcc; }
+            40% { border-color: #9b59b6; box-shadow: 0 0 20px #9b59b6, inset 0 0 10px #9b59b6; }
+            60% { border-color: #f1c40f; box-shadow: 0 0 20px #f1c40f, inset 0 0 10px #f1c40f; }
+            80% { border-color: #ff3300; box-shadow: 0 0 20px #ff3300, inset 0 0 10px #ff3300; }
+            100% { border-color: #ff0055; box-shadow: 0 0 20px #ff0055, inset 0 0 10px #ff0055; }
         }
 
+        @keyframes rgb-text {
+            0% { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
+            25% { color: #00ffcc; text-shadow: 0 0 10px #00ffcc; }
+            50% { color: #9b59b6; text-shadow: 0 0 10px #9b59b6; }
+            75% { color: #f1c40f; text-shadow: 0 0 10px #f1c40f; }
+            100% { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
+        }
+
+        @keyframes background-rgb {
+            0% { background-color: #0f051d; }
+            50% { background-color: #05131a; }
+            100% { background-color: #0f051d; }
+        }
+
+        @keyframes spin-clockwise {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Główne Style Strony */
         body {
-            background-color: #111;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: background-rgb 15s infinite ease-in-out;
+            color: #ffffff;
+            font-family: 'Consolas', 'Courier New', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+            user-select: none;
         }
 
         h1 {
             animation: rgb-text 6s infinite linear;
+            font-size: 32px;
             margin-bottom: 5px;
+            letter-spacing: 2px;
         }
 
-        /* Panel Statystyk i Sklepu */
-        #top-bar {
+        /* Górny Panel Statusu i Zakupów */
+        #dashboard {
             display: flex;
+            flex-wrap: wrap;
             gap: 20px;
-            background: #222;
-            padding: 15px 25px;
-            border-radius: 10px;
-            border: 2px solid #333;
-            animation: rgb-border 8s infinite linear;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 15px 30px;
+            border-radius: 12px;
+            border: 2px solid #fff;
+            animation: rgb-glow 10s infinite linear;
             margin-bottom: 20px;
             align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
         }
 
-        .stat { font-size: 18px; font-weight: bold; }
-        
-        .btn-buy {
-            background: #333;
-            color: white;
-            border: 2px solid #555;
-            padding: 8px 15px;
-            border-radius: 5px;
+        .stat-box {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .premium-status {
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: #444;
+            color: #aaa;
+        }
+        .premium-active {
+            background: #ff0055;
+            color: #fff;
+            text-shadow: 0 0 5px #fff;
+            animation: rgb-glow 3s infinite linear;
+        }
+
+        .btn-action {
+            background: #111;
+            color: #fff;
+            border: 2px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.2s;
+            font-family: inherit;
+            transition: all 0.2s ease;
         }
-        .btn-buy:hover { background: #444; border-color: #00ff00; }
+        .btn-action:hover {
+            border-color: #00ffcc;
+            box-shadow: 0 0 10px #00ffcc;
+            transform: translateY(-2px);
+        }
 
-        /* Główny Kontener */
-        #game-container {
+        /* SEKCJA PREMIUM - DARMOWE ACTIVATION */
+        #premium-shop {
             display: flex;
-            background-color: #151515;
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid #222;
-            gap: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            gap: 15px;
+            background: rgba(15, 15, 15, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 750px;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .shop-card {
+            background: #222;
+            border: 1px solid #444;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-align: center;
+            min-width: 180px;
+        }
+        .shop-card h3 { margin: 0 0 8px 0; font-size: 14px; color: #f1c40f; }
+        .btn-premium {
+            background: #f1c40f;
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-premium:hover {
+            box-shadow: 0 0 10px #f1c40f;
         }
 
-        /* Droga potworów */
-        #path {
-            width: 100px;
-            height: 400px;
-            background-color: #222;
-            border: 1px solid #333;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
+        /* Kontener Planszy */
+        #arena {
+            display: flex;
+            background-color: rgba(10, 10, 10, 0.9);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid #222;
+            gap: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .gate {
+
+        /* Tor Przeszkód i Potworów */
+        #combat-lane {
+            width: 120px;
+            height: 380px;
+            background: linear-gradient(180deg, #111 0%, #1a1a1a 100%);
+            border: 2px solid #333;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .waypoint {
             position: absolute;
             width: 100%;
             text-align: center;
-            padding: 5px 0;
-            font-size: 12px;
+            padding: 6px 0;
+            font-size: 11px;
             font-weight: bold;
-            background: #333;
+            background: rgba(30, 30, 30, 0.8);
+            letter-spacing: 1px;
         }
-        .spawn { top: 0; color: #ff4d4d; }
-        .base { bottom: 0; color: #1e90ff; }
+        .spawn-zone { top: 0; border-bottom: 1px solid #ff0055; color: #ff0055; }
+        .base-zone { bottom: 0; border-top: 1px solid #00ffcc; color: #00ffcc; }
 
-        /* Siatka kół */
-        #grid {
+        /* Siatka Konstrukcyjna Kół */
+        #gear-matrix {
             display: grid;
             grid-template-columns: repeat(3, 110px);
             grid-template-rows: repeat(3, 110px);
-            gap: 15px;
+            gap: 20px;
         }
-        .slot {
-            background-color: #1c1c1c;
-            border: 2px dashed #333;
+        .matrix-cell {
+            background-color: rgba(25, 25, 25, 0.6);
+            border: 2px dashed #444;
             border-radius: 50%;
             position: relative;
+            transition: all 0.3s ease;
+        }
+        .matrix-cell.hovered {
+            border-color: #00ffcc;
+            background: rgba(0, 255, 204, 0.1);
         }
 
-        /* Koła Zębate RGB */
-        .gear {
-            width: 100px;
-            height: 100px;
+        /* Neonowe Koła Zębate RGB */
+        .gear-entity {
+            width: 104px;
+            height: 104px;
             border-radius: 50%;
             position: absolute;
-            top: 3px;
-            left: 3px;
+            top: 1px;
+            left: 1px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 28px;
             cursor: grab;
-            user-select: none;
-            border: 4px dashed;
-            animation: spin 3s linear infinite, rgb-border 5s infinite linear;
+            border: 5px dashed;
+            animation: spin-clockwise 4s linear infinite, rgb-glow 6s infinite linear;
         }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .gear-entity .level-badge { font-size: 26px; line-height: 26px; }
+        .gear-entity .type-badge { font-size: 10px; opacity: 0.8; margin-top: 2px; }
 
-        /* Jednostki */
-        .mob, .defender {
-            width: 26px;
-            height: 26px;
+        /* Jednostki Bojowe i Wrogowie */
+        .enemy-unit, .ally-bullet {
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             position: absolute;
-            left: 37px;
+            left: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transition: top 0.05s linear;
         }
-        .mob { background: #9400d3; top: 30px; }
-        .defender { background: #00eded; bottom: 30px; animation: rgb-border 3s infinite linear; }
+        .enemy-unit {
+            background: #9b59b6;
+            box-shadow: 0 0 12px #9b59b6;
+            border: 2px solid #fff;
+            top: 40px;
+        }
+        .ally-bullet {
+            background: #00ffcc;
+            box-shadow: 0 0 12px #00ffcc;
+            border: 2px solid #fff;
+            bottom: 40px;
+        }
 
-        /* PANEL Z LINKAMI */
-        #links-panel {
-            margin-top: 25px;
+        /* DOLNY PANEL SPOŁECZNOŚCIOWY */
+        #social-footer {
+            margin-top: 40px;
             display: flex;
-            gap: 15px;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .custom-link {
-            color: #fff;
+        .profile-hub {
+            color: #ffffff;
             text-decoration: none;
-            padding: 10px 20px;
-            background: #222;
-            border-radius: 5px;
-            border: 1px solid #444;
+            padding: 12px 25px;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 8px;
+            border: 2px solid #333;
             font-weight: bold;
-            transition: 0.3s;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: inherit;
         }
-        .custom-link:hover {
-            animation: rgb-border 2s infinite linear;
-            transform: scale(1.05);
+        .profile-hub:hover {
+            animation: rgb-glow 3s infinite linear;
+            transform: scale(1.05) translateY(-3px);
         }
     </style>
 </head>
 <body>
 
-    <h1>FORTRESS OF GEARS - CHROMA RGB</h1>
+    <h1>GEARS FORTRESS // CHROMA</h1>
 
-    <div id="top-bar">
-        <div class="stat">Złoto: <span id="gold">50</span> 💰</div>
-        <div class="stat">Życie: <span id="hp">10</span> ❤️</div>
-        <button class="btn-buy" id="btn-buy-gear">Kup Koło Lvl 1 (Koszt: 20💰)</button>
+    <div id="dashboard">
+        <div class="stat-box">ZŁOTO: <span id="balance">60</span> 💰</div>
+        <div class="stat-box">PŻ BAZY: <span id="health">10</span> ❤️</div>
+        <div class="stat-box">PREMIUM: <span id="premium-indicator" class="premium-status">NIEAKTYWNE</span></div>
+        <button class="btn-action" id="btn-buy">Kup Koło Lvl 1 [30 💰]</button>
     </div>
 
-    <div id="game-container">
-        <div id="path">
-            <div class="gate spawn">PORTAL</div>
-            <div class="gate base">BAZA</div>
+    <div id="premium-shop">
+        <div class="shop-card">
+            <h3>PAKIET MINUTOWY</h3>
+            <button class="btn-premium" onclick="activatePremium(60)">1 MIN ZA DARMO</button>
         </div>
-        <div id="grid"></div>
+        <div class="shop-card">
+            <h3>PAKIET GODZINNY</h3>
+            <button class="btn-premium" onclick="activatePremium(3600)">1 GODZ ZA DARMO</button>
+        </div>
+        <div class="shop-card">
+            <h3>PAKIET DZIENNY</h3>
+            <button class="btn-premium" onclick="activatePremium(86400)">1 DZIEŃ ZA DARMO</button>
+        </div>
     </div>
 
-    <div id="links-panel">
-        <a href="https://github.com" target="_blank" class="custom-link">Mój GitHub 🚀</a>
-        <a href="https://codepen.io" target="_blank" class="custom-link">Moje Projekty 💻</a>
+    <div id="arena">
+        <div id="combat-lane">
+            <div class="waypoint spawn-zone">PORTAL</div>
+            <div class="waypoint base-zone">REAKTOR</div>
+        </div>
+        <div id="gear-matrix"></div>
+    </div>
+
+    <div id="social-footer">
+        <a href="https://github.com" target="_blank" class="profile-hub">PROFIL GITHUB 🚀</a>
+        <a href="https://tiktok.com" target="_blank" class="profile-hub">PROFIL TIKTOK 🎬</a>
+        <a href="https://youtube.com" target="_blank" class="profile-hub">KANAŁ YOUTUBE 📺</a>
     </div>
 
 <script>
-    let gold = 50;
-    let hp = 10;
-    let draggedGear = null;
-    let mobs = [];
-    let defenders = [];
+    let gold = 60;
+    let baseHp = 10;
+    let premiumTimeLeft = 0;
+    let draggedElement = null;
+    
+    let activeEnemies = [];
+    let activeBullets = [];
 
-    const grid = document.getElementById('grid');
-    const path = document.getElementById('path');
-    const goldDisplay = document.getElementById('gold');
-    const hpDisplay = document.getElementById('hp');
+    const matrix = document.getElementById('gear-matrix');
+    const combatLane = document.getElementById('combat-lane');
+    const balanceTxt = document.getElementById('balance');
+    const healthTxt = document.getElementById('health');
+    const premiumIndicator = document.getElementById('premium-indicator');
 
-    // Generowanie siatki 3x3
+    // Inicjalizacja Slotów Planszy (3x3)
     for (let i = 0; i < 9; i++) {
-        const slot = document.createElement('div');
-        slot.classList.add('slot');
-        slot.addEventListener('dragover', (e) => e.preventDefault());
-        slot.addEventListener('drop', handleDrop);
-        grid.appendChild(slot);
+        const cell = document.createElement('div');
+        cell.classList.add('matrix-cell');
+        cell.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            cell.classList.add('hovered');
+        });
+        cell.addEventListener('dragleave', () => cell.classList.remove('hovered'));
+        cell.addEventListener('drop', handleDrop);
+        matrix.appendChild(cell);
     }
 
-    // Zakupywanie kół zębatych
-    document.getElementById('btn-buy-gear').addEventListener('click', () => {
-        if (gold >= 20) {
-            const emptySlot = Array.from(document.querySelectorAll('.slot')).find(slot => !slot.hasChildNodes());
-            if (emptySlot) {
-                gold -= 20;
-                goldDisplay.innerText = gold;
-                createGear(emptySlot, 1);
+    // Zakup Podstawowego Koła
+    document.getElementById('btn-buy').addEventListener('click', () => {
+        if (gold >= 30) {
+            const openCell = Array.from(document.querySelectorAll('.matrix-cell')).find(c => !c.hasChildNodes());
+            if (openCell) {
+                gold -= 30;
+                updateUI();
+                spawnGearEntity(openCell, 1);
             } else {
-                alert("Brak wolnego miejsca na siatce!");
+                alert("Brak wolnego miejsca na polach RGB!");
             }
         } else {
-            alert("Za mało złota!");
+            alert("Niewystarczająca ilość funduszy!");
         }
     });
 
-    function createGear(slot, level) {
-        if (level > 4) level = 4;
+    // Generator Kół Zębatych
+    function spawnGearEntity(slot, lvl) {
+        if (lvl > 5) lvl = 5;
         const gear = document.createElement('div');
-        gear.classList.add('gear');
+        gear.classList.add('gear-entity');
         gear.draggable = true;
-        gear.innerText = level;
-        gear.dataset.level = level;
+        
+        // Zależność prędkości obrotowej od poziomu
+        gear.style.animation = `spin-clockwise ${5 / lvl}s linear infinite, rgb-glow 6s infinite linear`;
 
-        // Im wyższy lvl, tym szybciej się kręci i częściej strzela
-        gear.style.animationDuration = `${4 / level}s, 4s`;
+        gear.innerHTML = `
+            <div class="level-badge">${lvl}</div>
+            <div class="type-badge">${lvl >= 3 ? 'OVERDRIVE' : 'CHROMA'}</div>
+        `;
+        gear.dataset.level = lvl;
 
-        const spawnRate = 4000 / level;
-        const interval = setInterval(() => {
-            if (document.body.contains(gear)) {
-                spawnDefender(level);
-            } else {
-                clearInterval(interval);
-            }
-        }, spawnRate);
+        // Mechanizm automatycznego spawnowania obrońców (Premium skraca czas produkcji o połowę)
+        let baseRate = 3500 / lvl;
+        function setupShooter() {
+            let actualRate = premiumTimeLeft > 0 ? baseRate / 2 : baseRate;
+            return setTimeout(() => {
+                if (document.body.contains(gear)) {
+                    fireDefenderUnit(lvl);
+                    gear.shooterTimeout = setupShooter();
+                }
+            }, actualRate);
+        }
+        gear.shooterTimeout = setupShooter();
 
-        gear.addEventListener('dragstart', () => draggedGear = gear);
-        gear.addEventListener('dragend', () => draggedGear = null);
+        gear.addEventListener('dragstart', () => draggedElement = gear);
+        gear.addEventListener('dragend', () => draggedElement = null);
         slot.appendChild(gear);
     }
 
+    // Łączenie struktur kół (Merge System)
     function handleDrop(e) {
         e.preventDefault();
-        const targetSlot = this;
-        const targetGear = targetSlot.querySelector('.gear');
-        if (!draggedGear) return;
+        this.classList.remove('hovered');
+        if (!draggedElement) return;
 
-        const sourceSlot = draggedGear.parentElement;
+        const targetGear = this.querySelector('.gear-entity');
+        const originSlot = draggedElement.parentElement;
 
         if (!targetGear) {
-            targetSlot.appendChild(draggedGear);
-        } else if (targetGear !== draggedGear) {
-            const lvl1 = parseInt(draggedGear.dataset.level);
-            const lvl2 = parseInt(targetGear.dataset.level);
+            this.appendChild(draggedElement);
+        } else if (targetGear !== draggedElement) {
+            const srcLvl = parseInt(draggedElement.dataset.level);
+            const trgLvl = parseInt(targetGear.dataset.level);
 
-            if (lvl1 === lvl2 && lvl1 < 4) {
-                sourceSlot.innerHTML = '';
-                targetSlot.innerHTML = '';
-                createGear(targetSlot, lvl1 + 1);
-                gold += 10; // Bonus za merge
-                goldDisplay.innerText = gold;
+            if (srcLvl === trgLvl && srcLvl < 5) {
+                clearTimeout(draggedElement.shooterTimeout);
+                clearTimeout(targetGear.shooterTimeout);
+                originSlot.innerHTML = '';
+                this.innerHTML = '';
+                
+                spawnGearEntity(this, srcLvl + 1);
+                gold += 15; // Nagroda za udany merge
+                updateUI();
             }
         }
     }
 
-    function spawnMob() {
-        const mob = document.createElement('div');
-        mob.classList.add('mob');
-        mob.innerText = "👹";
-        mob.style.top = "30px";
-        mob.dataset.hp = 3;
-        path.appendChild(mob);
-        mobs.push(mob);
+    // Aktywacja Sklepu Premium (Czasowa)
+    window.activatePremium = function(seconds) {
+        premiumTimeLeft += seconds;
+        premiumIndicator.classList.add('premium-active');
+        alert(`Uruchomiono tryb Premium! Prędkość strzału Twoich kół wzrasta dwukrotnie na czas trwania pakietu.`);
+        updateUI();
+    };
+
+    function updateUI() {
+        balanceTxt.innerText = gold;
+        healthTxt.innerText = baseHp;
+        if (premiumTimeLeft > 0) {
+            premiumIndicator.innerText = `AKTYWNE (${premiumTimeLeft}s)`;
+            premiumIndicator.classList.add('premium-active');
+        } else {
+            premiumIndicator.innerText = "NIEAKTYWNE";
+            premiumIndicator.classList.remove('premium-active');
+        }
     }
-    setInterval(spawnMob, 3500);
 
-    function spawnDefender(level) {
-        const def = document.createElement('div');
-        def.classList.add('defender');
-        def.innerText = level === 1 ? "⚔️" : level === 2 ? "💥" : "⚡";
-        def.style.bottom = "30px";
-        def.dataset.power = level;
-        path.appendChild(def);
-        defenders.push(def);
+    // Pętla Odliczania Czasu Premium
+    setInterval(() => {
+        if (premiumTimeLeft > 0) {
+            premiumTimeLeft--;
+            updateUI();
+        }
+    }, 1000);
+
+    // Produkcja jednostek defensywnych na tor
+    function fireDefenderUnit(level) {
+        const bullet = document.createElement('div');
+        bullet.classList.add('ally-bullet');
+        bullet.innerText = level >= 3 ? "⚡" : "⚔️";
+        bullet.style.bottom = "40px";
+        bullet.dataset.damage = level;
+        combatLane.appendChild(bullet);
+        activeBullets.push(bullet);
     }
 
-    // Pętla gry
-    function update() {
-        // Ruch potworów w dół
-        for (let i = mobs.length - 1; i >= 0; i--) {
-            let mob = mobs[i];
-            let top = mob.offsetTop;
-            mob.style.top = (top + 1) + "px";
+    // Spawner hord przeciwników
+    setInterval(() => {
+        const enemy = document.createElement('div');
+        enemy.classList.add('enemy-unit');
+        enemy.innerText = "👹";
+        enemy.style.top = "40px";
+        enemy.dataset.hp = 4;
+        combatLane.appendChild(enemy);
+        activeEnemies.push(enemy);
+    }, 3000);
 
-            if (top >= 360) {
-                hp--;
-                hpDisplay.innerText = hp;
-                mob.remove();
-                mobs.splice(i, 1);
-                if (hp <= 0) {
-                    alert("Koniec gry! Twoja baza została zniszczona.");
+    // Główny Proces Przetwarzania Silnika Gry (60 FPS)
+    function processEngine() {
+        // Ruch przeciwników w dół toru
+        for (let i = activeEnemies.length - 1; i >= 0; i--) {
+            let enemy = activeEnemies[i];
+            let topPosition = enemy.offsetTop;
+            enemy.style.top = (topPosition + 1.2) + "px";
+
+            // Detekcja wdarcia się do rdzenia bazy
+            if (topPosition >= 340) {
+                baseHp--;
+                updateUI();
+                enemy.remove();
+                activeEnemies.splice(i, 1);
+                
+                if (baseHp <= 0) {
+                    alert("System zniszczony! Nastąpi restart reaktora.");
                     window.location.reload();
                 }
             }
         }
 
-        // Ruch obrońców w górę
-        for (let i = defenders.length - 1; i >= 0; i--) {
-            let def = defenders[i];
-            let top = def.offsetTop;
-            def.style.top = (top - 2) + "px";
+        // Ruch pocisków/obrońców w górę toru
+        for (let i = activeBullets.length - 1; i >= 0; i--) {
+            let bullet = activeBullets[i];
+            let topPosition = bullet.offsetTop;
+            bullet.style.top = (topPosition - 2.5) + "px";
 
-            if (top <= 20) {
-                def.remove();
-                defenders.splice(i, 1);
+            if (topPosition <= 20) {
+                bullet.remove();
+                activeBullets.splice(i, 1);
             }
         }
 
-        // Walka
-        for (let i = mobs.length - 1; i >= 0; i--) {
-            let mob = mobs[i];
-            for (let j = defenders.length - 1; j >= 0; j--) {
-                let def = defenders[j];
-                if (Math.abs(mob.offsetTop - def.offsetTop) < 20) {
-                    let mHp = parseInt(mob.dataset.hp) - parseInt(def.dataset.power);
-                    def.remove();
-                    defenders.splice(j, 1);
+        // System Kolizji i Obliczania Obrażeń (Kombat)
+        for (let i = activeEnemies.length - 1; i >= 0; i--) {
+            let enemy = activeEnemies[i];
+            for (let j = activeBullets.length - 1; j >= 0; j--) {
+                let bullet = activeBullets[j];
+                
+                if (Math.abs(enemy.offsetTop - bullet.offsetTop) < 20) {
+                    let currentHp = parseInt(enemy.dataset.hp) - parseInt(bullet.dataset.damage);
+                    bullet.remove();
+                    activeBullets.splice(j, 1);
 
-                    if (mHp <= 0) {
-                        gold += 15;
-                        goldDisplay.innerText = gold;
-                        mob.remove();
-                        mobs.splice(i, 1);
+                    if (currentHp <= 0) {
+                        // Bonus za zniszczenie (Premium daje x2 złota)
+                        gold += premiumTimeLeft > 0 ? 40 : 20;
+                        updateUI();
+                        enemy.remove();
+                        activeEnemies.splice(i, 1);
                         break;
                     } else {
-                        mob.dataset.hp = mHp;
+                        enemy.dataset.hp = currentHp;
                     }
                 }
             }
         }
-        requestAnimationFrame(update);
+        requestAnimationFrame(processEngine);
     }
-    update();
+    
+    // Uruchomienie pętli silnika
+    requestAnimationFrame(processEngine);
 </script>
 </body>
 </html>
