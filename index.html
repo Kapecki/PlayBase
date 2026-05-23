@@ -3,389 +3,841 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber-Forge RGB // Generator Przyszłości</title>
+    <title>CYBER-FORGE SYSTEM: ULTRA CHROMA RGB</title>
     <style>
-        /* Efekty Neon Chroma RGB */
-        @keyframes rgb-glow {
-            0% { border-color: #00ffcc; box-shadow: 0 0 20px #00ffcc; }
-            25% { border-color: #ff0055; box-shadow: 0 0 20px #ff0055; }
-            50% { border-color: #9b59b6; box-shadow: 0 0 20px #9b59b6; }
-            75% { border-color: #f1c40f; box-shadow: 0 0 20px #f1c40f; }
-            100% { border-color: #00ffcc; box-shadow: 0 0 20px #00ffcc; }
+        /* CSS TYLKO DLA PRAWDZIWYCH WYKOKSÓW - ULTRA CHROMA RGB */
+        :root {
+            --bg-dark: #05050a;
+            --panel-bg: rgba(13, 13, 23, 0.95);
+            --border-glow: #00ffcc;
+            --text-neon: #00ffcc;
         }
 
-        @keyframes text-rainbow {
-            0% { color: #00ffcc; text-shadow: 0 0 10px #00ffcc; }
-            50% { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
-            100% { color: #00ffcc; text-shadow: 0 0 10px #00ffcc; }
+        @keyframes ultra-chroma {
+            0% { border-color: #ff0055; box-shadow: 0 0 25px #ff0055, inset 0 0 10px #ff0055; }
+            16% { border-color: #00ffcc; box-shadow: 0 0 25px #00ffcc, inset 0 0 10px #00ffcc; }
+            33% { border-color: #9b59b6; box-shadow: 0 0 25px #9b59b6, inset 0 0 10px #9b59b6; }
+            50% { border-color: #f1c40f; box-shadow: 0 0 25px #f1c40f, inset 0 0 10px #f1c40f; }
+            66% { border-color: #ff3300; box-shadow: 0 0 25px #ff3300, inset 0 0 10px #ff3300; }
+            83% { border-color: #00ff00; box-shadow: 0 0 25px #00ff00, inset 0 0 10px #00ff00; }
+            100% { border-color: #ff0055; box-shadow: 0 0 25px #ff0055, inset 0 0 10px #ff0055; }
+        }
+
+        @keyframes text-chroma {
+            0% { color: #ff0055; text-shadow: 0 0 12px #ff0055; }
+            25% { color: #00ffcc; text-shadow: 0 0 12px #00ffcc; }
+            50% { color: #9b59b6; text-shadow: 0 0 12px #9b59b6; }
+            75% { color: #f1c40f; text-shadow: 0 0 12px #f1c40f; }
+            100% { color: #ff0055; text-shadow: 0 0 12px #ff0055; }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
         }
 
         body {
-            background-color: #0a0a12;
+            background-color: var(--bg-dark);
             color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Consolas', 'Courier New', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+            overflow-x: hidden;
             user-select: none;
         }
 
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9999;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
         h1 {
-            animation: text-rainbow 5s infinite linear;
-            font-size: 28px;
-            letter-spacing: 3px;
-            margin-bottom: 5px;
+            animation: text-chroma 5s infinite linear;
+            font-size: 36px;
+            letter-spacing: 4px;
+            margin: 10px 0;
             text-transform: uppercase;
+            text-align: center;
         }
 
-        /* Główny Panel Statystyk */
-        #control-panel {
-            display: flex;
+        /* GŁÓWNY INTERFEJS DEWELOPERSKI */
+        #core-grid-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
             gap: 25px;
-            background: rgba(20, 20, 30, 0.9);
-            padding: 15px 30px;
-            border-radius: 12px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 900px) {
+            #core-grid-layout { grid-template-columns: 1fr; }
+        }
+
+        .cyber-panel {
+            background: var(--panel-bg);
             border: 2px solid #222;
-            animation: rgb-glow 12s infinite linear;
-            margin-bottom: 25px;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-box {
+        .cyber-panel::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,255,204,0.03) 0%, transparent 10% );
+            animation: scanline 6s infinite linear;
+            pointer-events: none;
+        }
+
+        /* PANEL KONTROLNY STATYSTYK */
+        #stats-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-line {
             font-size: 16px;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-line span { font-weight: bold; color: #00ffcc; }
+
+        .big-money {
+            font-size: 28px;
             font-weight: bold;
-            letter-spacing: 1px;
+            text-align: center;
+            padding: 15px 0;
+            background: rgba(0,0,0,0.4);
+            border-radius: 6px;
+            border: 1px solid #333;
+            animation: text-chroma 8s infinite linear;
         }
 
-        .premium-badge {
-            background: #333;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #aaa;
-        }
-        .premium-on {
-            background: #ff0055;
-            color: white;
-            box-shadow: 0 0 10px #ff0055;
-        }
-
-        /* Przyciski operacyjne */
-        .btn-core {
-            background: #111;
-            color: #00ffcc;
-            border: 2px solid #00ffcc;
-            padding: 10px 20px;
+        /* PRZYCISKI OPERACYJNE */
+        .cyber-btn {
+            background: #0d0d14;
+            color: #fff;
+            border: 2px solid #444;
+            padding: 12px 20px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
             font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .cyber-btn:hover:not(:disabled) {
+            border-color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0,255,204,0.4);
+            transform: translateY(-2px);
+            background: #141420;
+        }
+
+        .cyber-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #222;
+        }
+
+        /* MATRYCA FORGE (4x4 SYSTEM MULTI-MERGE) */
+        #forge-matrix-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 110px);
+            grid-template-rows: repeat(4, 110px);
+            gap: 15px;
+            background: rgba(5, 5, 10, 0.8);
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #222;
+            animation: ultra-chroma 15s infinite linear;
+        }
+
+        @media (max-width: 550px) {
+            #matrix-grid {
+                grid-template-columns: repeat(4, 75px);
+                grid-template-rows: repeat(4, 75px);
+                gap: 8px;
+                padding: 10px;
+            }
+        }
+
+        .matrix-cell {
+            background: #090911;
+            border: 1px dashed #3a3a52;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
             transition: all 0.2s;
         }
-        .btn-core:hover {
-            background: #00ffcc;
-            color: #111;
-            box-shadow: 0 0 15px #00ffcc;
-            transform: translateY(-2px);
-        }
 
-        /* Sklep czasowy Premium */
-        #premium-market {
-            display: flex;
-            gap: 15px;
-            background: rgba(15, 15, 25, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #333;
-            margin-bottom: 25px;
-            width: 100%;
-            max-width: 700px;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .market-card {
-            background: #151522;
-            border: 1px solid #444;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            min-width: 160px;
-        }
-        .market-card h3 { margin: 0 0 5px 0; font-size: 13px; color: #f1c40f; }
-        .btn-activate {
-            background: #f1c40f;
-            color: #000;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-        }
-        .btn-activate:hover { box-shadow: 0 0 10px #f1c40f; }
-
-        /* Siatka Laboratorium (Matryca Tworzenia) */
-        #forge-matrix {
-            display: grid;
-            grid-template-columns: repeat(4, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 15px;
-            background: rgba(10, 10, 15, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #333;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-        }
-        .matrix-slot {
-            background: #11111d;
-            border: 1px dashed #444;
-            border-radius: 8px;
-            position: relative;
-        }
-        .matrix-slot.drag-over {
+        .matrix-cell.drag-hover {
             border-color: #00ffcc;
-            background: rgba(0, 255, 204, 0.05);
+            background: rgba(0, 255, 204, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
         }
 
-        /* Przedmioty (Itemy RGB) */
-        .cyber-item {
-            width: 90px;
-            height: 90px;
+        /* JEDNOSTKI CYBER-ITEMY */
+        .forge-item {
+            width: 102px;
+            height: 102px;
             position: absolute;
-            top: 3px;
-            left: 3px;
+            top: 3px; left: 3px;
             border-radius: 8px;
+            background: linear-gradient(135deg, #131324 0%, #1a1a3a 100%);
+            border: 2px solid #333;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: grab;
-            border: 2px solid;
-            animation: rgb-glow 8s infinite linear;
-            background: #1c1c28;
-            box-sizing: border-box;
-            padding: 5px;
-            text-align: center;
+            transition: transform 0.1s, border-color 0.3s;
+            animation: ultra-chroma 10s infinite ease-in-out;
         }
-        .cyber-item:active { cursor: grabbing; }
-        .item-icon { font-size: 24px; }
-        .item-name { font-size: 9px; font-weight: bold; margin-top: 4px; color: #bbb; text-transform: uppercase; }
-        .item-income { font-size: 9px; color: #00ffcc; margin-top: 2px; }
 
-        /* Dolny Panel z Twoimi Linkami */
-        #user-profiles {
-            margin-top: 40px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+        @media (max-width: 550px) {
+            .forge-item { width: 68px; height: 68px; top: 2px; left: 2px; }
         }
-        .profile-btn {
+
+        .forge-item:active { cursor: grabbing; transform: scale(0.95); }
+
+        .item-icon { font-size: 26px; margin-bottom: 2px; }
+        .item-title { font-size: 9px; font-weight: bold; color: #a2a2d0; text-transform: uppercase; text-align: center; max-width: 95%; overflow: hidden; }
+        .item-stat { font-size: 8px; color: #00ffcc; margin-top: 2px; }
+        .item-lvl-badge { position: absolute; top: 4px; right: 6px; font-size: 9px; font-weight: bold; color: #fff; background: rgba(0,0,0,0.6); padding: 1px 4px; border-radius: 3px; border: 1px solid #444; }
+
+        @media (max-width: 550px) {
+            .item-icon { font-size: 18px; }
+            .item-title { display: none; }
+            .item-stat { font-size: 7px; }
+        }
+
+        /* SEKTY SKLEPÓW I ZARZĄDZANIA */
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-left: 3px solid #00ffcc;
+            padding-left: 8px;
+            margin: 15px 0 10px 0;
+            color: #00ffcc;
+        }
+
+        #premium-center {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 750px) { #premium-center { grid-template-columns: 1fr; } }
+
+        .premium-card {
+            background: rgba(10, 10, 18, 0.9);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+        .premium-card h4 { margin: 0 0 5px 0; font-size: 13px; color: #f1c40f; letter-spacing: 1px; }
+        .premium-card p { margin: 0 0 12px 0; font-size: 11px; color: #888; }
+
+        /* LISTA OSIĄGNIĘĆ */
+        #achievements-box {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .ach-item {
+            background: #09090f;
+            border: 1px solid #222;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.5;
+            transition: opacity 0.5s, border-color 0.5s;
+        }
+
+        .ach-item.unlocked {
+            opacity: 1;
+            border-color: #00ffcc;
+            background: linear-gradient(90deg, #09090f 0%, rgba(0,255,204,0.05) 100%);
+        }
+
+        .ach-icon { font-size: 16px; }
+
+        /* LISTA LINKÓW SPOŁECZNOŚCIOWYCH */
+        #social-hub {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .hub-link {
+            background: #0a0a10;
             color: #fff;
             text-decoration: none;
-            padding: 10px 20px;
-            background: #161622;
-            border-radius: 6px;
+            padding: 12px 25px;
             border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: bold;
-            font-size: 13px;
-            transition: all 0.2s;
             letter-spacing: 1px;
+            transition: all 0.2s;
         }
-        .profile-btn:hover {
-            animation: rgb-glow 3s infinite linear;
-            transform: scale(1.05);
+
+        .hub-link:hover {
+            animation: ultra-chroma 4s infinite linear;
+            transform: scale(1.05) translateY(-2px);
         }
+
+        /* EFEKT MATRIXA / DESZCZU RGB PODCZAS BOOSTERA */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.15;
+            transition: opacity 1s;
+        }
+
+        /* SCROLLBAR CUSTOMIZATION */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #07070c; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ffcc; }
     </style>
 </head>
 <body>
 
-    <h1>Cyber-Forge // Matryca RGB</h1>
+    <canvas id="matrix-canvas"></canvas>
 
-    <div id="control-panel">
-        <div class="stat-box">KREDYTY: <span id="currency-val">100</span> 🌌</div>
-        <div class="stat-box">GENERACJA: +<span id="income-val">0</span>/s</div>
-        <div class="stat-box">BOOSTER PREMIUM: <span id="premium-status" class="premium-badge">NIEAKTYWNY</span></div>
-        <button class="btn-core" id="btn-buy-core">Stwórz Rdzeń [Koszt: 40 🌌]</button>
+    <h1>CYBER-FORGE // OS SYSTEM 8.4</h1>
+
+    <div id="core-grid-layout">
+        
+        <div class="cyber-panel" id="stats-panel">
+            <div class="big-money"><span id="credits-display">0</span> 🌌</div>
+            
+            <div class="stat-line">GENERACJA REAKTORA: <span id="income-display">+0/s</span></div>
+            <div class="stat-line">BOOSTER MATRIXA: <span id="booster-display">NIEAKTYWNY</span></div>
+            <div class="stat-line">ZAPEŁNIENIE MATRYCY: <span id="fill-display">0 / 16</span></div>
+            <div class="stat-line">ZREAKTYWOWANE BOTY: <span id="bots-display">0 / 5</span></div>
+
+            <div class="section-title">Konstruktor Obiektów</div>
+            <button class="cyber-btn" id="btn-buy-item">Stwórz Komponent [Koszt: <span id="cost-display">40</span> 🌌]</button>
+            <button class="cyber-btn" id="btn-clicker">Ręczny Zastrzyk Energii [+10 🌌]</button>
+
+            <div class="section-title">Automatyzacja Fabryki</div>
+            <button class="cyber-btn" id="btn-buy-bot">Zatrudnij Bota Scalającego [<span id="bot-cost-display">500</span> 🌌]</button>
+            
+            <div class="section-title">Logi Wyzwań i Osiągnięć</div>
+            <div id="achievements-box"></div>
+        </div>
+
+        <div id="forge-matrix-container">
+            <div class="cyber-panel">
+                <div id="matrix-grid"></div>
+            </div>
+        </div>
+
     </div>
 
-    <div id="premium-market">
-        <div class="market-card">
-            <h3>ZASILANIE 1 MINUTA</h3>
-            <button class="btn-activate" onclick="triggerPremium(60)">AKTYWUJ ZA DARMO</button>
+    <div id="premium-center">
+        <div class="premium-card">
+            <h4>BŁYSKAWICZNY IMPULS</h4>
+            <p>Przyspieszenie produkcji x3 na okres 1 minuty.</p>
+            <button class="cyber-btn" onclick="activateBooster(60)">AKTYWUJ ZA DARMO</button>
         </div>
-        <div class="market-card">
-            <h3>ZASILANIE 1 GODZINA</h3>
-            <button class="btn-activate" onclick="triggerPremium(3600)">AKTYWUJ ZA DARMO</button>
+        <div class="premium-card">
+            <h4>KANTOWE PRZEŁADOWANIE</h4>
+            <p>Przyspieszenie produkcji x3 na okres 1 godziny.</p>
+            <button class="cyber-btn" onclick="activateBooster(3600)">AKTYWUJ ZA DARMO</button>
         </div>
-        <div class="market-card">
-            <h3>ZASILANIE 1 DZIEŃ</h3>
-            <button class="btn-activate" onclick="triggerPremium(86400)">AKTYWUJ ZA DARMO</button>
+        <div class="premium-card">
+            <h4>KOSMICZNY PRZEŁOM</h4>
+            <p>Przyspieszenie produkcji x3 na okres 1 dnia.</p>
+            <button class="cyber-btn" onclick="activateBooster(86400)">AKTYWUJ ZA DARMO</button>
         </div>
     </div>
 
-    <div id="forge-matrix"></div>
-
-    <div id="user-profiles">
-        <a href="https://github.com" target="_blank" class="profile-btn">MÓJ GITHUB 🚀</a>
-        <a href="https://tiktok.com" target="_blank" class="profile-btn">MÓJ TIKTOK 🎬</a>
-        <a href="https://youtube.com" target="_blank" class="profile-btn">MÓJ YOUTUBE 📺</a>
+    <div id="social-hub">
+        <a href="https://github.com" target="_blank" class="hub-link">SYSTEM GITHUB 🚀</a>
+        <a href="https://tiktok.com" target="_blank" class="hub-link">KANAŁ TIKTOK 🎬</a>
+        <a href="https://youtube.com" target="_blank" class="hub-link">STACJA YOUTUBE 📺</a>
     </div>
 
 <script>
-    // Konfiguracja poziomów przedmiotów (Baza danych przedmiotów przyszłości)
-    const itemDatabase = {
-        1: { name: "Rdzeń Energii", icon: "💎", income: 1 },
-        2: { name: "Micro-Chip RGB", icon: "💾", income: 3 },
-        3: { name: "Cyber-Miecz", icon: "⚔️", income: 8 },
-        4: { name: "Kwantowy PC", icon: "💻", income: 20 },
-        5: { name: "Rdzeń Fuzji", icon: "⚛️", income: 50 },
-        6: { name: "Napęd Antymaterii", icon: "🚀", income: 150 }
+    /* ==========================================================================
+       POTĘŻNY SKRYPT JS JEST ELEMENTEM NAPĘDOWYM CAŁEJ CYBER-FABRYKI
+       ========================================================================== */
+
+    // 1. Baza danych technologicznych (10 Poziomów ewolucji przedmiotów)
+    const techDatabase = {
+        1:  { name: "Nanoboty Złomu", icon: "⚙️", baseIncome: 1 },
+        2:  { name: "Krystaliczny Rdzeń", icon: "💎", baseIncome: 4 },
+        3:  { name: "Karta Szyfrująca", icon: "💾", baseIncome: 15 },
+        4:  { name: "Cyber-Viper", icon: "🐍", baseIncome: 50 },
+        5:  { name: "Kwantowy Emulator", icon: "💻", baseIncome: 180 },
+        6:  { name: "Działo Plazmowe", icon: "🔫", baseIncome: 650 },
+        7:  { name: "Generator Fuzji", icon: "⚛️", baseIncome: 2200 },
+        8:  { name: "Hiper-Napęd", icon: "🚀", baseIncome: 8000 },
+        9:  { name: "Rdzeń Antymaterii", icon: "🔮", baseIncome: 30000 },
+        10: { name: "Osobliwość RGB", icon: "🌀", baseIncome: 120000 }
     };
 
-    let credits = 100;
-    let premiumSeconds = 0;
-    let currentIncome = 0;
+    // 2. Baza konfiguracji osiągnięć
+    const achDatabase = [
+        { id: "ach1", title: "Początek Syntezy", desc: "Zbuduj swój pierwszy komponent.", triggered: false, icon: "🛠️" },
+        { id: "ach2", title: "Kwantowy Skok", desc: "Osiągnij Poziom 3 elementu.", triggered: false, icon: "⚡" },
+        { id: "ach3", title: "Ruch Oporu", desc: "Kup swojego pierwszego Bota.", triggered: false, icon: "🤖" },
+        { id: "ach4", title: "Krezus Kosmosu", desc: "Zgromadź ponad 5000 kredytów.", triggered: false, icon: "💰" },
+        { id: "ach5", title: "Chroma-Władca", desc: "Odblokuj element Poziomu 6.", triggered: false, icon: "👑" },
+        { id: "ach6", title: "Maksymalna Automatyzacja", desc: "Posiadaj 5 aktywnych botów.", triggered: false, icon: "🏭" },
+        { id: "ach7", title: "Hiper Prędkość", desc: "Aktywuj darmowy booster premium.", triggered: false, icon: "🔥" },
+        { id: "ach8", title: "Koniec Symulacji", desc: "Stwórz Osobliwość Poziomu 10.", triggered: false, icon: "🌌" }
+    ];
+
+    // 3. Zmienne stanu aplikacji (Silnik gry)
+    let state = {
+        credits: 100,
+        baseCost: 40,
+        itemsBought: 0,
+        boosterTime: 0,
+        botsCount: 0,
+        botCost: 500,
+        highestLevelUnlocked: 1,
+        unlockedAchievements: []
+    };
+
     let draggedItem = null;
 
-    const matrix = document.getElementById('forge-matrix');
-    const currencyTxt = document.getElementById('currency-val');
-    const incomeTxt = document.getElementById('income-val');
-    const premiumTxt = document.getElementById('premium-status');
+    // Pobranie elementów HTML dom
+    const gridDOM = document.getElementById('matrix-grid');
+    const creditsDOM = document.getElementById('credits-display');
+    const incomeDOM = document.getElementById('income-display');
+    const boosterDOM = document.getElementById('booster-display');
+    const fillDOM = document.getElementById('fill-display');
+    const botsDOM = document.getElementById('bots-display');
+    const costDOM = document.getElementById('cost-display');
+    const botCostDOM = document.getElementById('bot-cost-display');
+    const achBoxDOM = document.getElementById('achievements-box');
 
-    // Tworzenie siatki laboratoryjnej 4x3 (12 slotów)
-    for (let i = 0; i < 12; i++) {
-        const slot = document.createElement('div');
-        slot.classList.add('matrix-slot');
-        
-        slot.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            slot.classList.add('drag-over');
+    /* ==========================================================================
+       SYSTEM OBSŁUGI PAMIĘCI I ZAPISU (AUTO-SAVE)
+       ========================================================================== */
+    function saveGame() {
+        const matrixData = [];
+        document.querySelectorAll('.matrix-cell').forEach((cell, idx) => {
+            const item = cell.querySelector('.forge-item');
+            if (item) {
+                matrixData.push({ slotIndex: idx, level: parseInt(item.dataset.level) });
+            }
         });
-        slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
-        slot.addEventListener('drop', handleMergeDrop);
-        
-        matrix.appendChild(slot);
+        localStorage.setItem('cyber_forge_state', JSON.stringify(state));
+        localStorage.setItem('cyber_forge_matrix', JSON.stringify(matrixData));
     }
 
-    // Kupowanie podstawowego komponentu (Poziom 1)
-    document.getElementById('btn-buy-core').addEventListener('click', () => {
-        if (credits >= 40) {
-            const freeSlot = Array.from(document.querySelectorAll('.matrix-slot')).find(s => !s.hasChildNodes());
-            if (freeSlot) {
-                credits -= 40;
-                generateItem(freeSlot, 1);
-                calculateTotalIncome();
-                updateInterface();
-            } else {
-                alert("Wszystkie komory matrycy są zajęte!");
-            }
-        } else {
-            alert("Brak wystarczającej ilości Kredytów Kosmicznych!");
-        }
-    });
+    function loadGame() {
+        const savedState = localStorage.getItem('cyber_forge_state');
+        const savedMatrix = localStorage.getItem('cyber_forge_matrix');
 
-    // Generator przedmiotów
-    function generateItem(slot, level) {
-        const data = itemDatabase[level];
+        if (savedState) {
+            state = { ...state, ...JSON.parse(savedState) };
+        }
+        
+        buildEmptyGrid();
+
+        if (savedMatrix) {
+            const matrixData = JSON.parse(savedMatrix);
+            const cells = document.querySelectorAll('.matrix-cell');
+            matrixData.forEach(data => {
+                if(cells[data.slotIndex]) {
+                    spawnItemElement(cells[data.slotIndex], data.level);
+                }
+            });
+        }
+        
+        buildAchievementsInterface();
+        recalculateEconomy();
+        updateUI();
+    }
+
+    /* ==========================================================================
+       BUDOWANIE INTERFEJSU PLANSZY I LOGIKI GRY
+       ========================================================================== */
+    function buildEmptyGrid() {
+        gridDOM.innerHTML = '';
+        for (let i = 0; i < 16; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('matrix-cell');
+            cell.dataset.index = i;
+
+            cell.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                cell.classList.add('drag-hover');
+            });
+            cell.addEventListener('dragleave', () => cell.classList.remove('drag-hover'));
+            cell.addEventListener('drop', handleItemDrop);
+
+            gridDOM.appendChild(cell);
+        }
+    }
+
+    function buildAchievementsInterface() {
+        achBoxDOM.innerHTML = '';
+        achDatabase.forEach(ach => {
+            const isUnlocked = state.unlockedAchievements.includes(ach.id);
+            const div = document.createElement('div');
+            div.classList.add('ach-item');
+            if (isUnlocked) div.classList.add('unlocked');
+            div.id = ach.id;
+            div.innerHTML = `
+                <div class="ach-icon">${ach.icon}</div>
+                <div>
+                    <div style="font-weight:bold;">${ach.title}</div>
+                    <div style="font-size:8px;color:#aaa;">${ach.desc}</div>
+                </div>
+            `;
+            achBoxDOM.appendChild(div);
+        });
+    }
+
+    function checkAchievements() {
+        if (state.itemsBought > 0) triggerUnlock("ach1");
+        if (state.highestLevelUnlocked >= 3) triggerUnlock("ach2");
+        if (state.botsCount > 0) triggerUnlock("ach3");
+        if (state.credits >= 5000) triggerUnlock("ach4");
+        if (state.highestLevelUnlocked >= 6) triggerUnlock("ach5");
+        if (state.botsCount >= 5) triggerUnlock("ach6");
+        if (state.boosterTime > 0) triggerUnlock("ach7");
+        if (state.highestLevelUnlocked >= 10) triggerUnlock("ach8");
+    }
+
+    function triggerUnlock(id) {
+        if (!state.unlockedAchievements.includes(id)) {
+            state.unlockedAchievements.push(id);
+            const el = document.getElementById(id);
+            if (el) el.classList.add('unlocked');
+        }
+    }
+
+    function spawnItemElement(parentSlot, level) {
+        if (level > 10) level = 10;
+        const data = techDatabase[level];
+
         const item = document.createElement('div');
-        item.classList.add('cyber-item');
+        item.classList.add('forge-item');
         item.draggable = true;
         item.dataset.level = level;
 
         item.innerHTML = `
+            <div class="item-lvl-badge">L${level}</div>
             <div class="item-icon">${data.icon}</div>
-            <div class="item-name">${data.name}</div>
-            <div class="item-income">+${data.income}/s</div>
+            <div class="item-title">${data.name}</div>
+            <div class="item-stat">+${data.baseIncome}💰/s</div>
         `;
 
         item.addEventListener('dragstart', () => draggedItem = item);
         item.addEventListener('dragend', () => draggedItem = null);
 
-        slot.appendChild(item);
+        parentSlot.appendChild(item);
+        
+        if (level > state.highestLevelUnlocked) {
+            state.highestLevelUnlocked = level;
+        }
     }
 
-    // System łączenia technologii (Merge)
-    function handleMergeDrop(e) {
+    /* ==========================================================================
+       SYSTEM DRAG & DROP / SYNTEZA PRZEDMIOTÓW (MERGE)
+       ========================================================================== */
+    function handleItemDrop(e) {
         e.preventDefault();
-        this.classList.remove('drag-over');
+        this.classList.remove('drag-hover');
         if (!draggedItem) return;
 
-        const targetItem = this.querySelector('.cyber-item');
-        const oldSlot = draggedItem.parentElement;
+        const targetItem = this.querySelector('.forge-item');
+        const sourceSlot = draggedItem.parentElement;
 
         if (!targetItem) {
             this.appendChild(draggedItem);
         } else if (targetItem !== draggedItem) {
-            const lvlA = parseInt(draggedItem.dataset.level);
-            const lvlB = parseInt(targetItem.dataset.level);
+            const lvlSource = parseInt(draggedItem.dataset.level);
+            const lvlTarget = parseInt(targetItem.dataset.level);
 
-            if (lvlA === lvlB && lvlA < 6) {
-                oldSlot.innerHTML = '';
+            if (lvlSource === lvlTarget && lvlSource < 10) {
+                sourceSlot.innerHTML = '';
                 this.innerHTML = '';
-                generateItem(this, lvlA + 1);
-                credits += 20; // Bonus finansowy za fuzję przedmiotów
-                calculateTotalIncome();
-                updateInterface();
+                spawnItemElement(this, lvlSource + 1);
+                
+                // Zastrzyk waluty nagrodowej za fuzję
+                state.credits += lvlSource * 25;
+                recalculateEconomy();
             }
         }
+        saveGame();
     }
 
-    // Kalkulator zysków z całego laboratorium
-    function calculateTotalIncome() {
+    /* ==========================================================================
+       SILNIK EKONOMICZNY I OBLICZENIA MOCY GENERACJI
+       ========================================================================== */
+    let calculatedIncome = 0;
+
+    function recalculateEconomy() {
         let total = 0;
-        document.querySelectorAll('.cyber-item').forEach(item => {
-            const lvl = parseInt(item.dataset.level);
-            total += itemDatabase[lvl].income;
+        document.querySelectorAll('.forge-item').forEach(item => {
+            const level = parseInt(item.dataset.level);
+            total += techDatabase[level].baseIncome;
         });
-        
-        // Jeśli premium działa, podwajamy całą produkcję fabryki!
-        if (premiumSeconds > 0) {
-            total = total * 2;
+
+        // Wpływ aktywnego boostera (x3)
+        if (state.boosterTime > 0) {
+            total = total * 3;
         }
-        currentIncome = total;
+
+        calculatedIncome = total;
     }
 
-    // Aktywacja darmowych pakietów czasowych
-    window.triggerPremium = function(seconds) {
-        premiumSeconds += seconds;
-        alert(`Booster Aktywowany! Całkowity przychód Twojego laboratorium rośnie x2 na czas trwania energii.`);
-        calculateTotalIncome();
-        updateInterface();
+    function updateUI() {
+        creditsDOM.innerText = Math.floor(state.credits).toLocaleString();
+        incomeDOM.innerText = `+${calculatedIncome.toLocaleString()}/s`;
+        costDOM.innerText = Math.floor(state.baseCost);
+        botCostDOM.innerText = Math.floor(state.botCost);
+        botsDOM.innerText = `${state.botsCount} / 5`;
+
+        const elementsCount = document.querySelectorAll('.forge-item').length;
+        fillDOM.innerText = `${elementsCount} / 16`;
+
+        if (state.boosterTime > 0) {
+            boosterDOM.innerText = `AKTYWNY (${state.boosterTime}s) [x3]`;
+            boosterDOM.style.color = "#ff0055";
+            document.getElementById('matrix-canvas').style.opacity = "0.4";
+        } else {
+            boosterDOM.innerText = "NIEAKTYWNY";
+            boosterDOM.style.color = "#888";
+            document.getElementById('matrix-canvas').style.opacity = "0.1";
+        }
+
+        // Blokowanie przycisków
+        document.getElementById('btn-buy-item').disabled = (state.credits < state.baseCost || elementsCount >= 16);
+        document.getElementById('btn-buy-bot').disabled = (state.credits < state.botCost || state.botsCount >= 5);
+    }
+
+    /* ==========================================================================
+       AKCJE UŻYTKOWNIKA I PRZYCISKI INTERFEJSU
+       ========================================================================== */
+    document.getElementById('btn-buy-item').addEventListener('click', () => {
+        if (state.credits >= state.baseCost) {
+            const emptyCell = Array.from(document.querySelectorAll('.matrix-cell')).find(c => !c.hasChildNodes());
+            if (emptyCell) {
+                state.credits -= state.baseCost;
+                state.itemsBought++;
+                // Skalowanie trudności zakupu
+                state.baseCost = Math.floor(state.baseCost * 1.15);
+                spawnItemElement(emptyCell, 1);
+                recalculateEconomy();
+                checkAchievements();
+                updateUI();
+                saveGame();
+            }
+        }
+    });
+
+    document.getElementById('btn-clicker').addEventListener('click', () => {
+        let clickPower = 10 + (state.highestLevelUnlocked * 5);
+        if (state.boosterTime > 0) clickPower *= 3;
+        state.credits += clickPower;
+        checkAchievements();
+        updateUI();
+    });
+
+    document.getElementById('btn-buy-bot').addEventListener('click', () => {
+        if (state.credits >= state.botCost && state.botsCount < 5) {
+            state.credits -= state.botCost;
+            state.botsCount++;
+            state.botCost = Math.floor(state.botCost * 2.5);
+            recalculateEconomy();
+            checkAchievements();
+            updateUI();
+            saveGame();
+        }
+    });
+
+    window.activateBooster = function(seconds) {
+        state.boosterTime += seconds;
+        recalculateEconomy();
+        checkAchievements();
+        updateUI();
+        saveGame();
     };
 
-    function updateInterface() {
-        currencyTxt.innerText = Math.floor(credits);
-        incomeTxt.innerText = currentIncome;
-        if (premiumSeconds > 0) {
-            premiumTxt.innerText = `AKTYWNY (${premiumSeconds}s)`;
-            premiumTxt.classList.add('premium-on');
-        } else {
-            premiumTxt.innerText = "NIEAKTYWNY";
-            premiumTxt.classList.remove('premium-on');
+    /* ==========================================================================
+       INTELIGENTNA SZYBKA SZYBKA SZYBKOŚĆ BOTÓW (AI BOT SYSTEM)
+       ========================================================================== */
+    function runAiBots() {
+        if (state.botsCount <= 0) return;
+
+        for (let b = 0; b < state.botsCount; b++) {
+            // Każdy bot co cykl ma szansę połączyć elementy o tej samej strukturze
+            const items = Array.from(document.querySelectorAll('.forge-item'));
+            let subbmittedMerge = false;
+
+            for (let i = 0; i < items.length; i++) {
+                for (let j = i + 1; j < items.length; j++) {
+                    const lvlA = parseInt(items[i].dataset.level);
+                    const lvlB = parseInt(items[j].dataset.level);
+
+                    if (lvlA === lvlB && lvlA < 10) {
+                        const targetCell = items[j].parentElement;
+                        items[i].parentElement.innerHTML = '';
+                        targetCell.innerHTML = '';
+                        spawnItemElement(targetCell, lvlA + 1);
+                        
+                        state.credits += lvlA * 15;
+                        subbmittedMerge = true;
+                        break;
+                    }
+                }
+                if (subbmittedMerge) break;
+            }
+
+            // Jeśli bot nie miał nic do połączenia, a fabrykę stać, ma 20% szans na dokupienie surowca
+            if (!subbmittedMerge && Math.random() < 0.2) {
+                const emptyCell = Array.from(document.querySelectorAll('.matrix-cell')).find(c => !c.hasChildNodes());
+                if (emptyCell && state.credits >= state.baseCost) {
+                    state.credits -= state.baseCost;
+                    state.itemsBought++;
+                    state.baseCost = Math.floor(state.baseCost * 1.15);
+                    spawnItemElement(emptyCell, 1);
+                }
+            }
+        }
+        recalculateEconomy();
+        updateUI();
+        saveGame();
+    }
+
+    // Częstotliwość pracy botów scalających (co 3 sekundy)
+    setInterval(runAiBots, 3000);
+
+    /* ==========================================================================
+       GŁÓWNE PĘTLE CZASOWE I SYSTEMY SEKUNDOWE
+       ========================================================================== */
+    // Generowanie zysków na sekundę i odliczanie dopalaczy
+    setInterval(() => {
+        if (state.boosterTime > 0) {
+            state.boosterTime--;
+            if (state.boosterTime === 0) recalculateEconomy();
+        }
+
+        if (calculatedIncome > 0) {
+            state.credits += (calculatedIncome / 10);
+        }
+
+        checkAchievements();
+        updateUI();
+    }, 100);
+
+    // Auto-save co 15 sekund dla bezpieczeństwa danych
+    setInterval(saveGame, 15000);
+
+    /* ==========================================================================
+       SYSTEM DIGIT DESZCZU RGB W TLE (MATRIX ANIMATION)
+       ========================================================================== */
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const katakana = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ☣⚛⚡🌀💎🚀";
+    const alphabet = katakana.split("");
+
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+
+    const rainDrops = [];
+    for (let x = 0; x < columns; x++) {
+        rainDrops[x] = 1;
+    }
+
+    function drawMatrixRain() {
+        ctx.fillStyle = 'rgba(5, 5, 10, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Zmiana barw matrixa na dynamiczną paletę RGB
+        let hue = (Date.now() / 50) % 360;
+        ctx.fillStyle = `hsla(${hue}, 100%, 50%, 1)`;
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < rainDrops.length; i++) {
+            const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                rainDrops[i] = 0;
+            }
+            rainDrops[i]++;
         }
     }
 
-    // Pętla odliczania czasu Boostera Premium (co 1 sekundę)
-    setInterval(() => {
-        if (premiumSeconds > 0) {
-            premiumSeconds--;
-            if (premiumSeconds === 0) calculateTotalIncome();
-            updateInterface();
-        }
-    }, 1000);
+    setInterval(drawMatrixRain, 30);
 
-    // Automatyczne generowanie dochodu (co 1 sekundę)
-    setInterval(() => {
-        if (currentIncome > 0) {
-            credits += currentIncome;
-            updateInterface();
-        }
-    }, 1000);
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
+    // START CAŁEGO SYSTEMU OPERACYJNEGO GRY
+    window.onload = () => {
+        loadGame();
+    };
+
 </script>
 </body>
 </html>
