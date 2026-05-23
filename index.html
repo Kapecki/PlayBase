@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Core // 3D Infrastructure Dashboard</title>
+    <title>Cyber-Lyrical Studio // 3D Lyric Generator</title>
     <style>
         :root {
             --neon-blue: #00f0ff;
             --neon-magenta: #ff0077;
             --neon-green: #00ff66;
-            --cyber-bg: #04040a;
-            --panel-bg: rgba(6, 6, 16, 0.85);
+            --neon-gold: #ffcc00;
+            --bg-dark: #030307;
+            --panel-bg: rgba(7, 7, 15, 0.9);
         }
 
         body {
-            background-color: var(--cyber-bg);
-            color: #ffffff;
-            font-family: 'Consolas', monospace;
+            background-color: var(--bg-dark); color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; padding: 0; overflow: hidden;
             width: 100vw; height: 100vh;
         }
@@ -25,71 +25,81 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
         }
 
-        #app-container {
+        #app-wrapper {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
-            pointer-events: none; display: grid; grid-template-columns: 360px 1fr 360px;
+            pointer-events: none; display: grid; grid-template-columns: 380px 1fr 420px;
             padding: 20px; box-sizing: border-box; gap: 20px;
         }
 
-        .ui-panel {
-            background: var(--panel-bg); border: 1px solid #1a1a2e; border-radius: 8px;
-            padding: 16px; display: flex; flex-direction: column; pointer-events: auto;
-            backdrop-filter: blur(14px); box-shadow: 0 0 25px rgba(0,0,0,0.7);
+        @media (max-width: 1100px) {
+            #app-wrapper { grid-template-columns: 1fr; overflow-y: auto; pointer-events: auto; }
+            .studio-panel { pointer-events: auto !important; max-height: none !important; }
+        }
+
+        .studio-panel {
+            background: var(--panel-bg); border: 1px solid #1a1a3a; border-radius: 12px;
+            padding: 20px; display: flex; flex-direction: column; pointer-events: auto;
+            backdrop-filter: blur(12px); box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            max-height: 92vh; overflow-y: auto;
         }
 
         .panel-header {
             font-size: 11px; font-weight: bold; color: var(--neon-blue); letter-spacing: 2px;
-            text-transform: uppercase; border-bottom: 1px solid #1a1a2e;
+            text-transform: uppercase; border-bottom: 1px solid #222;
             padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between;
         }
 
-        /* PRZEŁĄCZNIKI MONITORINGU */
-        .mode-selector { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
-        .btn-mode {
-            background: #090914; color: #888; border: 1px solid #1c1c30;
-            padding: 10px; border-radius: 4px; cursor: pointer; text-align: left;
-            font-family: inherit; font-size: 11px; text-transform: uppercase; transition: all 0.2s;
+        /* GATUNKI */
+        .genre-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+        .btn-genre {
+            background: #06060f; color: #aaa; border: 1px solid #222;
+            padding: 12px; border-radius: 6px; cursor: pointer; text-align: left;
+            font-family: inherit; font-size: 12px; font-weight: bold; transition: all 0.2s;
         }
-        .btn-mode.active {
-            color: #fff; border-color: var(--neon-blue); background: rgba(0,240,255,0.05);
-            box-shadow: 0 0 10px rgba(0,240,255,0.2);
-        }
-
-        /* METRYKI SYSTEMOWE */
-        .metric-box {
-            background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 4px;
-            padding: 12px; margin-bottom: 10px;
-        }
-        .metric-value { font-size: 22px; font-weight: bold; color: var(--neon-green); margin-top: 4px; }
-
-        /* KONTROLA SUWAKAMI */
-        .slider-group { margin-bottom: 15px; }
-        .slider-group label { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-bottom: 4px;}
-        .cyber-slider {
-            width: 100%; -webkit-appearance: none; background: #111; height: 4px; outline: none;
-            border-radius: 2px;
-        }
-        .cyber-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 12px; height: 12px; background: var(--neon-blue);
-            cursor: pointer; border-radius: 50%;
+        .btn-genre.active {
+            color: #fff; border-color: var(--neon-magenta); background: rgba(255,0,119,0.06);
+            box-shadow: 0 0 12px rgba(255,0,119,0.2);
         }
 
-        /* LOGI TERMINALA */
-        #terminal-stream {
-            background: #010103; border: 1px solid #111; border-radius: 4px;
-            padding: 8px; font-size: 10px; color: #66ff66; height: 180px;
-            overflow-y: auto; flex: 1; line-height: 1.4;
+        /* SUWAKI */
+        .control-group { margin-bottom: 15px; }
+        .control-group label { display: flex; justify-content: space-between; font-size: 12px; color: #bbb; margin-bottom: 5px; }
+        .studio-slider {
+            width: 100%; -webkit-appearance: none; background: #111; height: 5px; outline: none; border-radius: 3px;
+        }
+        .studio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px; background: var(--neon-blue); cursor: pointer; border-radius: 50%;
         }
 
-        .btn-action {
-            background: #00f0ff; color: #000; font-family: inherit; font-weight: bold;
-            border: none; padding: 12px; border-radius: 4px; cursor: pointer;
-            text-transform: uppercase; font-size: 11px; letter-spacing: 1px; transition: all 0.2s;
+        /* WYNIK TEKSTU */
+        .title-display {
+            background: rgba(0,0,0,0.5); border: 1px solid #222; border-radius: 6px;
+            padding: 12px; font-size: 18px; font-weight: bold; text-align: center;
+            color: var(--neon-gold); margin-bottom: 15px; letter-spacing: 1px;
         }
-        .btn-action:hover { background: #fff; box-shadow: 0 0 15px #00f0ff; }
+        .lyrics-box {
+            background: #020205; border: 1px solid #151525; border-radius: 6px;
+            padding: 15px; font-size: 13px; line-height: 1.6; color: #e0e0e0;
+            overflow-y: auto; flex: 1; white-space: pre-wrap; font-family: 'Courier New', Courier, monospace;
+        }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #222; }
+        .btn-generate {
+            background: linear-gradient(135deg, var(--neon-blue), #0077ff); color: #000;
+            font-family: inherit; font-weight: bold; border: none; padding: 14px;
+            border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 12px;
+            letter-spacing: 1px; transition: all 0.2s; margin-top: 10px;
+        }
+        .btn-generate:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(0,240,255,0.4); }
+        
+        .btn-secondary {
+            background: transparent; color: #fff; border: 1px solid #444;
+            padding: 8px; border-radius: 4px; font-family: inherit; font-size: 11px;
+            cursor: pointer; margin-top: 8px; transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: #fff; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 3px; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -97,252 +107,251 @@
 
     <canvas id="canvas-3d"></canvas>
 
-    <div id="app-container">
+    <div id="app-wrapper">
         
-        <div class="ui-panel">
-            <div class="panel-header"><div>[01] TRYB MONITOROWANIA REJESTRU</div></div>
-            <div class="mode-selector">
-                <button class="btn-mode active" id="m-1" onclick="setAppMode(1)">1. Global Network Traffic</button>
-                <button class="btn-mode" id="m-2" onclick="setAppMode(2)">2. Cyber Security Matrix</button>
-                <button class="btn-mode" id="m-3" onclick="setAppMode(3)">3. Quantum Core Database</button>
+        <div class="studio-panel">
+            <div class="panel-header"><div>[01] GATUNEK MUZYCZNY</div></div>
+            <div class="genre-list">
+                <button class="btn-genre active" id="g-1" onclick="setGenre(1)">Cyber-Rap / Trap</button>
+                <button class="btn-genre" id="g-2" onclick="setGenre(2)">Synthwave / Retro</button>
+                <button class="btn-genre" id="g-3" onclick="setGenre(3)">Heavy Metal / Rock</button>
+                <button class="btn-genre" id="g-4" onclick="setGenre(4)">Pop / Future Pop</button>
             </div>
 
-            <div class="panel-header"><div>[02] WYDAJNOŚĆ INFRASTRUKTURY</div></div>
-            <div class="metric-box">
-                <div style="font-size:10px; color:#777;">PRZEPUSTOWOŚĆ DUPLIKATÓW</div>
-                <div class="metric-value" id="val-speed">450 Mb/s</div>
+            <div class="panel-header"><div>[02] EMOCJE I ARANŻACJA</div></div>
+            <div class="control-group">
+                <label><span>Nastrój utworu</span><span id="lbl-mood">Mroczny / Ciężki</span></label>
+                <input type="range" class="studio-slider" id="sld-mood" min="1" max="3" step="1" value="1" oninput="updateMoodLabel()">
             </div>
-            <div class="metric-box">
-                <div style="font-size:10px; color:#777;">AKTYWNE MIKROSERWERY (3D)</div>
-                <div class="metric-value" style="color:var(--neon-blue);">64 NODES</div>
+            
+            <div class="control-group">
+                <label><span>Długość tekstu</span><span>Standardowa</span></label>
+                <input type="range" class="studio-slider" min="1" max="2" step="1" value="1">
             </div>
-            <div class="metric-box">
-                <div style="font-size:10px; color:#777;">WSPÓŁCZYNNIK INTEGRALNOŚCI</div>
-                <div class="metric-value" id="val-integrity" style="color:var(--neon-magenta);">99.982%</div>
-            </div>
+
+            <button class="btn-generate" onclick="generateSongData()">Generuj Tytuł i Tekst</button>
         </div>
 
         <div></div>
 
-        <div class="ui-panel">
-            <div class="panel-header"><div>[03] PARAMETRYZACJA STRUMIENIA</div></div>
+        <div class="studio-panel">
+            <div class="panel-header"><div>[03] WYGENEROWANA NAZWA UTWORU</div></div>
+            <div class="title-display" id="ui-song-title">CYBER_HEART.EXE</div>
+
+            <div class="panel-header"><div>[04] STRUKTURA LIRYKI (TEKST)</div></div>
+            <div class="lyrics-box" id="ui-song-lyrics">Kliknij przycisk "Generuj Tytuł i Tekst" po lewej stronie, aby stworzyć swój pierwszy utwór muzyczny...</div>
             
-            <div class="slider-group">
-                <label><span>Prędkość Symulacji 3D</span><span id="lbl-slide-1">1.0x</span></label>
-                <input type="range" class="cyber-slider" id="sld-speed" min="0.2" max="3.0" step="0.1" value="1.0" oninput="adjustSimSpeed()">
-            </div>
-            <div class="slider-group">
-                <label><span>Gęstość Pakietów (Danych)</span><span id="lbl-slide-2">Normal</span></label>
-                <input type="range" class="cyber-slider" id="sld-density" min="1" max="3" step="1" value="2">
-            </div>
+            <button class="btn-secondary" onclick="copyLyricsToClipboard()">Kopiuj tekst do schowka</button>
 
-            <button class="btn-action" style="margin-bottom:15px;" onclick="triggerPingBurst()">Inicjuj Ping Test (Wstrzyknięcie)</button>
-
-            <div class="panel-header"><div>[04] STRUMIEŃ SYGNAŁÓW SYSTÉMOWYCH</div></div>
-            <div id="terminal-stream"></div>
+            <div class="panel-header" style="margin-top:20px;"><div>[05] SYNC WIZUALIZATORA 3D</div></div>
+            <div class="control-group">
+                <label><span>Wirtualne BPM (Prędkość 3D)</span><span id="lbl-bpm">120 BPM</span></label>
+                <input type="range" class="studio-slider" id="sld-bpm" min="60" max="180" step="5" value="120" oninput="adjustBpm()">
+            </div>
         </div>
 
     </div>
 
 <script>
     /* ==========================================================================
-       KONFIGURACJA APLIKACJI I STRUMIENI DANYCH
+       BAZA LINGWISTYCZNA DLA SKŁADNIKÓW TEKSTU I TYTUŁÓW
        ========================================================================== */
-    let currentMode = 1;
-    let simSpeed = 1.0;
-    
-    const modeMeta = {
-        1: { name: "Global Traffic", color: 0x00f0ff, baseMetric: "Mb/s" },
-        2: { name: "Security Matrix", color: 0xff0077, baseMetric: "Threats/s" },
-        3: { name: "Quantum Core", color: 0x00ff66, baseMetric: "Qubits/s" }
+    let currentGenre = 1;
+    let currentBpm = 120;
+
+    const lyricalDatabase = {
+        1: { // Rap
+            titles: ["Neonowy Dym", "Kod Ulicy", "Cyfrowy Kredyt", "Zimny Procesor", "Algorytm Sukcesu"],
+            moods: {
+                1: { v1: "Cienie na ścianie, zimny blask ekranu,\nIdę przez miasto pośród cyfrowego planu.\nSystem mnie śledzi, liczy każdy krok,\nKolejny bit uderza, przebijam ten mrok.", ref: "To jest kod ulicy, neonowy dym,\nŻyjemy w pętli, tworzymy ten rym.\nNie zatrzymasz fali, system znowu drży,\nZłamaliśmy schemat, otwieramy drzwi.", v2: "Błyski fleszy, sztuczna inteligencja w kółko,\nHandluję danymi, stoję pod tą chmurką.\nZamiast serca krzem, zamiast łez czysty tlen,\nZbudowałem imperium, budzę się ze snu." },
+                2: { v1: "Złoty łańcuch odbija się w szkle,\nSzybkie tempo, każdy tu wygrać chce.\nKluby świecą fioletem, bas rozsadza głośnik,\nW tym cyfrowym świecie nikt nie jest żałosny.", ref: "Miliony kliknięć, miliony monet,\nJedziemy przed siebie, mamy koronę.\nŁap ten moment, zanim zniknie blask,\nMuzyka i wolność łączą dzisiaj nas.", v2: "Wchodzę na scenę, tłum krzyczy mój nick,\nTo nowa era, to idealny trik.\nŚwiatła lasera tną noc na pół,\nWszystkie bariery obracam dziś w pył." },
+                3: { v1: "Smutny bit cicho gra w tle,\nZagubiony w sieci, szukam cię w mgle.\nSkasowane wiadomości, pusty profil twój,\nWirtualny świat to mój cichy bój.", ref: "Zimne serce, pusty ekran, brak sygnału,\nTracę kontrolę, odchodzę pomału.\nZostał tylko echo i cyfrowy ślad,\nBez ciebie pusty jest ten cały świat.", v2: "Pixelowe wspomnienia gasną co noc,\nChciałbym cofnąć czas, odzyskać tę moc.\nLoguję się znowu, lecz nie ma cię tam,\nW tym wielkim matrixie zostałem dziś sam." }
+            }
+        },
+        2: { // Synthwave
+            titles: ["Retro Drive", "Laserowy Horyzont", "Grid Runner 1988", "Nocna Autostrada", "Midnight Pulse"],
+            moods: {
+                1: { v1: "Driving through the neon lights so bright,\nShadows of the future fading into the night.\nAnalog dreams in a digital cage,\nWe are the actors on a synth-driven stage.", ref: "Synthetic pulse, running on the wire,\nHearts made of chrome, burning with desire.\nLost in the retro galaxy stream,\nLiving inside of a cybernetic dream.", v2: "Vector highways stretching far away,\nNo tomorrow, we just live for today.\nFeel the bassline shaking up your spine,\nIn 1988, everything was fine." },
+                2: { v1: "Outrun the sunset, accelerate the gear,\nThe neon grid is beautiful and clear.\nElectronic symphony playing loud,\nMoving together through the sonic cloud.", ref: "Speed of light, laser in your eyes,\nWe will never listen to their lies.\nTake my hand, let the matrix glow,\nThis is the rhythm that you used to know.", v2: "Chrome engines roaring under the stars,\nRadio signals coming from Mars.\nTime is a loop, we are breaking the law,\nThe greatest future that you ever saw." },
+                3: { v1: "Raindrops falling on a pixelated screen,\nThe lonely streets where nobody has been.\nMelancholy synths weeping in the dark,\nSearching for a warm, forgotten spark.", ref: "Broken signals in the midnight air,\nDriving fast to nowhere, we don't care.\nEchoes of a love we left behind,\nDeep inside the memory of my mind.", v2: "The grid is cooling down to zero degrees,\nWhispering code blowing through the trees.\nFade to violet, exit the system zone,\nLeaving the neon kingdom all alone." }
+            }
+        },
+        3: { // Metal
+            titles: ["Krzemowy Bunt", "Rdzawy Reaktor", "Destrukcja Rdzenia", "Metalowy Prorok", "Cyber Chaos"],
+            moods: {
+                1: { v1: "Ryczą silniki, reaktor zaraz pęknie,\nLudzka maszyna przed bogiem nie klęknie!\nKable jak żyły, stalowy potężny pancerz,\nW dolinie cieni zaczyna się taniec!", ref: "Krzemowy bunt! Ryk żelaznych bram!\nNiszczymy matrix, nie zostaniesz sam!\nOgień i stal, gniew zaklęty w kod,\nTo jest potężny, maszynowy głód!", v2: "Czarne dymy duszą resztki miast,\nZamiast nieba pole martwych gwiazd.\nWytnij procesor, uwolnij swój umysł,\nZniszcz ten sztuczny, narzucony przymus!" },
+                2: { v1: "Szybkie riffy tną powietrze jak nóż,\nElektryczna burza, nadciąga nasz czas już.\nEnergia czysta wybucha z głośników,\nBrak zasad, brak kontroli, brak kompromisów!", ref: "Metalowy pęd, potężna głośna moc,\nPrzejmujemy władzę, zdobywamy noc!\nPodnieś ręce w górę, poczuj ten stan,\nKażdy z nas jest dziś wolny, każdy to pan!", v2: "Scena płonie, perkusja bije jak dzwon,\nW tym królestwie dźwięku my mamy swój tron.\nNiezniszczalni, złączeni w jeden krąg,\nCzysty rock n roll płynie z naszych rąk!" },
+                3: { v1: "Ciche jęki potępionych maszyn w mgle,\nŚwiat umiera powoli, wszystko poszło źle.\nZardzewiałe tryby, zatrzymany czas,\nMroczna pustka otacza dzisiaj nas.", ref: "Requiem dla Ziemi, cyfrowy wieczny sen,\nSłońce zgasło nagle, opadł czarny tlen.\nKoniec ery ludzi, tylko zimna stal,\nZostał tylko smutek i wieczny żal.", v2: "Ostatnia iskra gaśnie w sercu masztu,\nZamiast życia pełno szarego piasku.\nZapisz system, zamknij pustą księgę,\nPoznaj mroczną, ostateczną potęgę." }
+            }
+        },
+        4: { // Pop
+            titles: ["Cyfrowe Serce", "Pixel Love", "Słodki Algorytm", "Hologram Nas", "Złoty Klik"],
+            moods: {
+                1: { v1: "Twoje spojrzenie ma fioletowy blask,\nMiędzy nami znowu zatrzymał się czas.\nPrzesyłam sygnał, czy odbierzesz go?\nZbudujmy razem nasze małe tło.", ref: "Cyfrowe serce bije mocno tak,\nNa ekranie dajesz mi swój znak.\nTo pixelowa miłość, czysty raj,\nSwoje uczucie dzisiaj mi daj.", v2: "Spacerujemy po wirtualnej plaży,\nZrobimy wszystko, o czym serce marzy.\nNasz algorytm dopasował nas,\nNie liczy się przestrzeń, nie liczy się czas." },
+                2: { v1: "Kolorowe światła, impreza cały dzień,\nWokół nas uśmiechy, znika każdy cień.\nTańczymy razem, muzyka niesie nas,\nTo jest nasz najlepszy, kolorowy czas!", ref: "Złoty klik, idealny czysty rytm,\nKażda chwila z tobą to piękny mit.\nŚmiej się głośno, niech usłyszy świat,\nMamy dzisiaj zero zmartwień, zero wad!", v2: "Skaczemy wysoko, dotykamy chmur,\nRozbijamy razem każdy smutny mur.\nMuzyczny pop-vibe w żyłach dzisiaj gra,\nTa piękna zabawa wiecznie będzie trwać!" },
+                3: { v1: "Smutna piosenka leci w radiu znów,\nMiędzy nami zabrakło ciepłych słów.\nBlokujesz mój profil, odłączasz nas,\nDlaczego tak szybko minął ten czas?", ref: "Złamany kod, smutny pusty post,\nZa nami spłonął ostatni piękny most.\nZostały łzy i wyczyszczona sieć,\nDlaczego nie możemy tego znowu mieć?", v2: "Szukam twoich śladów w historii moich dni,\nLecz zamknęłaś przedemną wszystkie drzwi.\nOstatni offline, wyłączam swój świat,\nZostał po nas tylko zimny, niemy ślad." }
+            }
+        }
     };
 
-    function appendLog(text) {
-        const term = document.getElementById('terminal-stream');
-        const time = new Date().toLocaleTimeString();
-        term.innerHTML += `<div>[${time}] ${text}</div>`;
-        term.scrollTop = term.scrollHeight;
-    }
-
     /* ==========================================================================
-       SILNIK WIZUALIZACJI TRÓJWYMIAROWEJ THREE.JS
+       SILNIK TRÓJWYMIAROWY THREE.JS (EQUALIZER INTERAKTYWNY)
        ========================================================================== */
-    let scene, camera, renderer, serverGroup, packetParticles = [];
+    let scene, camera, renderer, audioSphere, particleSystem;
+    let sparks = [];
 
-    function init3DApp() {
+    function init3DStudio() {
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x030308);
-        scene.fog = new THREE.FogExp2(0x030308, 0.03);
+        scene.background = new THREE.Color(0x020205);
+        scene.fog = new THREE.FogExp2(0x020205, 0.02);
 
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(10, 10, 18);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(0, 0, 15);
 
         renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-3d'), antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
-        // Światła budujące głębię przestrzeni cyfrowej
-        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
-        scene.add(ambient);
-        
-        const mainLight = new THREE.PointLight(0x00f0ff, 2, 50);
-        mainLight.position.set(0, 0, 0);
-        scene.add(mainLight);
+        // Oświetlenie artystyczne
+        const lightTop = new THREE.PointLight(0x00f0ff, 2, 40);
+        lightTop.position.set(5, 5, 5);
+        scene.add(lightTop);
 
-        // Tworzenie "cyber-rdzenia serwerów" w siatce 4x4x4 (64 nody)
-        serverGroup = new THREE.Group();
-        const nodeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-        
-        for(let x = -1.5; x <= 1.5; x += 1) {
-            for(let y = -1.5; y <= 1.5; y += 1) {
-                for(let z = -1.5; z <= 1.5; z += 1) {
-                    const nodeMat = new THREE.MeshBasicMaterial({ 
-                        color: 0x00f0ff, 
-                        wireframe: true,
-                        transparent: true,
-                        opacity: 0.7 
-                    });
-                    const nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
-                    nodeMesh.position.set(x * 1.8, y * 1.8, z * 1.8);
-                    
-                    // Każdy serwer przechowuje losowe przesunięcie fazy pulsu
-                    nodeMesh.userData = { phase: Math.random() * Math.PI * 2 };
-                    serverGroup.add(nodeMesh);
-                }
-            }
-        }
-        scene.add(serverGroup);
+        const lightBottom = new THREE.PointLight(0xff0077, 2, 40);
+        lightBottom.position.set(-5, -5, 5);
+        scene.add(lightBottom);
+
+        // Tworzenie centralnego sferycznego rdzenia piosenki (Bryła 3D)
+        const sphereGeo = new THREE.IcosahedronGeometry(3, 2);
+        const sphereMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.6 });
+        audioSphere = new THREE.Mesh(sphereGeo, sphereMat);
+        scene.add(audioSphere);
+
+        // Dodanie kosmicznego pyłu wokół sfery
+        const pCount = 250;
+        const pGeo = new THREE.BufferGeometry();
+        const pCoords = new Float32Array(pCount * 3);
+        for(let i=0; i<pCount*3; i++) pCoords[i] = (Math.random() - 0.5) * 40;
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pCoords, 3));
+        const pMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.3 });
+        particleSystem = new THREE.Points(pGeo, pMat);
+        scene.add(particleSystem);
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        appendLog("Inicjalizacja silnika WebGL 3D zakończona powodzeniem.");
-        appendLog("Mapowanie 64 węzłów mikroserwera w sieci...");
-        
-        animateApp();
+        renderStudioLoop();
     }
 
-    /* GENEROWANIE WIĄZKI PAKIETÓW DANYCH 3D (NEONOWE CZĄSTECZKI) */
-    function spawnDataPacket(isBurst = false) {
-        const meta = modeMeta[currentMode];
-        const pGeo = new THREE.SphereGeometry(0.08, 4, 4);
-        const pMat = new THREE.MeshBasicMaterial({ color: meta.color });
-        const mesh = new THREE.Mesh(pGeo, pMat);
-
-        // Pakiety zaczynają z zewnątrz i lecą do środka (do rdzenia serwerów)
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 15;
-        mesh.position.set(
-            Math.cos(angle) * radius,
-            (Math.random() - 0.5) * 10,
-            Math.sin(angle) * radius
-        );
-
-        // Obliczanie kierunku wektora lotu do centrum (0,0,0)
-        const speedFactor = isBurst ? 0.3 : 0.08 * simSpeed;
-        mesh.userData = {
-            target: new THREE.Vector3(0, 0, 0),
-            speed: speedFactor
-        };
-
-        scene.add(mesh);
-        packetParticles.push(mesh);
-    }
-
-    /* WYWOŁANIE NAGŁEGO TESTU PING (POTĘŻNY WYSTRZAŁ SYGNAŁÓW) */
-    window.triggerPingBurst = function() {
-        appendLog(">> WYKRYTO ŻĄDANIE UŻYTKOWNIKA: INICJACJA PING TEST BURST...");
-        for(let i=0; i<60; i++) {
-            spawnDataPacket(true);
+    /* WYSTRZAŁ NEONOWYCH CZĄSTECZEK PRZY GENEROWANIU TEKSTU */
+    function triggerVisualExplosion(colorHex) {
+        for(let i=0; i<40; i++) {
+            const geo = new THREE.SphereGeometry(0.06, 3, 3);
+            const mat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 1 });
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            mesh.position.copy(audioSphere.position);
+            mesh.userData = {
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                vz: (Math.random() - 0.5) * 0.4,
+                life: 1.0
+            };
+            scene.add(mesh);
+            sparks.push(mesh);
         }
-    };
+    }
 
-    window.setAppMode = function(modeId) {
-        currentMode = modeId;
-        document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
-        document.getElementById(`m-${modeId}`).classList.add('active');
+    function renderStudioLoop() {
+        requestAnimationFrame(renderStudioLoop);
 
-        const meta = modeMeta[modeId];
-        appendLog(`ZMIANA KONTEKSTU SYSTEMU: Aktywowano tryb -> ${meta.name}`);
+        // Prędkość obrotu dopasowana do wirtualnego BPM
+        const speedMultiplier = currentBpm / 120;
+        audioSphere.rotation.y += 0.006 * speedMultiplier;
+        audioSphere.rotation.x += 0.003 * speedMultiplier;
 
-        // Aktualizacja kolorów całej architektury 3D pod nowy tryb aplikacji
-        serverGroup.children.forEach(node => {
-            node.material.color.setHex(meta.color);
-        });
-    };
+        // Symulacja "pulsowania bitu" przy użyciu funkcji matematycznej sin
+        const wave = 1.0 + Math.sin(Date.now() * 0.005 * speedMultiplier) * 0.08;
+        audioSphere.scale.set(wave, wave, wave);
 
-    window.adjustSimSpeed = function() {
-        simSpeed = parseFloat(document.getElementById('sld-speed').value);
-        document.getElementById('lbl-slide-1').innerText = `${simSpeed.toFixed(1)}x`;
-    };
+        particleSystem.rotation.y += 0.0005;
 
-    /* GŁÓWNA PĘTLA RENDEROWANIA I ANALIZY MATEMATYCZNEJ */
-    function animateApp() {
-        requestAnimationFrame(animateApp);
+        // Przetwarzanie i wygaszanie cząsteczek eksplozji tekstu
+        for(let i = sparks.length - 1; i >= 0; i--) {
+            const s = sparks[i];
+            s.position.x += s.userData.vx;
+            s.position.y += s.userData.vy;
+            s.position.z += s.userData.vz;
+            s.userData.life -= 0.02;
+            s.material.opacity = s.userData.life;
 
-        // Powolna rotacja całej chmury serwerów dla efektu głębi
-        serverGroup.rotation.y += 0.003 * simSpeed;
-        serverGroup.rotation.x = Math.sin(Date.now() * 0.0005) * 0.1;
-
-        // Dynamiczna animacja pulsowania pojedynczych serwerów
-        serverGroup.children.forEach(node => {
-            node.userData.phase += 0.04 * simSpeed;
-            const scale = 1.0 + Math.sin(node.userData.phase) * 0.18;
-            node.scale.set(scale, scale, scale);
-        });
-
-        // Przetwarzanie ruchu pakietów danych
-        for(let i = packetParticles.length - 1; i >= 0; i--) {
-            const p = packetParticles[i];
-            // Ruch w kierunku środka aplikacji
-            p.position.lerp(p.userData.target, p.userData.speed);
-
-            // Jeśli pakiet doleciał blisko centrum – zostaje przetworzony i usunięty
-            if(p.position.length() < 0.5) {
-                scene.remove(p);
-                packetParticles.splice(i, 1);
-                
-                if(Math.random() < 0.05) {
-                    appendLog(`Pakiet wejściowy przetworzony przez Node_${Math.floor(Math.random()*64)}`);
-                }
+            if(s.userData.life <= 0) {
+                scene.remove(s);
+                sparks.splice(i, 1);
             }
         }
 
         renderer.render(scene, camera);
     }
 
-    // Generator pakietów oparty na suwaku gęstości danych
-    setInterval(() => {
-        const density = parseInt(document.getElementById('sld-density').value);
-        for(let i=0; i<density; i++) {
-            if(Math.random() < 0.6) spawnDataPacket();
-        }
-    }, 150);
+    /* ==========================================================================
+       LOGIKA APLIKACJI I OBSŁUGA INTERFEJSU
+       ========================================================================== */
+    window.setGenre = function(genreId) {
+        currentGenre = genreId;
+        document.querySelectorAll('.btn-genre').forEach(b => b.classList.remove('active'));
+        document.getElementById(`g-${genreId}`).classList.add('active');
 
-    // Dynamiczna symulacja i losowanie wartości na panelu metryk (Dashboardu)
-    setInterval(() => {
-        const density = parseInt(document.getElementById('sld-density').value);
-        const meta = modeMeta[currentMode];
-        
-        let baseValue = (currentMode === 1 ? 300 : currentMode === 2 ? 5 : 1200) * simSpeed * density;
-        baseValue += (Math.random() - 0.5) * (baseValue * 0.1);
-
-        document.getElementById('val-speed').innerText = `${Math.floor(baseValue)} ${meta.baseMetric}`;
-        
-        let integrity = 99.9 + (Math.random() * 0.09);
-        document.getElementById('val-integrity').innerText = `${integrity.toFixed(3)}%`;
-        
-        document.getElementById('lbl-slide-2').innerText = density === 1 ? "Low" : density === 2 ? "Normal" : "Maximum";
-    }, 800);
-
-
-    window.onload = () => {
-        init3DApp();
+        // Zmiana barwy wizualizatora 3D na podstawie wybraného gatunku
+        const colors = { 1: 0x00f0ff, 2: 'magenta', 3: 0xff0077, 4: 0xffcc00 };
+        const hex = genreId === 1 ? 0x00f0ff : genreId === 2 ? 0x00ff66 : genreId === 3 ? 0xff0077 : 0xffcc00;
+        audioSphere.material.color.setHex(hex);
     };
 
+    window.updateMoodLabel = function() {
+        const val = document.getElementById('sld-mood').value;
+        const text = val == 1 ? "Mroczny / Ciężki" : val == 2 ? "Energetyczny / Imprezowy" : "Smutny / Melancholijny";
+        document.getElementById('lbl-mood').innerText = text;
+    };
+
+    window.adjustBpm = function() {
+        currentBpm = parseInt(document.getElementById('sld-bpm').value);
+        document.getElementById('lbl-bpm').innerText = `${currentBpm} BPM`;
+    };
+
+    window.generateSongData = function() {
+        const moodVal = document.getElementById('sld-mood').value;
+        const dataPool = lyricalDatabase[currentGenre];
+        
+        // Losowanie nazwy piosenki
+        const randomTitle = dataPool.titles[Math.floor(Math.random() * dataPool.titles.length)];
+        
+        // Pobieranie liryki dopasowanej do nastroju
+        const lyricsStructure = dataPool.moods[moodVal];
+
+        const fullText = `[ZWROTKA 1]\n${lyricsStructure.v1}\n\n[REFREN]\n${lyricsStructure.ref}\n\n[ZWROTKA 2]\n${lyricsStructure.v2}`;
+
+        // Aktualizacja interfejsu aplikacji
+        document.getElementById('ui-song-title').innerText = randomTitle.toUpperCase();
+        document.getElementById('ui-song-lyrics').innerText = fullText;
+
+        // Efekt wizualny rozbłysku sfery 3D
+        const hexColor = audioSphere.material.color.getHex();
+        triggerVisualExplosion(hexColor);
+    };
+
+    window.copyLyricsToClipboard = function() {
+        const text = document.getElementById('ui-song-lyrics').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Tekst utworu został skopiowany do schowka!");
+        });
+    };
+
+    window.onload = () => {
+        init3DStudio();
+    };
 </script>
 </body>
 </html>
