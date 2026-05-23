@@ -2,195 +2,362 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>KAPECKI OS v1.0 - OVERDRIVE EDITION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortress of Gears - RGB Edition</title>
     <style>
-        :root {
-            --red: #ff0000;
-            --bg: #050505;
-            --glass: rgba(20, 0, 0, 0.8);
-            --border: rgba(255, 0, 0, 0.3);
+        /* Animacja tęczy RGB */
+        @keyframes rgb-border {
+            0% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+            33% { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
+            66% { border-color: #0000ff; box-shadow: 0 0 15px #0000ff; }
+            100% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+        }
+        @keyframes rgb-text {
+            0% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+            33% { color: #00ff00; text-shadow: 0 0 5px #00ff00; }
+            66% { color: #0000ff; text-shadow: 0 0 5px #0000ff; }
+            100% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
         }
 
-        body, html {
-            margin: 0; padding: 0; height: 100%; width: 100%;
-            background: var(--bg); color: white;
-            font-family: 'Consolas', 'Courier New', monospace;
-            overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #1a0000 0%, #050505 100%);
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
         }
 
-        /* PULPIT */
-        #desktop {
-            width: 100%; height: calc(100% - 50px);
-            position: relative; padding: 20px; box-sizing: border-box;
-            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        h1 {
+            animation: rgb-text 6s infinite linear;
+            margin-bottom: 5px;
         }
 
-        .icon {
-            width: 80px; text-align: center; cursor: pointer;
-            margin-bottom: 30px; transition: 0.3s;
-        }
-        .icon img, .icon-box {
-            width: 60px; height: 60px; background: var(--red);
-            margin: 0 auto 5px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px; border: 2px solid white;
-            box-shadow: 0 0 15px rgba(255,0,0,0.5);
-        }
-        .icon:hover { transform: scale(1.1); filter: drop-shadow(0 0 10px red); }
-
-        /* SYSTEM OKIEN */
-        .window {
-            position: absolute; width: 400px; height: 300px;
-            background: var(--glass); backdrop-filter: blur(10px);
-            border: 1px solid var(--border); border-radius: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            display: none; flex-direction: column;
-            resize: both; overflow: auto;
-            animation: bootUp 0.3s ease-out;
-        }
-        @keyframes bootUp { from { opacity: 0; transform: scale(0.8); } }
-
-        .win-header {
-            padding: 10px; background: rgba(255,0,0,0.2);
-            border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: move;
-        }
-        .close-btn { color: red; cursor: pointer; font-weight: bold; }
-
-        .win-content { padding: 15px; flex-grow: 1; overflow-y: auto; }
-
-        /* PASEK ZADAŃ */
-        #taskbar {
-            width: 100%; height: 50px; background: rgba(0,0,0,0.9);
-            border-top: 2px solid var(--red);
-            display: flex; align-items: center; padding: 0 20px; box-sizing: border-box;
-            position: fixed; bottom: 0; z-index: 9999;
-        }
-        .start-btn {
-            background: var(--red); color: white; border: none;
-            padding: 5px 15px; border-radius: 5px; font-weight: bold;
-            cursor: pointer; margin-right: 20px; box-shadow: 0 0 10px red;
+        /* Panel Statystyk i Sklepu */
+        #top-bar {
+            display: flex;
+            gap: 20px;
+            background: #222;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid #333;
+            animation: rgb-border 8s infinite linear;
+            margin-bottom: 20px;
+            align-items: center;
         }
 
-        /* SPECJALNE ELEMENTY */
-        .terminal-text { color: #00ff00; font-size: 13px; }
-        .input-line { background: transparent; border: none; color: white; width: 100%; outline: none; border-bottom: 1px solid #333; }
+        .stat { font-size: 18px; font-weight: bold; }
         
-        #clock { margin-left: auto; color: var(--red); font-weight: bold; }
-
-        /* TRYB OVERDRIVE */
-        .overdrive-active {
-            animation: shake 0.1s infinite;
-            filter: hue-rotate(360deg);
-            transition: filter 5s linear;
+        .btn-buy {
+            background: #333;
+            color: white;
+            border: 2px solid #555;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
         }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } }
+        .btn-buy:hover { background: #444; border-color: #00ff00; }
+
+        /* Główny Kontener */
+        #game-container {
+            display: flex;
+            background-color: #151515;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #222;
+            gap: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        /* Droga potworów */
+        #path {
+            width: 100px;
+            height: 400px;
+            background-color: #222;
+            border: 1px solid #333;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gate {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 12px;
+            font-weight: bold;
+            background: #333;
+        }
+        .spawn { top: 0; color: #ff4d4d; }
+        .base { bottom: 0; color: #1e90ff; }
+
+        /* Siatka kół */
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-template-rows: repeat(3, 110px);
+            gap: 15px;
+        }
+        .slot {
+            background-color: #1c1c1c;
+            border: 2px dashed #333;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        /* Koła Zębate RGB */
+        .gear {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 28px;
+            cursor: grab;
+            user-select: none;
+            border: 4px dashed;
+            animation: spin 3s linear infinite, rgb-border 5s infinite linear;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Jednostki */
+        .mob, .defender {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            position: absolute;
+            left: 37px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .mob { background: #9400d3; top: 30px; }
+        .defender { background: #00eded; bottom: 30px; animation: rgb-border 3s infinite linear; }
+
+        /* PANEL Z LINKAMI */
+        #links-panel {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+        }
+        .custom-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: #222;
+            border-radius: 5px;
+            border: 1px solid #444;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .custom-link:hover {
+            animation: rgb-border 2s infinite linear;
+            transform: scale(1.05);
+        }
     </style>
 </head>
-<body id="main-body">
+<body>
 
-    <div id="desktop">
-        <div class="icon" onclick="openWindow('win-chat')">
-            <div class="icon-box">💬</div>
-            <span>K-CHAT</span>
-        </div>
-        <div class="icon" onclick="openWindow('win-clicker')">
-            <div class="icon-box">🖱️</div>
-            <span>CLICKER</span>
-        </div>
-        <div class="icon" onclick="openWindow('win-term')">
-            <div class="icon-box">⌨️</div>
-            <span>TERMINAL</span>
-        </div>
+    <h1>FORTRESS OF GEARS - CHROMA RGB</h1>
+
+    <div id="top-bar">
+        <div class="stat">Złoto: <span id="gold">50</span> 💰</div>
+        <div class="stat">Życie: <span id="hp">10</span> ❤️</div>
+        <button class="btn-buy" id="btn-buy-gear">Kup Koło Lvl 1 (Koszt: 20💰)</button>
     </div>
 
-    <div id="win-chat" class="window" style="top: 50px; left: 150px;">
-        <div class="win-header"><span>KAPECKI-AI.exe</span><span class="close-btn" onclick="closeWindow('win-chat')">X</span></div>
-        <div class="win-content">
-            <div id="chat-output" class="terminal-text">> System Ready...</div>
-            <input type="text" id="chat-input" class="input-line" placeholder="Zapytaj AI...">
+    <div id="game-container">
+        <div id="path">
+            <div class="gate spawn">PORTAL</div>
+            <div class="gate base">BAZA</div>
         </div>
+        <div id="grid"></div>
     </div>
 
-    <div id="win-clicker" class="window" style="top: 100px; left: 200px;">
-        <div class="win-header"><span>CLICKER_V2.sys</span><span class="close-btn" onclick="closeWindow('win-clicker')">X</span></div>
-        <div class="win-content" style="text-align: center;">
-            <h2 id="pts">0</h2>
-            <button onclick="addPoint()" style="background:red; color:white; padding: 20px; border:none; border-radius: 10px; cursor:pointer;">KLIKAJ!</button>
-        </div>
+    <div id="links-panel">
+        <a href="https://github.com" target="_blank" class="custom-link">Mój GitHub 🚀</a>
+        <a href="https://codepen.io" target="_blank" class="custom-link">Moje Projekty 💻</a>
     </div>
 
-    <div id="win-term" class="window" style="top: 200px; left: 300px; width: 500px; background: black;">
-        <div class="win-header"><span>ROOT_TERMINAL</span><span class="close-btn" onclick="closeWindow('win-term')">X</span></div>
-        <div class="win-content">
-            <div class="terminal-text">KAPECKI OS [Version 1.0.442]</div>
-            <div class="terminal-text">Wpisz 'overdrive', aby podkręcić system.</div>
-            <div id="term-out" class="terminal-text"></div>
-            <input type="text" id="term-input" class="input-line" style="color: lime;" placeholder="command_">
-        </div>
-    </div>
+<script>
+    let gold = 50;
+    let hp = 10;
+    let draggedGear = null;
+    let mobs = [];
+    let defenders = [];
 
-    <div id="taskbar">
-        <button class="start-btn" onclick="alert('KAPECKI OS v1.0\nStatus: Ultra RGB\nCPU: 99% Red Power')">K-START</button>
-        <div id="clock">00:00:00</div>
-    </div>
+    const grid = document.getElementById('grid');
+    const path = document.getElementById('path');
+    const goldDisplay = document.getElementById('gold');
+    const hpDisplay = document.getElementById('hp');
 
-    <script>
-        // SYSTEMOWE FUNKCJE
-        function openWindow(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeWindow(id) { document.getElementById(id).style.display = 'none'; }
+    // Generowanie siatki 3x3
+    for (let i = 0; i < 9; i++) {
+        const slot = document.createElement('div');
+        slot.classList.add('slot');
+        slot.addEventListener('dragover', (e) => e.preventDefault());
+        slot.addEventListener('drop', handleDrop);
+        grid.appendChild(slot);
+    }
 
-        // ZEGAR
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
-
-        // CLICKER LOGIC
-        let p = 0;
-        function addPoint() { p++; document.getElementById('pts').innerText = p; }
-
-        // TERMINAL LOGIC
-        const termInput = document.getElementById('term-input');
-        termInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const cmd = termInput.value.toLowerCase();
-                const out = document.getElementById('term-out');
-                
-                if (cmd === 'overdrive') {
-                    document.getElementById('main-body').classList.toggle('overdrive-active');
-                    out.innerHTML += "<br>> TRYB OVERDRIVE AKTYWOWANY!";
-                } else if (cmd === 'clear') {
-                    out.innerHTML = "";
-                } else {
-                    out.innerHTML += `<br>> Nieznana komenda: ${cmd}`;
-                }
-                termInput.value = "";
+    // Zakupywanie kół zębatych
+    document.getElementById('btn-buy-gear').addEventListener('click', () => {
+        if (gold >= 20) {
+            const emptySlot = Array.from(document.querySelectorAll('.slot')).find(slot => !slot.hasChildNodes());
+            if (emptySlot) {
+                gold -= 20;
+                goldDisplay.innerText = gold;
+                createGear(emptySlot, 1);
+            } else {
+                alert("Brak wolnego miejsca na siatce!");
             }
-        });
+        } else {
+            alert("Za mało złota!");
+        }
+    });
 
-        // DRAGGING LOGIC (Uproszczony)
-        document.querySelectorAll('.win-header').forEach(header => {
-            header.onmousedown = function(e) {
-                let win = header.parentElement;
-                let shiftX = e.clientX - win.getBoundingClientRect().left;
-                let shiftY = e.clientY - win.getBoundingClientRect().top;
-                
-                function moveAt(pageX, pageY) {
-                    win.style.left = pageX - shiftX + 'px';
-                    win.style.top = pageY - shiftY + 'px';
+    function createGear(slot, level) {
+        if (level > 4) level = 4;
+        const gear = document.createElement('div');
+        gear.classList.add('gear');
+        gear.draggable = true;
+        gear.innerText = level;
+        gear.dataset.level = level;
+
+        // Im wyższy lvl, tym szybciej się kręci i częściej strzela
+        gear.style.animationDuration = `${4 / level}s, 4s`;
+
+        const spawnRate = 4000 / level;
+        const interval = setInterval(() => {
+            if (document.body.contains(gear)) {
+                spawnDefender(level);
+            } else {
+                clearInterval(interval);
+            }
+        }, spawnRate);
+
+        gear.addEventListener('dragstart', () => draggedGear = gear);
+        gear.addEventListener('dragend', () => draggedGear = null);
+        slot.appendChild(gear);
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const targetSlot = this;
+        const targetGear = targetSlot.querySelector('.gear');
+        if (!draggedGear) return;
+
+        const sourceSlot = draggedGear.parentElement;
+
+        if (!targetGear) {
+            targetSlot.appendChild(draggedGear);
+        } else if (targetGear !== draggedGear) {
+            const lvl1 = parseInt(draggedGear.dataset.level);
+            const lvl2 = parseInt(targetGear.dataset.level);
+
+            if (lvl1 === lvl2 && lvl1 < 4) {
+                sourceSlot.innerHTML = '';
+                targetSlot.innerHTML = '';
+                createGear(targetSlot, lvl1 + 1);
+                gold += 10; // Bonus za merge
+                goldDisplay.innerText = gold;
+            }
+        }
+    }
+
+    function spawnMob() {
+        const mob = document.createElement('div');
+        mob.classList.add('mob');
+        mob.innerText = "👹";
+        mob.style.top = "30px";
+        mob.dataset.hp = 3;
+        path.appendChild(mob);
+        mobs.push(mob);
+    }
+    setInterval(spawnMob, 3500);
+
+    function spawnDefender(level) {
+        const def = document.createElement('div');
+        def.classList.add('defender');
+        def.innerText = level === 1 ? "⚔️" : level === 2 ? "💥" : "⚡";
+        def.style.bottom = "30px";
+        def.dataset.power = level;
+        path.appendChild(def);
+        defenders.push(def);
+    }
+
+    // Pętla gry
+    function update() {
+        // Ruch potworów w dół
+        for (let i = mobs.length - 1; i >= 0; i--) {
+            let mob = mobs[i];
+            let top = mob.offsetTop;
+            mob.style.top = (top + 1) + "px";
+
+            if (top >= 360) {
+                hp--;
+                hpDisplay.innerText = hp;
+                mob.remove();
+                mobs.splice(i, 1);
+                if (hp <= 0) {
+                    alert("Koniec gry! Twoja baza została zniszczona.");
+                    window.location.reload();
                 }
+            }
+        }
 
-                function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
-                document.addEventListener('mousemove', onMouseMove);
-                header.onmouseup = function() {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    header.onmouseup = null;
-                };
-            };
-            header.ondragstart = function() { return false; };
-        });
-    </script>
+        // Ruch obrońców w górę
+        for (let i = defenders.length - 1; i >= 0; i--) {
+            let def = defenders[i];
+            let top = def.offsetTop;
+            def.style.top = (top - 2) + "px";
+
+            if (top <= 20) {
+                def.remove();
+                defenders.splice(i, 1);
+            }
+        }
+
+        // Walka
+        for (let i = mobs.length - 1; i >= 0; i--) {
+            let mob = mobs[i];
+            for (let j = defenders.length - 1; j >= 0; j--) {
+                let def = defenders[j];
+                if (Math.abs(mob.offsetTop - def.offsetTop) < 20) {
+                    let mHp = parseInt(mob.dataset.hp) - parseInt(def.dataset.power);
+                    def.remove();
+                    defenders.splice(j, 1);
+
+                    if (mHp <= 0) {
+                        gold += 15;
+                        goldDisplay.innerText = gold;
+                        mob.remove();
+                        mobs.splice(i, 1);
+                        break;
+                    } else {
+                        mob.dataset.hp = mHp;
+                    }
+                }
+            }
+        }
+        requestAnimationFrame(update);
+    }
+    update();
+</script>
 </body>
 </html>
